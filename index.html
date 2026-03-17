@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>쓰레기집청소 비용 무료 견적계산기 | 특수청소에버그린</title>
+<meta name="description" content="쓰레기집 청소 비용이 궁금하신가요? 평수·오염도·폐기물량을 입력하면 즉시 견적이 산출됩니다. 무료 견적서 PDF · 전국 출동 · 현금 분할납부.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --g1:#1a3a2a; --g2:#2d6a4f; --g3:#40916c; --g4:#74c69d; --gp:#d8f3dc;
+  --gold:#c9a84c; --gol:#f0d080;
+  --cr:#faf8f3; --ch:#1c1c1c; --gm:#6b7280; --gl:#f3f4f6;
+  --wh:#ffffff; --rd:#dc2626; --or:#b45309;
+  --sh:0 4px 24px rgba(26,58,42,.12);
+  --shl:0 12px 48px rgba(26,58,42,.18);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--cr);color:var(--ch);min-height:100vh;overflow-x:hidden}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,var(--g1) 0%,var(--g2) 55%,var(--g3) 100%);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:rgba(116,198,157,.1)}
+.hero::after{content:'';position:absolute;bottom:-50px;left:-30px;width:180px;height:180px;border-radius:50%;background:rgba(201,168,76,.08)}
+.hero-in{position:relative;z-index:2;max-width:720px;margin:0 auto;padding:36px 18px 30px;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:24px;padding:5px 15px;margin-bottom:18px;backdrop-filter:blur(8px)}
+.badge span{font-size:11px;font-weight:500;color:var(--gp);letter-spacing:.05em}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+.hero h1{font-family:'Noto Serif KR',serif;font-size:clamp(20px,5vw,32px);font-weight:900;color:#fff;line-height:1.35;margin-bottom:10px;letter-spacing:-.02em}
+.hero h1 em{color:var(--gol);font-style:normal}
+.hero p{font-size:13px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:6px}
+/* 앵커 미끼가 배너 */
+.anchor-badge{display:inline-block;background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:20px;padding:7px 20px;margin:10px 0 18px}
+.anchor-badge span{color:#fff;font-size:14px;font-weight:700;letter-spacing:.03em}
+.trust-bar{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
+.ti{display:flex;flex-direction:column;align-items:center;gap:2px}
+.tn{font-family:'Noto Serif KR',serif;font-size:18px;font-weight:700;color:var(--gol)}
+.tl{font-size:10px;color:rgba(255,255,255,.65)}
+.td{width:1px;background:rgba(255,255,255,.2);height:32px;align-self:center}
+
+/* ── PROGRESS ── */
+.prog-wrap{background:#fff;border-bottom:1px solid #e5e7eb;padding:12px 18px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.prog-in{max-width:720px;margin:0 auto}
+.slbls{display:flex;justify-content:space-between;margin-bottom:7px}
+.sl{font-size:11px;color:var(--gm);font-weight:500;transition:color .3s}
+.sl.active{color:var(--g2);font-weight:700}
+.sl.done{color:var(--g3)}
+.ptrack{height:4px;background:#e5e7eb;border-radius:4px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,var(--g2),var(--g3));border-radius:4px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+/* ── MAIN ── */
+.main{max-width:720px;margin:0 auto;padding:24px 14px 80px}
+.card{background:#fff;border-radius:20px;box-shadow:var(--shl);overflow:hidden}
+.ch{background:linear-gradient(135deg,var(--g1),var(--g2));padding:16px 22px;display:flex;align-items:center;gap:11px}
+.ci{width:38px;height:38px;background:rgba(255,255,255,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.ch h2{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;color:#fff}
+.ch p{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px}
+.cb{padding:22px 20px}
+
+/* ── STEPS ── */
+.step{display:none;animation:fadeIn .35s ease}
+.step.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── FORM ── */
+.fg{margin-bottom:16px}
+.lbl{display:block;font-size:13px;font-weight:700;color:var(--g1);margin-bottom:7px;letter-spacing:.02em}
+.lbl .req{color:#dc2626;margin-left:3px}
+.lbl .hint{font-weight:400;font-size:11px;color:var(--gm);margin-left:6px}
+.inp{width:100%;padding:11px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:15px;font-family:'Noto Sans KR',sans-serif;transition:border-color .2s,box-shadow .2s;background:#fff;color:var(--ch)}
+.inp:focus{outline:none;border-color:var(--g3);box-shadow:0 0 0 3px rgba(64,145,108,.12)}
+.inp::placeholder{color:#adb5bd}
+
+/* ── PYEONG STEPPER ── */
+.py-wrap{display:flex;align-items:center;gap:10px}
+.py-btn{width:44px;height:44px;border:2px solid #e5e7eb;border-radius:10px;background:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;color:var(--g2);user-select:none}
+.py-btn:hover{border-color:var(--g3);background:var(--gp)}
+.py-inp{flex:1;text-align:center;font-size:26px;font-weight:700;font-family:'Noto Serif KR',serif;color:var(--g1);border:2px solid #e5e7eb;border-radius:10px;padding:8px 0}
+.py-inp:focus{outline:none;border-color:var(--g3)}
+.py-unit{font-size:14px;color:var(--gm);font-weight:500}
+
+/* ── RADIO CARDS ── */
+.rg{display:grid;gap:8px}
+.rg.c2{grid-template-columns:1fr 1fr}
+.rg.c3{grid-template-columns:1fr 1fr 1fr}
+.rg.c4{grid-template-columns:1fr 1fr 1fr 1fr}
+.rc{position:relative;cursor:pointer}
+.rc input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+.rb{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 7px;border:2px solid #e5e7eb;border-radius:11px;text-align:center;transition:all .2s;background:#fff;height:100%;justify-content:center;min-height:76px}
+.rc input:checked+.rb{border-color:var(--g2);background:var(--gp);box-shadow:0 0 0 3px rgba(64,145,108,.1)}
+.rb .em{font-size:19px}
+.rb .nm{font-size:12px;font-weight:700;color:var(--ch);line-height:1.3}
+.rb .sm{font-size:10px;color:var(--gm);line-height:1.3}
+.rc input:checked+.rb .nm{color:var(--g1)}
+/* 오염단계 배지 */
+.lvbadge{position:absolute;top:5px;left:5px;width:19px;height:19px;border-radius:50%;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+.lv1{background:#22c55e}.lv2{background:#f59e0b}.lv3{background:#ef4444}.lv4{background:#1f2937}
+
+/* ── CHECKBOX ITEMS ── */
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ci-item{display:flex;align-items:center;gap:8px;padding:10px 13px;border:2px solid #e5e7eb;border-radius:10px;cursor:pointer;transition:all .2s}
+.ci-item:has(input:checked){border-color:var(--g2);background:var(--gp)}
+.ci-item input[type=checkbox]{width:15px;height:15px;accent-color:var(--g2);cursor:pointer;flex-shrink:0}
+.ci-item span{font-size:13px;font-weight:600}
+
+/* ── 폐기물 슬라이더 ── */
+.ton-wrap{background:var(--gl);border-radius:12px;padding:16px}
+.ton-sel{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.ton-btn{padding:9px 5px;border:2px solid #e5e7eb;border-radius:8px;background:#fff;font-size:12px;font-weight:600;color:var(--ch);cursor:pointer;text-align:center;transition:all .2s}
+.ton-btn.active{border-color:var(--g2);background:var(--gp);color:var(--g1)}
+.ton-btn.alert-btn{border-color:#fee2e2;background:#fff5f5;color:var(--rd)}
+.ton-result{background:#fff;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.ton-result .trl{font-size:12px;color:var(--gm)}
+.ton-result .trv{font-size:14px;font-weight:700;color:var(--g1)}
+
+/* ── CONSENT ── */
+.consent-box{background:var(--gl);border-radius:9px;padding:12px 14px;font-size:12px;color:var(--gm);line-height:1.7;margin-bottom:11px}
+.consent-chk{display:flex;align-items:center;gap:9px;cursor:pointer}
+.consent-chk input{width:17px;height:17px;accent-color:var(--g2);cursor:pointer}
+.consent-chk span{font-size:13px;font-weight:600;color:var(--ch)}
+
+/* ── BUTTONS ── */
+.br{display:flex;gap:9px;margin-top:22px}
+.btn{flex:1;padding:13px 16px;border-radius:11px;font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.btn-p{background:linear-gradient(135deg,var(--g2),var(--g3));color:#fff;box-shadow:0 4px 14px rgba(45,106,79,.35)}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(45,106,79,.45)}
+.btn-s{background:var(--gl);color:var(--gm)}
+.btn-s:hover{background:#e5e7eb}
+.btn-kakao{background:#FEE500;color:#3A1D1D;box-shadow:0 4px 14px rgba(254,229,0,.4)}
+.btn-kakao:hover{transform:translateY(-2px)}
+.btn-naver{background:#03C75A;color:#fff;box-shadow:0 4px 14px rgba(3,199,90,.35)}
+.btn-naver:hover{transform:translateY(-2px)}
+.btn-tel{background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;box-shadow:0 4px 14px rgba(29,78,216,.3)}
+.btn-tel:hover{transform:translateY(-2px)}
+.btn-pdf{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;box-shadow:0 4px 14px rgba(26,58,42,.3)}
+.btn-pdf:hover{transform:translateY(-2px)}
+
+/* ── LOADING ── */
+.loading{display:none;position:fixed;inset:0;background:rgba(26,58,42,.9);z-index:1000;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(4px)}
+.loading.on{display:flex}
+.spin{width:52px;height:52px;border:4px solid rgba(255,255,255,.2);border-top-color:var(--gol);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lt{color:#fff;font-size:15px;font-weight:600;text-align:center}
+.ls{color:rgba(255,255,255,.65);font-size:12px;text-align:center;line-height:1.6}
+
+/* ── RESULT ── */
+.rh{text-align:center;padding:22px 0 16px;border-bottom:1px solid #e5e7eb;margin-bottom:20px}
+.rstamp{display:inline-block;background:var(--gp);border:2px solid var(--g3);border-radius:50%;width:56px;height:56px;line-height:52px;font-size:26px;margin-bottom:11px}
+.rtitle{font-family:'Noto Serif KR',serif;font-size:18px;font-weight:900;color:var(--g1);margin-bottom:4px}
+.rsub{font-size:12px;color:var(--gm)}
+
+/* ── 견적 박스 (앵커가 강조) ── */
+.anchor-box{background:linear-gradient(135deg,var(--g1),var(--g2));border-radius:15px;padding:20px;margin-bottom:12px;text-align:center;position:relative;overflow:hidden}
+.anchor-box::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.05)}
+.ab-label{font-size:11px;color:rgba(255,255,255,.7);margin-bottom:6px}
+.ab-price{font-family:'Noto Serif KR',serif;font-size:clamp(28px,7vw,42px);font-weight:900;color:var(--gol);letter-spacing:-.02em}
+.ab-sub{font-size:11px;color:rgba(255,255,255,.6);margin-top:5px}
+.ab-note{font-size:12px;color:rgba(255,255,255,.75);margin-top:8px;line-height:1.5}
+
+/* ── 무료제공 절감 배너 (손실회피 전략) ── */
+.free-banner{background:linear-gradient(135deg,#14532d,#166534);border-radius:12px;padding:13px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;border:1px solid rgba(134,239,172,.3)}
+.fb-icon{font-size:22px;flex-shrink:0}
+.fb-txt .fbt{color:#86efac;font-size:13px;font-weight:700;margin-bottom:2px}
+.fb-txt .fbs{color:rgba(255,255,255,.75);font-size:11px}
+
+/* ── 현금분할납부 배너 ── */
+.install-banner{background:linear-gradient(135deg,#7c2d12,#b45309);border-radius:12px;padding:13px 18px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.ib-icon{font-size:22px;flex-shrink:0}
+.ib-t{color:#fff;font-size:15px;font-weight:700}
+.ib-s{color:rgba(255,255,255,.8);font-size:11px;margin-top:2px}
+
+/* ── 비용 내역 (심리적 회계: 분리 표시) ── */
+.breakdown{background:var(--gl);border-radius:12px;padding:16px;margin-bottom:14px}
+.bk-title{font-size:13px;font-weight:700;color:var(--g1);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.bk-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #e5e7eb;font-size:13px}
+.bk-row:last-child{border-bottom:none}
+.bk-lbl{color:var(--gm);display:flex;align-items:center;gap:5px}
+.bk-val{font-weight:700;color:var(--g1)}
+.bk-val.waste{color:#b45309}
+.bk-val.svc{color:var(--g2)}
+.bk-row.total{background:var(--gp);border-radius:8px;padding:10px 12px;margin-top:8px;border:none}
+.bk-row.total .bk-lbl{color:var(--g1);font-weight:700;font-size:14px}
+.bk-row.total .bk-val{color:var(--g1);font-size:14px}
+.bk-vat{font-size:11px;color:var(--gm);text-align:right;margin-top:5px}
+.free-tag{background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+
+/* ── 현장방문 CTA ── */
+.site-visit{background:linear-gradient(135deg,var(--g1),var(--g2));border-radius:13px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.sv-txt{flex:1}
+.sv-t{color:var(--gol);font-size:14px;font-weight:700;margin-bottom:3px}
+.sv-s{color:rgba(255,255,255,.8);font-size:11px;line-height:1.6}
+.sv-btn{background:var(--gol);color:var(--g1);border:none;border-radius:9px;padding:9px 13px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:none;flex-shrink:0}
+
+/* ── 신뢰 섹션 ── */
+.trust-sec{border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin-bottom:14px}
+.ts-h{font-size:13px;font-weight:700;color:var(--g1);margin-bottom:12px;display:flex;align-items:center;gap:5px}
+.ts-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.ts-stat{background:var(--gp);border-radius:9px;padding:10px 7px;text-align:center}
+.ts-n{font-family:'Noto Serif KR',serif;font-size:16px;font-weight:700;color:var(--g1)}
+.ts-l{font-size:9px;color:var(--g2);margin-top:2px;font-weight:600}
+.rev-grid{display:grid;gap:9px}
+.rev{background:var(--gl);border-radius:10px;padding:12px 14px}
+.rev-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
+.rev-nm{font-size:12px;font-weight:700;color:var(--ch)}
+.rev-dt{font-size:10px;color:var(--gm)}
+.rev-stars{color:#f59e0b;font-size:12px;margin-bottom:3px}
+.rev-txt{font-size:12px;color:#4b5563;line-height:1.6}
+
+/* 액션 버튼 */
+.act-btns{display:grid;gap:9px;margin-top:20px}
+.act-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
+/* 구분선 */
+.divider{display:flex;align-items:center;gap:10px;margin:20px 0 14px}
+.divider span{font-size:11px;font-weight:700;color:var(--g2);white-space:nowrap}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:#e5e7eb}
+
+/* 공지 */
+.notice{background:#fffbeb;border:1px solid #fcd34d;border-radius:9px;padding:10px 14px;font-size:12px;color:#92400e;line-height:1.6;margin-bottom:14px}
+
+/* PDF 캡처용 (숨김) */
+#pdfPreview{position:fixed;left:-9999px;top:0;width:794px;background:#fff;z-index:-1}
+
+/* FOOTER */
+footer{text-align:center;padding:26px 16px;font-size:12px;color:#9ca3af;line-height:1.8}
+footer strong{color:var(--g2)}
+footer a{color:var(--g3);text-decoration:none}
+
+/* ── MOBILE ── */
+@media(max-width:480px){
+  .cb{padding:16px 13px}
+  .rg.c4{grid-template-columns:1fr 1fr}
+  .rg.c3{grid-template-columns:1fr 1fr}
+  .cg{grid-template-columns:1fr 1fr}
+  .ton-sel{grid-template-columns:repeat(4,1fr)}
+  .act-row{grid-template-columns:1fr}
+  .ts-stats{grid-template-columns:repeat(3,1fr)}
+  .ab-price{font-size:28px}
+  .btn{font-size:13px;padding:12px 12px}
+  .hero-in{padding:28px 15px 24px}
+  .trust-bar{gap:10px}
+  .td{display:none}
+  .tn{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading" id="loading">
+  <div class="spin"></div>
+  <div class="lt">견적을 계산하고 있습니다...</div>
+  <div class="ls">입력하신 정보를 분석 중이에요<br>잠시만 기다려 주세요</div>
+</div>
+
+<!-- PDF 캡처용 (숨김) -->
+<div id="pdfPreview"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-in">
+    <div class="badge"><div class="dot"></div><span>특수청소에버그린 · 전국 직영 지점 · 365일 24시간</span></div>
+    <h1>쓰레기집 청소 비용<br><em>지금 바로 계산해보세요</em></h1>
+    <p>평수·오염도·폐기물량 입력 → 즉시 견적 산출</p>
+    <div class="anchor-badge"><span>📦 원룸 기본 청소 10만원부터 · 전국 어디든 출동</span></div>
+    <div class="trust-bar">
+      <div class="ti"><div class="tn">7년</div><div class="tl">전문 경력</div></div>
+      <div class="td"></div>
+      <div class="ti"><div class="tn">1,500+</div><div class="tl">누적 작업건수</div></div>
+      <div class="td"></div>
+      <div class="ti"><div class="tn">24시간</div><div class="tl">365일 연중무휴</div></div>
+      <div class="td"></div>
+      <div class="ti"><div class="tn">20회+</div><div class="tl">MBC·KBS·SBS</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="prog-wrap">
+  <div class="prog-in">
+    <div class="slbls">
+      <span class="sl active" id="sl1">① 기본정보</span>
+      <span class="sl" id="sl2">② 현장정보</span>
+      <span class="sl" id="sl3">③ 폐기물·서비스</span>
+      <span class="sl" id="sl4">④ 견적확인</span>
+    </div>
+    <div class="ptrack"><div class="pfill" id="pfill" style="width:25%"></div></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+<div class="card">
+  <div class="ch" id="ch">
+    <div class="ci" id="ci">📋</div>
+    <div><h2 id="ctitle">기본 정보 입력</h2><p id="csub">연락처와 주소를 입력해주세요</p></div>
+  </div>
+  <div class="cb">
+
+  <!-- ══ STEP 1 ══ -->
+  <div class="step active" id="step1">
+    <div class="notice">📢 본 견적은 <strong>기본 작업 기준 시작가</strong>입니다. 실제 금액은 현장 확인 후 최종 확정됩니다.</div>
+    <div class="fg">
+      <label class="lbl">연락처 <span class="req">*</span></label>
+      <input type="tel" class="inp" id="phone" placeholder="010-0000-0000" maxlength="13">
+    </div>
+    <div class="fg">
+      <label class="lbl">주소 <span class="req">*</span><span class="hint">도로명 주소</span></label>
+      <input type="text" class="inp" id="addr" placeholder="예) 서울시 노원구 상계동 123-4">
+    </div>
+    <div class="fg">
+      <label class="lbl">작업 희망일<span class="hint">미정이어도 됩니다</span></label>
+      <input type="date" class="inp" id="wdate">
+    </div>
+    <div class="fg">
+      <label class="lbl">고객 성함<span class="hint">선택</span></label>
+      <input type="text" class="inp" id="cname" placeholder="홍길동 (선택)">
+    </div>
+    <div class="fg">
+      <div class="consent-box">수집항목: 연락처·주소 · 목적: 견적 산출 및 상담 연결 · 보유: 상담 완료 후 즉시 파기</div>
+      <label class="consent-chk"><input type="checkbox" id="consent"><span>개인정보 수집·이용에 동의합니다.</span></label>
+    </div>
+    <div class="br"><button class="btn btn-p" onclick="go(2)">다음 단계 →</button></div>
+  </div>
+
+  <!-- ══ STEP 2 ══ -->
+  <div class="step" id="step2">
+    <div class="fg">
+      <label class="lbl">평수 <span class="req">*</span></label>
+      <div class="py-wrap">
+        <button class="py-btn" type="button" onclick="chPy(-3)">−</button>
+        <input type="number" class="py-inp" id="pyeong" value="10" min="3" max="200" oninput="clampPy()">
+        <span class="py-unit">평</span>
+        <button class="py-btn" type="button" onclick="chPy(3)">+</button>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="lbl">오염 단계 <span class="req">*</span><span class="hint">단계가 높을수록 비용 증가</span></label>
+      <div class="rg c2" style="gap:10px">
+        <label class="rc">
+          <input type="radio" name="cont" value="1" checked>
+          <div class="rb" style="padding-top:16px">
+            <span class="lvbadge lv1">1</span>
+            <span class="em">🟢</span><span class="nm">1단계 · 일반</span>
+            <span class="sm">생활쓰레기만<br>냄새 거의 없음</span>
+          </div>
+        </label>
+        <label class="rc">
+          <input type="radio" name="cont" value="2">
+          <div class="rb" style="padding-top:16px">
+            <span class="lvbadge lv2">2</span>
+            <span class="em">🟡</span><span class="nm">2단계 · 중간</span>
+            <span class="sm">부패음식물 포함<br>약한 악취</span>
+          </div>
+        </label>
+        <label class="rc">
+          <input type="radio" name="cont" value="3">
+          <div class="rb" style="padding-top:16px">
+            <span class="lvbadge lv3">3</span>
+            <span class="em">🔴</span><span class="nm">3단계 · 심각</span>
+            <span class="sm">벌레·배설물<br>심한 악취</span>
+          </div>
+        </label>
+        <label class="rc">
+          <input type="radio" name="cont" value="4">
+          <div class="rb" style="padding-top:16px">
+            <span class="lvbadge lv4">4</span>
+            <span class="em">⚫</span><span class="nm">4단계 · 특수</span>
+            <span class="sm">장기방치<br>심각한 특수오염</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="lbl">쓰레기 양 <span class="req">*</span></label>
+      <div class="rg c3">
+        <label class="rc"><input type="radio" name="trash" value="0.8"><div class="rb"><span class="em">🗂️</span><span class="nm">적음</span><span class="sm">바닥 보임</span></div></label>
+        <label class="rc"><input type="radio" name="trash" value="1.0" checked><div class="rb"><span class="em">📦</span><span class="nm">보통</span><span class="sm">걷기 불편</span></div></label>
+        <label class="rc"><input type="radio" name="trash" value="1.35"><div class="rb"><span class="em">🗑️</span><span class="nm">심함</span><span class="sm">진입 어려움</span></div></label>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="lbl">엘리베이터 <span class="req">*</span></label>
+      <div class="rg c3" id="elvGrp">
+        <label class="rc"><input type="radio" name="elev" value="1.0" checked><div class="rb"><span class="em">🏠</span><span class="nm">1층</span><span class="sm">추가 없음</span></div></label>
+        <label class="rc"><input type="radio" name="elev" value="1.1"><div class="rb"><span class="em">🛗</span><span class="nm">2층이상</span><span class="sm">엘베 있음</span></div></label>
+        <label class="rc"><input type="radio" name="elev" value="1.25"><div class="rb"><span class="em">🪜</span><span class="nm">2층이상</span><span class="sm">엘베 없음</span></div></label>
+      </div>
+    </div>
+
+    <!-- 전국 서비스 안내 배너 -->
+    <div style="background:linear-gradient(135deg,#1a3a2a,#2d6a4f);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:4px">
+      <div style="font-size:26px;flex-shrink:0">🗺️</div>
+      <div>
+        <div style="color:#f0d080;font-size:13px;font-weight:700;margin-bottom:3px">전국 출동 · 지역별 직영 지점 보유</div>
+        <div style="color:rgba(255,255,255,.8);font-size:11px;line-height:1.6">
+          서울·경기·인천·충청·경상·전라·강원·제주 전 지역 출동 가능<br>
+          <strong style="color:#74c69d">365일 24시간 · 공휴일·새벽·야간 언제든 작업 가능</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="br">
+      <button class="btn btn-s" onclick="go(1)">← 이전</button>
+      <button class="btn btn-p" onclick="go(3)">다음 단계 →</button>
+    </div>
+  </div>
+
+  <!-- ══ STEP 3 ══ -->
+  <div class="step" id="step3">
+    <div class="fg">
+      <label class="lbl">예상 폐기물 양<span class="hint">1톤 = 1톤 트럭 1대 기준</span></label>
+      <div class="ton-wrap">
+        <div class="ton-sel" id="tonSel">
+          <button class="ton-btn active" onclick="setTon(this,0)" data-ton="0">없음</button>
+          <button class="ton-btn" onclick="setTon(this,0.5)" data-ton="0.5">0.5톤<br><span style="font-size:10px;color:var(--gm)">약 20만~</span></button>
+          <button class="ton-btn" onclick="setTon(this,1)" data-ton="1">1톤<br><span style="font-size:10px;color:var(--gm)">약 40만~</span></button>
+          <button class="ton-btn" onclick="setTon(this,1.5)" data-ton="1.5">1.5톤<br><span style="font-size:10px;color:var(--gm)">약 60만~</span></button>
+          <button class="ton-btn" onclick="setTon(this,2)" data-ton="2">2톤<br><span style="font-size:10px;color:var(--gm)">약 80만~</span></button>
+          <button class="ton-btn" onclick="setTon(this,2.5)" data-ton="2.5">2.5톤<br><span style="font-size:10px;color:var(--gm)">약 100만~</span></button>
+          <button class="ton-btn" onclick="setTon(this,3)" data-ton="3">3톤<br><span style="font-size:10px;color:var(--gm)">약 120만~</span></button>
+          <button class="ton-btn alert-btn" onclick="setTon(this,5)" data-ton="5">4톤+<br><span style="font-size:10px">📞현장확인</span></button>
+        </div>
+        <div class="ton-result">
+          <span class="trl">폐기물 처리 추가비</span>
+          <span class="trv" id="tonResult">포함 안 함</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"><span>추가 서비스 선택 (선택)</span></div>
+
+    <div class="fg">
+      <label class="lbl">필요한 추가 서비스<span class="hint">복수 선택 가능</span></label>
+      <div class="cg">
+        <label class="ci-item"><input type="checkbox" name="svc" value="pest" data-price="100000"><span>🪳 해충제거</span></label>
+        <label class="ci-item"><input type="checkbox" name="svc" value="odor" data-price="80000"><span>🌿 악취탈취</span></label>
+        <label class="ci-item"><input type="checkbox" name="svc" value="wash" data-price="80000"><span>👕 세탁서비스</span></label>
+        <label class="ci-item"><input type="checkbox" name="svc" value="clean" data-price="100000"><span>✨ 입주청소</span></label>
+        <label class="ci-item"><input type="checkbox" name="svc" value="ladder" data-price="150000"><span>🪜 사다리차</span></label>
+        <label class="ci-item"><input type="checkbox" name="svc" value="night" data-price="0"><span>🌙 심야비밀작업</span></label>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="lbl">특이사항<span class="hint">있으면 입력해주세요</span></label>
+      <textarea class="inp" id="memo" rows="3" placeholder="예) 반려동물 키움, 10년 이상 방치, 화장실 막힘, 보관 필요 물품 있음 등"></textarea>
+    </div>
+
+    <div class="br">
+      <button class="btn btn-s" onclick="go(2)">← 이전</button>
+      <button class="btn btn-p" onclick="calcQuote()">💰 견적 바로 계산하기</button>
+    </div>
+  </div>
+
+  <!-- ══ STEP 4 결과 ══ -->
+  <div class="step" id="step4">
+
+    <div class="rh">
+      <div class="rstamp">✅</div>
+      <div class="rtitle">견적 계산 완료!</div>
+      <div class="rsub" id="rdate"></div>
+    </div>
+
+    <!-- 앵커가 (가장 크게) -->
+    <div class="anchor-box">
+      <div class="ab-label">기본 청소 시작 금액 (VAT 별도)</div>
+      <div class="ab-price" id="anchorPrice">—</div>
+      <div class="ab-sub">※ 기본 작업 기준 최저가 · 현장 확인 후 최종 확정</div>
+      <div class="ab-note" id="workDays"></div>
+    </div>
+
+    <!-- 무료 제공 절감 (손실회피) -->
+    <div class="free-banner">
+      <div class="fb-icon">🎁</div>
+      <div class="fb-txt">
+        <div class="fbt">타사 대비 절감 혜택 · 기본 소독·탈취 무료 제공</div>
+        <div class="fbs">일반 탈취·소독 작업 (약 20만원 상당) 기본 포함 — 추가 바가지 없음</div>
+      </div>
+    </div>
+
+    <!-- 현금분할납부 -->
+    <div class="install-banner">
+      <div class="ib-icon">💳</div>
+      <div>
+        <div class="ib-t">🏆 국내유일 현금 분할납부 가능</div>
+        <div class="ib-s">부담 없이 작업 먼저, 납부는 나누어서 · 상담 시 문의</div>
+      </div>
+    </div>
+
+    <!-- 비용 내역 (심리적 회계: 항목 분리) -->
+    <div class="breakdown">
+      <div class="bk-title">💡 비용 내역 (투명 공개)</div>
+      <div id="bkRows"></div>
+      <div class="bk-vat" id="bkVat"></div>
+    </div>
+
+    <!-- 무료 현장 방문 CTA -->
+    <div class="site-visit">
+      <div class="sv-txt">
+        <div class="sv-t">🏠 무료 현장 방문 견적 신청</div>
+        <div class="sv-s">위 금액은 기본 시작가이며 실제 현장 상태에 따라 달라집니다.<br>전문가가 직접 방문하여 <strong style="color:#f0d080">정확한 견적을 무료</strong>로 산출해드립니다.</div>
+      </div>
+      <a href="tel:010-8499-0024" class="sv-btn">📞 바로 연결</a>
+    </div>
+
+    <!-- 신뢰 섹션 -->
+    <div class="trust-sec">
+      <div class="ts-h">🏅 에버그린을 선택해야 하는 이유</div>
+      <div class="ts-stats">
+        <div class="ts-stat"><div class="ts-n">7년+</div><div class="ts-l">전문경력</div></div>
+        <div class="ts-stat"><div class="ts-n">1,500+</div><div class="ts-l">누적 작업건수</div></div>
+        <div class="ts-stat"><div class="ts-n">20회+</div><div class="ts-l">MBC·KBS·SBS 방송출연</div></div>
+      </div>
+      <div class="rev-grid">
+        <div class="rev">
+          <div class="rev-top"><div><div class="rev-nm">인천 남동구 최○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2026.02.18</div></div>
+          <div class="rev-txt">2년 넘게 방치된 현장인데 하루 만에 완전히 처리해 주셨어요. 현금 분할로 부담도 없었고 추가 요금도 없었습니다.</div>
+        </div>
+        <div class="rev">
+          <div class="rev-top"><div><div class="rev-nm">서울 노원구 박○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2026.01.09</div></div>
+          <div class="rev-txt">견적계산기 금액이 실제랑 거의 같아서 믿고 맡겼어요. 3단계 오염인데 냄새도 완전히 잡아주셨고 행정 처리까지 도와주셔서 감사했습니다.</div>
+        </div>
+        <div class="rev">
+          <div class="rev-top"><div><div class="rev-nm">경기 부천시 이○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2025.12.03</div></div>
+          <div class="rev-txt">SBS에 나온 업체라 믿었는데 기대 이상이었어요. 쓰레기가 천장까지 쌓인 현장이었는데 깔끔하게 처리해 주시고 무료로 탈취 처리까지 해주셔서 너무 좋았습니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 액션 버튼 -->
+    <div class="act-btns">
+      <button class="btn btn-pdf" onclick="dlPDF()">📄 PDF 견적서 저장</button>
+      <div class="act-row">
+        <a href="https://open.kakao.com/o/sOTSCZqd" target="_blank" class="btn btn-kakao">💬 카카오톡 상담</a>
+        <a href="https://talk.naver.com/ct/w1x4i65" target="_blank" class="btn btn-naver">💚 네이버 톡톡</a>
+      </div>
+      <a href="tel:010-8499-0024" class="btn btn-tel">📞 010-8499-0024 전화 상담</a>
+    </div>
+
+    <div style="margin-top:16px;text-align:center">
+      <button onclick="reset()" style="background:none;border:none;font-size:12px;color:var(--gm);cursor:pointer;text-decoration:underline">처음부터 다시 입력하기</button>
+    </div>
+
+  </div><!-- /step4 -->
+  </div><!-- /cb -->
+</div><!-- /card -->
+</div><!-- /main -->
+
+<footer>
+  <strong>특수청소에버그린</strong> | 전국 직영 지점 운영<br>
+  대표: 김현섭 | 행정사 면허 보유 | <strong style="color:var(--g3)">365일 24시간 연중무휴</strong><br>
+  <a href="https://www.evergreen24.co.kr/" target="_blank">www.evergreen24.co.kr</a> |
+  <a href="tel:010-8499-0024">010-8499-0024</a><br>
+  © 2026 주식회사 리커버리프로. All rights reserved.
+</footer>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════
+// 🔔 알림 설정
+// ═══════════════════════════════════════════════
+const CFG = {
+  web3forms_key: 'YOUR_WEB3FORMS_KEY',
+  telegram_token: '8615878395:AAHhMj3uCVQ8HQbo-jem1QB_YMk0ltY7RjU',
+  telegram_chat_id: '1701103630',
+  email: 'khssos@naver.com',
+};
+
+// ═══════════════════════════════════════════════
+// 💰 가격 테이블 (시장 분석 기반 완성 데이터)
+// ─ [최저가, 최고가, 최소견적] / VAT 별도
+// ─ 전략: 최저가 = 앵커 미끼가 (고객 표시)
+//         최고가 = 참고 상한선
+//         최소견적 = 내부 하한선
+// ═══════════════════════════════════════════════
+const PRICE_TABLE = {
+  // key: 평수구간_오염단계 → [최저, 최고, 최소, 레이블]
+  '5_1':  [100000,  180000,  120000, '원룸(5~10평)'],
+  '5_2':  [180000,  280000,  200000, '원룸(5~10평)'],
+  '5_3':  [280000,  450000,  300000, '원룸(5~10평)'],
+  '5_4':  [450000,  700000,  500000, '원룸(5~10평)'],
+  '11_1': [150000,  250000,  150000, '소형(11~15평)'],
+  '11_2': [250000,  400000,  280000, '소형(11~15평)'],
+  '11_3': [400000,  600000,  450000, '소형(11~15평)'],
+  '11_4': [600000,  900000,  700000, '소형(11~15평)'],
+  '16_1': [220000,  350000,  220000, '중형(16~20평)'],
+  '16_2': [350000,  550000,  350000, '중형(16~20평)'],
+  '16_3': [550000,  850000,  600000, '중형(16~20평)'],
+  '16_4': [850000, 1200000,  900000, '중형(16~20평)'],
+  '21_1': [280000,  450000,  280000, '중형(21~25평)'],
+  '21_2': [450000,  650000,  450000, '중형(21~25평)'],
+  '21_3': [650000, 1000000,  700000, '중형(21~25평)'],
+  '21_4':[1000000, 1500000, 1100000, '중형(21~25평)'],
+  '26_1': [350000,  500000,  350000, '중형(26~30평)'],
+  '26_2': [500000,  800000,  550000, '중형(26~30평)'],
+  '26_3': [800000, 1200000,  850000, '중형(26~30평)'],
+  '26_4':[1200000, 1800000, 1300000, '중형(26~30평)'],
+  '31_1': [450000,  650000,  450000, '대형(31~40평)'],
+  '31_2': [650000, 1000000,  700000, '대형(31~40평)'],
+  '31_3':[1000000, 1600000, 1100000, '대형(31~40평)'],
+  '31_4':[1600000, 2400000, 1700000, '대형(31~40평)'],
+  '41_1': [550000,  800000,  550000, '대형(41~50평)'],
+  '41_2': [800000, 1200000,  850000, '대형(41~50평)'],
+  '41_3':[1200000, 1900000, 1300000, '대형(41~50평)'],
+  '41_4':[1900000, 3000000, 2000000, '대형(41~50평)'],
+  '51_1': [650000,  900000,  650000, '대형(51~60평)'],
+  '51_2': [900000, 1400000, 1000000, '대형(51~60평)'],
+  '51_3':[1400000, 2200000, 1500000, '대형(51~60평)'],
+  '51_4':[2200000, 3500000, 2400000, '대형(51~60평)'],
+  '61_1': [800000, 1200000,  800000, '특대형(61~80평)'],
+  '61_2':[1200000, 1800000, 1300000, '특대형(61~80평)'],
+  '61_3':[1800000, 2800000, 2000000, '특대형(61~80평)'],
+  '61_4':[2800000, 4500000, 3000000, '특대형(61~80평)'],
+  '81_1':[1000000, 1500000, 1000000, '특대형(81평+)'],
+  '81_2':[1500000, 2200000, 1600000, '특대형(81평+)'],
+  '81_3':[2200000, 3500000, 2400000, '특대형(81평+)'],
+  '81_4':[3500000,    null,  3800000, '특대형(81평+)'], // 최고가=현장확인
+};
+
+// 평수 → 테이블 키 반환
+function pyKey(py) {
+  if (py<=10) return '5';
+  if (py<=15) return '11';
+  if (py<=20) return '16';
+  if (py<=25) return '21';
+  if (py<=30) return '26';
+  if (py<=40) return '31';
+  if (py<=50) return '41';
+  if (py<=60) return '51';
+  if (py<=80) return '61';
+  return '81';
+}
+
+// 추가서비스 라벨
+const SVC_LABELS = {
+  pest:   {nm:'해충제거 (전문 방역)',  p:100000, note:'오염 3~4단계 권장'},
+  odor:   {nm:'악취탈취 (특수 약품)',  p:80000,  note:'4단계 필수'},
+  wash:   {nm:'세탁서비스',            p:80000,  note:'의류·침구 위탁'},
+  clean:  {nm:'입주청소 (마무리)',     p:100000, note:'정밀 딥클린'},
+  ladder: {nm:'사다리차',              p:150000, note:'4층+ 엘베없음 시'},
+  night:  {nm:'심야 비밀 작업',        p:0,      note:'총 청소비 1.5배 할증'},
+};
+
+// 상태
+let curStep=1, tonVal=0, quoteData=null;
+
+// ── UI 업데이트 ──
+const stepCfg=[null,
+  {icon:'📋',title:'기본 정보 입력',sub:'연락처와 주소를 입력해주세요'},
+  {icon:'🏠',title:'현장 정보 입력',sub:'평수·오염단계·쓰레기양을 선택해주세요'},
+  {icon:'📦',title:'폐기물 & 추가 서비스',sub:'폐기물 양과 필요한 서비스를 선택하세요'},
+  {icon:'✅',title:'견적 계산 결과',sub:'계산된 예상 견적을 확인하세요'},
+];
+
+function updateUI(s) {
+  document.querySelectorAll('.step').forEach(e=>e.classList.remove('active'));
+  document.getElementById('step'+s).classList.add('active');
+  const pcts=[0,25,50,75,100];
+  document.getElementById('pfill').style.width=pcts[s]+'%';
+  ['sl1','sl2','sl3','sl4'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.className='sl';
+    if(i+1<s) el.classList.add('done');
+    else if(i+1===s) el.classList.add('active');
+  });
+  const c=stepCfg[s];
+  document.getElementById('ci').textContent=c.icon;
+  document.getElementById('ctitle').textContent=c.title;
+  document.getElementById('csub').textContent=c.sub;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function go(s) {
+  if(s===2) {
+    if(!document.getElementById('phone').value.trim()){alert('연락처를 입력해주세요.');return;}
+    if(!document.getElementById('addr').value.trim()){alert('주소를 입력해주세요.');return;}
+    if(!document.getElementById('consent').checked){alert('개인정보 수집·이용에 동의해주세요.');return;}
+  }
+  curStep=s; updateUI(s);
+}
+
+// 평수 조작
+function chPy(d){
+  const el=document.getElementById('pyeong');
+  el.value=Math.max(3,Math.min(200,(parseInt(el.value)||10)+d));
+}
+function clampPy(){
+  const el=document.getElementById('pyeong');
+  el.value=Math.max(3,Math.min(200,parseInt(el.value)||10));
+}
+
+// 폐기물 톤 선택
+function setTon(btn, val) {
+  document.querySelectorAll('.ton-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  tonVal=val;
+  const el=document.getElementById('tonResult');
+  if(val===0) el.textContent='포함 안 함';
+  else if(val>=5) {
+    el.innerHTML='<span style="color:var(--rd);font-weight:700">📞 현장 방문 후 별도 확인</span>';
+  } else {
+    el.textContent=`${Math.round(val*400000).toLocaleString('ko-KR')}원 (${val}톤 × 40만원)`;
+  }
+}
+
+// 전화번호 포맷
+document.getElementById('phone').addEventListener('input',function(){
+  let v=this.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>7) this.value=v.replace(/(\d{3})(\d{4})(\d+)/,'$1-$2-$3');
+  else if(v.length>3) this.value=v.replace(/(\d{3})(\d+)/,'$1-$2');
+  else this.value=v;
+});
+
+// ── 핵심 계산 로직 ──
+function calcQuote() {
+  const py   = parseInt(document.getElementById('pyeong').value)||10;
+  const cont = parseInt(document.querySelector('input[name=cont]:checked')?.value||1);
+  const trash= parseFloat(document.querySelector('input[name=trash]:checked')?.value||1.0);
+  const elev = parseFloat(document.querySelector('input[name=elev]:checked')?.value||1.0);
+  const reg  = 1.0; // 전국 동일 단가
+  const svcs = Array.from(document.querySelectorAll('input[name=svc]:checked')).map(e=>e.value);
+
+  const phone= document.getElementById('phone').value.trim();
+  const addr = document.getElementById('addr').value.trim();
+  const wdate= document.getElementById('wdate').value;
+  const cname= document.getElementById('cname').value.trim();
+  const memo = document.getElementById('memo').value.trim();
+
+  document.getElementById('loading').classList.add('on');
+
+  setTimeout(()=>{
+    // 1. 기본 청소비 (가격 테이블)
+    const key=`${pyKey(py)}_${cont}`;
+    const row=PRICE_TABLE[key]||[300000,500000,250000,''];
+    let baseMin=row[0], baseMax=row[1];
+
+    // 2. 보정계수 적용 (기본청소비에만)
+    const factor = trash * elev * reg;
+
+    // 심야 할증 (1.5배)
+    const hasNight = svcs.includes('night');
+    const nightFactor = hasNight ? 1.5 : 1.0;
+
+    const adjMin = Math.round(baseMin * factor * nightFactor / 10000) * 10000;
+    const adjMax = baseMax ? Math.round(baseMax * factor * nightFactor / 10000) * 10000 : null;
+
+    // 3. 폐기물 처리비 (별도 분리)
+    const wasteAmt = (tonVal>0 && tonVal<5) ? tonVal*400000 : 0;
+    const wasteSite = (tonVal>=5);
+
+    // 4. 추가서비스 합계
+    let svcTotal = 0;
+    const svcRows = [];
+    svcs.filter(s=>s!=='night').forEach(s=>{
+      const info=SVC_LABELS[s];
+      if(!info||info.p===0) return;
+      svcTotal+=info.p;
+      svcRows.push({nm:info.nm, p:info.p, note:info.note});
+    });
+
+    // 5. 소계
+    const subtotal = adjMin + wasteAmt + svcTotal;
+    const vatTotal = Math.round(subtotal*1.1/10000)*10000;
+
+    // 작업일수 추정
+    const workDays = py<=15?1:py<=30?'1~2':py<=50?'2':py<=70?'2~3':'별도확인';
+
+    quoteData = {
+      py, cont, trash, elev, reg, svcs, tonVal,
+      baseMin, baseMax, adjMin, adjMax,
+      wasteAmt, wasteSite, svcTotal, svcRows,
+      subtotal, vatTotal, workDays, factor, nightFactor,
+      phone, addr, wdate, cname, memo,
+      ts: new Date().toISOString(),
+    };
+
+    document.getElementById('loading').classList.remove('on');
+    showResult(quoteData);
+
+    // 알림 발송
+    sendNotify(quoteData).catch(()=>{});
+  }, 600);
+}
+
+// ── 결과 표시 ──
+const fmt = n => typeof n==='number' ? n.toLocaleString('ko-KR')+'원' : '—';
+const contNm = {1:'1단계 일반',2:'2단계 중간',3:'3단계 심각',4:'4단계 특수'};
+const trashNm = {'0.8':'적음(×0.8)','1.0':'보통(기준)','1.35':'심함(×1.35)'};
+const elevNm  = {'1.0':'1층/엘베있음','1.1':'2층이상 엘베있음(×1.1)','1.25':'2층이상 엘베없음(×1.25)'};
+const regNm   = {'1.0':'수도권','1.15':'수도권외(×1.15)','1.25':'지방(×1.25)'};
+
+function showResult(r) {
+  curStep=4; updateUI(4);
+  const now=new Date();
+  document.getElementById('rdate').textContent=
+    `${now.toLocaleDateString('ko-KR')} ${now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})} 기준 산출`;
+
+  // 앵커가 (가장 크게)
+  document.getElementById('anchorPrice').textContent = fmt(r.adjMin)+'~';
+  document.getElementById('workDays').textContent =
+    `예상 작업일수: ${r.workDays}일 · 현장 방문 후 최종 금액 확정`;
+
+  // 비용 내역 (심리적 회계: 항목 분리)
+  const rows=[];
+
+  // 기본 청소비
+  rows.push({
+    icon:'🧹', lbl:`기본 청소비 (${r.py}평 · ${contNm[r.cont]})`,
+    val: fmt(r.adjMin)+'~', cls:'',
+    sub: r.factor!==1?`보정계수 ×${r.factor.toFixed(2)}${r.nightFactor>1?' · 심야×1.5':''} 적용`:'',
+  });
+
+  // 무료 소독·탈취 (손실회피 전략)
+  rows.push({
+    icon:'🎁', lbl:'기본 소독 · 생활 악취 탈취',
+    val:'무료 제공', cls:'free', tag:'무료',
+  });
+
+  // 폐기물 처리비 (별도 분리)
+  if(r.wasteSite) {
+    rows.push({icon:'🚛',lbl:`폐기물 처리비 (${r.tonVal}톤 이상)`,val:'📞 현장 별도 확인',cls:'waste'});
+  } else if(r.wasteAmt>0) {
+    rows.push({icon:'🚛',lbl:`폐기물 처리비 (${r.tonVal}톤 × 40만원)`,val:fmt(r.wasteAmt),cls:'waste'});
+  }
+
+  // 추가서비스
+  r.svcRows.forEach(s=>{
+    rows.push({icon:'➕',lbl:s.nm,val:fmt(s.p),cls:'svc'});
+  });
+
+  // 소계 / VAT
+  const html = rows.map(row=>`
+    <div class="bk-row">
+      <span class="bk-lbl">${row.icon} ${row.lbl}${row.sub?`<br><small style="font-size:10px;color:var(--gm)">${row.sub}</small>`:''}</span>
+      <span class="bk-val ${row.cls||''}">${row.val}${row.tag?` <span class="free-tag">${row.tag}</span>`:''}</span>
+    </div>`).join('');
+
+  const totalRow = r.wasteSite ? '' : `
+    <div class="bk-row total">
+      <span class="bk-lbl">소계 (VAT 별도)</span>
+      <span class="bk-val">${fmt(r.subtotal)}~</span>
+    </div>`;
+
+  document.getElementById('bkRows').innerHTML = html + totalRow;
+  document.getElementById('bkVat').innerHTML = r.wasteSite
+    ? '※ 폐기물 비용은 현장 방문 후 별도 산출됩니다'
+    : `VAT(10%) 포함 예상 총액: <strong>${fmt(r.vatTotal)}~</strong>`;
+}
+
+// ── 알림 발송 ──
+async function sendNotify(r) {
+  const msg=`🔔 [에버그린 새 견적 접수]
+━━━━━━━━━━━━━━
+📅 ${new Date(r.ts).toLocaleString('ko-KR')}
+📞 ${r.phone}
+📍 ${r.addr}
+📐 ${r.py}평 | 오염 ${contNm[r.cont]}
+🗑️ 쓰레기양: ${trashNm[String(r.trash)]||r.trash}
+🛗 ${elevNm[String(r.elev)]||r.elev}
+🗺️ ${regNm[String(r.reg)]||r.reg}
+📦 폐기물: ${r.tonVal>=5?'5톤+ 현장확인':r.tonVal===0?'없음':r.tonVal+'톤'}
+➕ 추가: ${r.svcs.length?r.svcs.join(','):'없음'}
+📝 메모: ${r.memo||'없음'}
+💰 표시견적: ${fmt(r.adjMin)}~
+🗓️ 희망일: ${r.wdate||'미정'}
+━━━━━━━━━━━━━━`;
+
+  const ps=[];
+  if(CFG.web3forms_key!=='YOUR_WEB3FORMS_KEY') {
+    ps.push(fetch('https://api.web3forms.com/submit',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        access_key:CFG.web3forms_key,
+        to:CFG.email,
+        subject:`[에버그린 견적] ${r.phone} · ${r.py}평 · ${contNm[r.cont]}`,
+        message:msg,from_name:'에버그린 견적계산기'
+      })
+    }));
+  }
+  if(CFG.telegram_token!=='YOUR_BOT_TOKEN') {
+    ps.push(fetch(`https://api.telegram.org/bot${CFG.telegram_token}/sendMessage`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:CFG.telegram_chat_id,text:msg})
+    }));
+  }
+  await Promise.allSettled(ps);
+}
+
+// ── PDF 생성 (html2canvas · 한글 완벽) ──
+async function dlPDF() {
+  if(!quoteData) return;
+  const r=quoteData;
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('ko-KR');
+  const preview=document.getElementById('pdfPreview');
+
+  preview.style.left='0'; preview.style.position='absolute';
+  preview.style.top=document.documentElement.scrollTop+'px';
+
+  preview.innerHTML=`
+  <div style="width:794px;background:#fff;font-family:'Noto Sans KR',sans-serif;padding:0">
+    <div style="background:linear-gradient(135deg,#1a3a2a,#2d6a4f);padding:28px 40px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="color:#74c69d;font-size:22px;font-weight:900;letter-spacing:2px">EVERGREEN</div>
+        <div style="color:rgba(255,255,255,.7);font-size:11px;margin-top:3px">특수청소에버그린</div>
+      </div>
+      <div style="text-align:right">
+        <div style="color:#f0d080;font-size:18px;font-weight:700">견 적 서</div>
+        <div style="color:rgba(255,255,255,.7);font-size:11px;margin-top:3px">발행일: ${dateStr} | 유효기간: 14일</div>
+      </div>
+    </div>
+    <div style="height:4px;background:linear-gradient(90deg,#c9a84c,#f0d080)"></div>
+
+    <div style="padding:22px 40px 0">
+      <div style="font-size:12px;font-weight:700;color:#1a3a2a;border-bottom:2px solid #2d6a4f;padding-bottom:5px;margin-bottom:10px">고객 정보</div>
+      <table style="width:100%;font-size:11px;border-collapse:collapse">
+        <tr><td style="padding:4px 0;color:#6b7280;width:80px">고객명</td><td style="padding:4px 0;font-weight:600">${r.cname||'-'}</td><td style="padding:4px 0;color:#6b7280;width:80px">연락처</td><td style="padding:4px 0;font-weight:600">${r.phone}</td></tr>
+        <tr><td style="padding:4px 0;color:#6b7280">주소</td><td colspan="3" style="padding:4px 0;font-weight:600">${r.addr}</td></tr>
+        <tr><td style="padding:4px 0;color:#6b7280">작업희망일</td><td style="padding:4px 0;font-weight:600">${r.wdate||'미정'}</td></tr>
+      </table>
+    </div>
+
+    <div style="padding:14px 40px 0">
+      <div style="font-size:12px;font-weight:700;color:#1a3a2a;border-bottom:2px solid #2d6a4f;padding-bottom:5px;margin-bottom:10px">현장 정보</div>
+      <table style="width:100%;font-size:11px;border-collapse:collapse">
+        <tr><td style="padding:4px 0;color:#6b7280;width:100px">평수</td><td style="padding:4px 0;font-weight:600">${r.py}평</td><td style="padding:4px 0;color:#6b7280;width:100px">오염 단계</td><td style="padding:4px 0;font-weight:600">${contNm[r.cont]}</td></tr>
+        <tr><td style="padding:4px 0;color:#6b7280">쓰레기 양</td><td style="padding:4px 0;font-weight:600">${trashNm[String(r.trash)]||r.trash}</td><td style="padding:4px 0;color:#6b7280">엘리베이터</td><td style="padding:4px 0;font-weight:600">${elevNm[String(r.elev)]||r.elev}</td></tr>
+        <tr><td style="padding:4px 0;color:#6b7280">지역</td><td style="padding:4px 0;font-weight:600">${regNm[String(r.reg)]||r.reg}</td><td style="padding:4px 0;color:#6b7280">폐기물</td><td style="padding:4px 0;font-weight:600">${r.tonVal>=5?'5톤+ (현장확인)':r.tonVal===0?'없음':r.tonVal+'톤'}</td></tr>
+        ${r.svcs.length?`<tr><td style="padding:4px 0;color:#6b7280">추가서비스</td><td colspan="3" style="padding:4px 0;font-weight:600">${r.svcs.map(s=>SVC_LABELS[s]?.nm||s).join(', ')}</td></tr>`:''}
+        ${r.memo?`<tr><td style="padding:4px 0;color:#6b7280">특이사항</td><td colspan="3" style="padding:4px 0">${r.memo}</td></tr>`:''}
+      </table>
+    </div>
+
+    <div style="padding:14px 40px 0">
+      <div style="font-size:12px;font-weight:700;color:#1a3a2a;border-bottom:2px solid #2d6a4f;padding-bottom:5px;margin-bottom:10px">견적 내역 (VAT 별도)</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <tr style="background:#1a3a2a"><th style="padding:8px 12px;color:#fff;text-align:left">항목</th><th style="padding:8px 12px;color:#fff;text-align:right">금액</th></tr>
+        <tr style="background:#f9fafb"><td style="padding:8px 12px">기본 청소비 (${r.py}평 · ${contNm[r.cont]}${r.factor!==1?' · 보정×'+r.factor.toFixed(2):''})</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#2d6a4f">${fmt(r.adjMin)}~</td></tr>
+        <tr style="background:#f0fdf4"><td style="padding:8px 12px">기본 소독 · 생활 악취 탈취 <span style="background:#dcfce7;color:#166534;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px">무료</span></td><td style="padding:8px 12px;text-align:right;color:#166534;font-weight:700">0원</td></tr>
+        ${r.wasteAmt>0?`<tr style="background:#fff7ed"><td style="padding:8px 12px">폐기물 처리비 (${r.tonVal}톤 × 40만원)</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#b45309">${fmt(r.wasteAmt)}</td></tr>`:''}
+        ${r.wasteSite?`<tr style="background:#fff7ed"><td style="padding:8px 12px">폐기물 처리비 (${r.tonVal}톤 이상)</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#dc2626">현장 방문 별도 확인</td></tr>`:''}
+        ${r.svcRows.map((s,i)=>`<tr style="background:${i%2===0?'#f9fafb':'#fff'}"><td style="padding:8px 12px">${s.nm}</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#2d6a4f">${fmt(s.p)}</td></tr>`).join('')}
+        ${!r.wasteSite?`<tr style="background:#d8f3dc"><td style="padding:9px 12px;font-weight:700;color:#1a3a2a">소계 (VAT 별도)</td><td style="padding:9px 12px;text-align:right;font-weight:700;color:#1a3a2a;font-size:12px">${fmt(r.subtotal)}~</td></tr>
+        <tr style="background:#fff8e7"><td style="padding:8px 12px;color:#92400e">VAT 포함 예상 총액</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#92400e">${fmt(r.vatTotal)}~</td></tr>`:''}
+      </table>
+    </div>
+
+    <div style="padding:12px 40px 0">
+      <div style="background:linear-gradient(135deg,#7c2d12,#b45309);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px">
+        <div style="font-size:20px">💳</div>
+        <div><div style="color:#fff;font-size:14px;font-weight:700">🏆 국내유일 현금 분할납부 가능</div>
+        <div style="color:rgba(255,255,255,.8);font-size:10px;margin-top:2px">부담 없이 작업 먼저, 납부는 나누어서 · 상담 시 문의</div></div>
+      </div>
+    </div>
+
+    <div style="padding:10px 40px 0">
+      <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:8px 12px;font-size:10px;color:#92400e">
+        ⚠️ 위 금액은 기본 작업 기준 최저가입니다. 실제 현장의 오염 상태·쓰레기 밀집도·접근 환경에 따라 최종 금액이 달라질 수 있습니다. 무료 방문 견적 후 최종 금액을 확정합니다.
+      </div>
+    </div>
+
+    <div style="background:#1a3a2a;margin-top:18px;padding:18px 40px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="color:#74c69d;font-size:12px;font-weight:700">특수청소에버그린 | 주식회사 리커버리프로</div>
+        <div style="color:rgba(255,255,255,.6);font-size:10px;margin-top:3px">대표: 김현섭 · 행정사 면허 보유 · 전국 출동</div>
+        <div style="color:rgba(255,255,255,.6);font-size:10px">www.evergreen24.co.kr</div>
+      </div>
+      <div style="text-align:right">
+        <div style="color:#f0d080;font-size:13px;font-weight:700">010-8499-0024</div>
+        <div style="color:rgba(255,255,255,.6);font-size:10px;margin-top:3px">카카오 오픈채팅 · 네이버 톡톡</div>
+      </div>
+    </div>
+  </div>`;
+
+  try {
+    const canvas=await html2canvas(preview.firstElementChild,{scale:2,useCORS:true,logging:false,backgroundColor:'#ffffff'});
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const pw=doc.internal.pageSize.getWidth(), ph=doc.internal.pageSize.getHeight();
+    const imgData=canvas.toDataURL('image/png');
+    const imgH=(canvas.height*pw)/canvas.width;
+    if(imgH<=ph) doc.addImage(imgData,'PNG',0,0,pw,imgH);
+    else {
+      let y=0;
+      while(y<imgH){if(y>0)doc.addPage();doc.addImage(imgData,'PNG',0,-y,pw,imgH);y+=ph;}
+    }
+    doc.save(`에버그린_쓰레기집청소견적서_${dateStr.replace(/\./g,'')}.pdf`);
+  } catch(e){
+    alert('PDF 저장 중 오류가 발생했습니다. 스크린샷으로 저장해주세요.');
+  } finally {
+    preview.style.left='-9999px'; preview.innerHTML='';
+  }
+}
+
+// ── 리셋 ──
+function reset() {
+  curStep=1; updateUI(1);
+  ['phone','addr','wdate','cname','memo'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('consent').checked=false;
+  document.getElementById('pyeong').value=10;
+  document.querySelectorAll('input[name=cont]')[0].checked=true;
+  document.querySelectorAll('input[name=trash]')[1].checked=true;
+  document.querySelectorAll('input[name=elev]')[0].checked=true;
+  document.querySelectorAll('input[name=svc]').forEach(e=>e.checked=false);
+  const btns=document.querySelectorAll('.ton-btn');
+  btns.forEach(b=>b.classList.remove('active'));
+  btns[0].classList.add('active');
+  tonVal=0;
+  document.getElementById('tonResult').textContent='포함 안 함';
+  quoteData=null;
+}
+</script>
+</body>
+</html>
