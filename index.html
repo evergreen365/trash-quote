@@ -859,17 +859,20 @@ function showResult(r) {
 
 // ── 알림 발송 ──
 async function sendNotify(r) {
+  const trashLabel = {'0.8':'적음','1.0':'보통','1.35':'심함'};
+  const elevLabel  = {'1.0':'1층/엘베있음','1.1':'2층이상 엘베있음','1.25':'2층이상 엘베없음'};
+  const svcLabel   = {pest:'해충제거',odor:'악취탈취',wash:'세탁서비스',clean:'입주청소',ladder:'사다리차',night:'심야비밀작업'};
+
   const msg=`🔔 [에버그린 새 견적 접수]
 ━━━━━━━━━━━━━━
 📅 ${new Date(r.ts).toLocaleString('ko-KR')}
 📞 ${r.phone}
 📍 ${r.addr}
 📐 ${r.py}평 | 오염 ${contNm[r.cont]}
-🗑️ 쓰레기양: ${trashNm[String(r.trash)]||r.trash}
-🛗 ${elevNm[String(r.elev)]||r.elev}
-🗺️ ${regNm[String(r.reg)]||r.reg}
+🗑️ 쓰레기양: ${trashLabel[String(r.trash)]||r.trash}
+🛗 ${elevLabel[String(r.elev)]||r.elev}
 📦 폐기물: ${r.tonVal>=5?'5톤+ 현장확인':r.tonVal===0?'없음':r.tonVal+'톤'}
-➕ 추가: ${r.svcs.length?r.svcs.join(','):'없음'}
+➕ 추가: ${r.svcs.length?r.svcs.map(s=>svcLabel[s]||s).join(', '):'없음'}
 📝 메모: ${r.memo||'없음'}
 💰 표시견적: ${fmt(r.adjMin)}~
 🗓️ 희망일: ${r.wdate||'미정'}
