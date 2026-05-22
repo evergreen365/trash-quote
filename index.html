@@ -34,8 +34,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--cr);color:var(--ch);
 .hero h1{font-family:'Noto Serif KR',serif;font-size:clamp(20px,5vw,32px);font-weight:900;color:#fff;line-height:1.35;margin-bottom:10px;letter-spacing:-.02em}
 .hero h1 em{color:var(--gol);font-style:normal}
 .hero p{font-size:13px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:6px}
-.anchor-badge{display:inline-block;background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:20px;padding:7px 20px;margin:10px 0 18px}
-.anchor-badge span{color:#fff;font-size:14px;font-weight:700;letter-spacing:.03em}
+.anchor-badge{display:inline-block;background:linear-gradient(135deg,#c9a84c,#f0d080);border-radius:20px;padding:7px 20px;margin:10px 0 18px;box-shadow:0 4px 15px rgba(201,168,76,.4)}
+.anchor-badge span{color:#1a3a2a;font-size:14px;font-weight:700;letter-spacing:.03em}
 .trust-bar{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
 .ti{display:flex;flex-direction:column;align-items:center;gap:2px}
 .tn{font-family:'Noto Serif KR',serif;font-size:18px;font-weight:700;color:var(--gol)}
@@ -55,10 +55,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--cr);color:var(--ch);
 /* ── MAIN ── */
 .main{max-width:720px;margin:0 auto;padding:24px 14px 80px}
 .card{background:#fff;border-radius:20px;box-shadow:var(--shl);overflow:hidden}
-.ch{background:linear-gradient(135deg,var(--g1),var(--g2));padding:16px 22px;display:flex;align-items:center;gap:11px}
-.ci{width:38px;height:38px;background:rgba(255,255,255,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
-.ch h2{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;color:#fff}
-.ch p{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px}
+.ch{background:linear-gradient(135deg,var(--g1),var(--g2));padding:20px 22px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.ci{width:48px;height:48px;background:rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:2px}
+.ch h2{font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;color:#fff;letter-spacing:-.01em}
+.ch p{font-size:13px;color:rgba(255,255,255,.75);margin-top:4px}
 .cb{padding:22px 20px}
 
 /* ── STEPS ── */
@@ -91,7 +91,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--cr);color:var(--ch);
 .rc{position:relative;cursor:pointer}
 .rc input[type=radio]{position:absolute;opacity:0;width:0;height:0}
 .rb{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 7px;border:2px solid #e5e7eb;border-radius:11px;text-align:center;transition:all .2s;background:#fff;height:100%;justify-content:center;min-height:76px}
-.rc input:checked+.rb{border-color:var(--g2);background:var(--gp);box-shadow:0 0 0 3px rgba(64,145,108,.1)}
+.rc input:checked+.rb{border-color:var(--g2);background:var(--gp);box-shadow:0 0 0 3px rgba(64,145,108,.15);transform:translateY(-2px)}
 .rb .em{font-size:19px}
 .rb .nm{font-size:12px;font-weight:700;color:var(--ch);line-height:1.3}
 .rb .sm{font-size:10px;color:var(--gm);line-height:1.3}
@@ -305,9 +305,8 @@ footer a{color:var(--g3);text-decoration:none}
 <div class="hero">
   <div class="hero-in">
     <div class="badge"><div class="dot"></div><span>AI 견적계산기 · 전국 직영 지점 · 365일 24시간</span></div>
-    <h1>쓰레기집 청소 비용<br><em>AI가 즉시 계산해드립니다</em></h1>
-    <p>평수·오염도·폐기물량 입력 → 즉시 견적 산출</p>
-    <div class="anchor-badge"><span>📦 원룸 기본 청소 10만원부터 · 전국 어디든 출동</span></div>
+    <h1>쓰레기집청소, 포기하지마세요!<br><em>AI가 청소 후 모습과 비용을 즉시 알려드립니다</em></h1>
+    <div class="anchor-badge"><span>📷 사진 한 장으로 청소 후 모습 확인 · 오늘 바로 출동 · 전국 가능</span></div>
     <div class="trust-bar">
       <div class="ti"><div class="tn">7년</div><div class="tl">전문 경력</div></div>
       <div class="td"></div>
@@ -381,38 +380,55 @@ footer a{color:var(--g3);text-decoration:none}
     </div>
 
     <div class="fg">
-      <label class="lbl">오염 단계 <span class="req">*</span><span class="hint">단계가 높을수록 비용 증가</span></label>
+      <label class="lbl">오염 단계 <span class="req">*</span></label>
+      <p style="font-size:11px;color:var(--gm);margin:-4px 0 10px">현재 상태와 가장 비슷한 단계를 선택하세요</p>
       <div class="rg c2" style="gap:10px">
         <label class="rc">
           <input type="radio" name="cont" value="1" checked>
-          <div class="rb" style="padding-top:16px">
-            <span class="lvbadge lv1">1</span>
-            <span class="em">🟢</span><span class="nm">1단계 · 일반</span>
-            <span class="sm">생활쓰레기만<br>냄새 거의 없음</span>
+          <div class="rb lv-card" style="border-color:#22c55e20;min-height:100px">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <div style="width:22px;height:22px;border-radius:50%;background:#22c55e;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">1</div>
+              <span style="font-size:13px;font-weight:700;color:#15803d">일반</span>
+            </div>
+            <div style="font-size:24px;margin-bottom:4px">🗑️</div>
+            <span class="sm" style="color:#15803d;font-weight:600">생활쓰레기만</span>
+            <span class="sm">냄새 거의 없음</span>
           </div>
         </label>
         <label class="rc">
           <input type="radio" name="cont" value="2">
-          <div class="rb" style="padding-top:16px">
-            <span class="lvbadge lv2">2</span>
-            <span class="em">🟡</span><span class="nm">2단계 · 중간</span>
-            <span class="sm">부패음식물 포함<br>약한 악취</span>
+          <div class="rb lv-card" style="border-color:#f59e0b20;min-height:100px">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <div style="width:22px;height:22px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">2</div>
+              <span style="font-size:13px;font-weight:700;color:#b45309">중간</span>
+            </div>
+            <div style="font-size:24px;margin-bottom:4px">🤢</div>
+            <span class="sm" style="color:#b45309;font-weight:600">부패음식물 포함</span>
+            <span class="sm">약한 악취</span>
           </div>
         </label>
         <label class="rc">
           <input type="radio" name="cont" value="3">
-          <div class="rb" style="padding-top:16px">
-            <span class="lvbadge lv3">3</span>
-            <span class="em">🔴</span><span class="nm">3단계 · 심각</span>
-            <span class="sm">벌레·배설물<br>심한 악취</span>
+          <div class="rb lv-card" style="border-color:#ef444420;min-height:100px">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <div style="width:22px;height:22px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">3</div>
+              <span style="font-size:13px;font-weight:700;color:#dc2626">심각</span>
+            </div>
+            <div style="font-size:24px;margin-bottom:4px">🪲</div>
+            <span class="sm" style="color:#dc2626;font-weight:600">벌레·배설물</span>
+            <span class="sm">심한 악취</span>
           </div>
         </label>
         <label class="rc">
           <input type="radio" name="cont" value="4">
-          <div class="rb" style="padding-top:16px">
-            <span class="lvbadge lv4">4</span>
-            <span class="em">⚫</span><span class="nm">4단계 · 특수</span>
-            <span class="sm">장기방치<br>심각한 특수오염</span>
+          <div class="rb lv-card" style="border-color:#1f293720;min-height:100px">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <div style="width:22px;height:22px;border-radius:50%;background:#1f2937;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">4</div>
+              <span style="font-size:13px;font-weight:700;color:#1f2937">특수</span>
+            </div>
+            <div style="font-size:24px;margin-bottom:4px">☠️</div>
+            <span class="sm" style="color:#1f2937;font-weight:600">장기방치·특수오염</span>
+            <span class="sm">고도 전문 작업</span>
           </div>
         </label>
       </div>
@@ -420,19 +436,69 @@ footer a{color:var(--g3);text-decoration:none}
 
     <div class="fg">
       <label class="lbl">쓰레기 양 <span class="req">*</span></label>
+      <p style="font-size:11px;color:var(--gm);margin:-4px 0 10px">쓰레기가 얼마나 쌓여 있나요?</p>
       <div class="rg c3">
-        <label class="rc"><input type="radio" name="trash" value="0.8"><div class="rb"><span class="em">🗂️</span><span class="nm">적음</span><span class="sm">바닥 보임</span></div></label>
-        <label class="rc"><input type="radio" name="trash" value="1.0" checked><div class="rb"><span class="em">📦</span><span class="nm">보통</span><span class="sm">걷기 불편</span></div></label>
-        <label class="rc"><input type="radio" name="trash" value="1.35"><div class="rb"><span class="em">🗑️</span><span class="nm">심함</span><span class="sm">진입 어려움</span></div></label>
+        <label class="rc">
+          <input type="radio" name="trash" value="0.8">
+          <div class="rb" style="min-height:110px;gap:3px">
+            <div style="font-size:32px;line-height:1">📦</div>
+            <div style="font-size:13px;font-weight:700;color:var(--g1);margin-top:4px">적음</div>
+            <div style="font-size:10px;color:var(--gm);text-align:center;line-height:1.5">바닥이 보임<br>이동 가능</div>
+            <div style="background:#dcfce7;color:#166534;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;margin-top:3px">×0.8</div>
+          </div>
+        </label>
+        <label class="rc">
+          <input type="radio" name="trash" value="1.0" checked>
+          <div class="rb" style="min-height:110px;gap:3px">
+            <div style="font-size:32px;line-height:1">🗑️</div>
+            <div style="font-size:13px;font-weight:700;color:var(--g1);margin-top:4px">보통</div>
+            <div style="font-size:10px;color:var(--gm);text-align:center;line-height:1.5">걷기 불편<br>허리 높이</div>
+            <div style="background:#fef3c7;color:#92400e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;margin-top:3px">기준</div>
+          </div>
+        </label>
+        <label class="rc">
+          <input type="radio" name="trash" value="1.35">
+          <div class="rb" style="min-height:110px;gap:3px">
+            <div style="font-size:32px;line-height:1">⛰️</div>
+            <div style="font-size:13px;font-weight:700;color:var(--g1);margin-top:4px">심함</div>
+            <div style="font-size:10px;color:var(--gm);text-align:center;line-height:1.5">진입 어려움<br>천장까지</div>
+            <div style="background:#fee2e2;color:#991b1b;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;margin-top:3px">×1.35</div>
+          </div>
+        </label>
       </div>
     </div>
 
     <div class="fg">
-      <label class="lbl">엘리베이터 <span class="req">*</span></label>
+      <label class="lbl">층수 / 엘리베이터 <span class="req">*</span></label>
+      <p style="font-size:11px;color:var(--gm);margin:-4px 0 10px">작업 위치에 따라 추가 인건비가 발생합니다</p>
       <div class="rg c3">
-        <label class="rc"><input type="radio" name="elev" value="1.0" checked><div class="rb"><span class="em">🏠</span><span class="nm">1층</span><span class="sm">추가 없음</span></div></label>
-        <label class="rc"><input type="radio" name="elev" value="1.1"><div class="rb"><span class="em">🛗</span><span class="nm">2층이상</span><span class="sm">엘베 있음</span></div></label>
-        <label class="rc"><input type="radio" name="elev" value="1.25"><div class="rb"><span class="em">🪜</span><span class="nm">2층이상</span><span class="sm">엘베 없음</span></div></label>
+        <label class="rc">
+          <input type="radio" name="elev" value="1.0" checked>
+          <div class="rb" style="min-height:110px;gap:3px">
+            <div style="font-size:32px;line-height:1">🏠</div>
+            <div style="font-size:13px;font-weight:700;color:var(--g1);margin-top:4px">1층</div>
+            <div style="font-size:10px;color:var(--gm);text-align:center;line-height:1.5">단독주택·상가<br>1층 작업</div>
+            <div style="background:#dcfce7;color:#166534;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;margin-top:3px">추가없음</div>
+          </div>
+        </label>
+        <label class="rc">
+          <input type="radio" name="elev" value="1.1">
+          <div class="rb" style="min-height:110px;gap:3px">
+            <div style="font-size:32px;line-height:1">🛗</div>
+            <div style="font-size:13px;font-weight:700;color:var(--g1);margin-top:4px">2층 이상</div>
+            <div style="font-size:10px;color:var(--gm);text-align:center;line-height:1.5">엘리베이터<br>있음</div>
+            <div style="background:#fef3c7;color:#92400e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;margin-top:3px">×1.1</div>
+          </div>
+        </label>
+        <label class="rc">
+          <input type="radio" name="elev" value="1.25">
+          <div class="rb" style="min-height:110px;gap:3px">
+            <div style="font-size:32px;line-height:1">🪜</div>
+            <div style="font-size:13px;font-weight:700;color:var(--g1);margin-top:4px">2층 이상</div>
+            <div style="font-size:10px;color:var(--gm);text-align:center;line-height:1.5">엘리베이터<br>없음</div>
+            <div style="background:#fee2e2;color:#991b1b;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;margin-top:3px">×1.25</div>
+          </div>
+        </label>
       </div>
     </div>
 
@@ -664,7 +730,7 @@ const CFG = {
   worker_url: 'https://evergreen-ai-proxy.ever24green.workers.dev',
   telegram_token: '8615878395:AAHhMj3uCVQ8HQbo-jem1QB_YMk0ltY7RjU',
   telegram_chat_id: '1701103630',
-  email: 'khssos@naver.com',
+  email: 'ever24green@gmail.com',
 };
 
 // Gemini Vision → OpenAI GPT-4o로 대체됨
