@@ -967,7 +967,8 @@ function unlockPhoto(){
 
   // 텔레그램 알림 (마케팅 데이터 수집)
   const msg2=`🔓 [AI시뮬레이션 잠금해제]\n📞 ${phone}\n📅 ${new Date().toLocaleString('ko-KR')}`;
-  fetch(\`https://api.telegram.org/bot\${CFG.telegram_token}/sendMessage\`,{
+  const tgUrl='https://api.telegram.org/bot'+CFG.telegram_token+'/sendMessage';
+  fetch(tgUrl,{
     method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({chat_id:CFG.telegram_chat_id,text:msg2})
   }).catch(()=>{});
