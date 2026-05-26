@@ -913,24 +913,40 @@ document.getElementById('phone').addEventListener('input',function(){
 // ═══════════════════════════════════════════════
 // 사진 업로드 처리
 // ═══════════════════════════════════════════════
+// 이미지 압축 함수 (최대 1024px, JPEG 80%)
+function compressImage(dataURL){
+  return new Promise((resolve)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=1024;
+      let w=img.width, h=img.height;
+      if(w>MAX||h>MAX){
+        if(w>h){h=Math.round(h*MAX/w);w=MAX;}
+        else{w=Math.round(w*MAX/h);h=MAX;}
+      }
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(canvas.toDataURL('image/jpeg',0.8));
+    };
+    img.src=dataURL;
+  });
+}
+
 function handlePhoto(event){
   const file=event.target.files[0];
   if(!file) return;
 
-  // 파일 크기 체크 (10MB 제한)
-  if(file.size > 10*1024*1024){
-    alert('파일 크기가 너무 큽니다. 10MB 이하 사진을 사용해주세요.');
-    return;
-  }
-
   const reader=new FileReader();
-  reader.onload=function(e){
-    uploadedPhotoDataURL=e.target.result;
-    const parts=e.target.result.split(',');
+  reader.onload=async function(e){
+    // 이미지 압축
+    const compressed=await compressImage(e.target.result);
+    uploadedPhotoDataURL=compressed;
+    const parts=compressed.split(',');
     uploadedPhotoBase64=parts[1];
-    uploadedPhotoMime=file.type||'image/jpeg';
+    uploadedPhotoMime='image/jpeg';
 
-    // 미리보기
+    // 미리보기 (원본 사진으로)
     const area=document.getElementById('uploadArea');
     area.classList.add('has-photo');
     document.getElementById('uploadText').textContent='사진 등록됨 ✓';
@@ -938,7 +954,7 @@ function handlePhoto(event){
     const previews=document.getElementById('photoPreviews');
     previews.innerHTML=`
       <div class="photo-thumb">
-        <img src="${e.target.result}" alt="업로드된 사진">
+        <img src="${compressed}" alt="업로드된 사진">
         <button class="del-btn" onclick="removePhoto(event)">✕</button>
       </div>`;
     document.getElementById('aiPromo').style.background='linear-gradient(135deg,#065f46,#064e3b)';
