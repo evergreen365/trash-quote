@@ -5,6 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>AI 쓰레기집청소 비용 무료 견적계산기</title>
 <meta name="description" content="AI가 쓰레기집 청소 비용을 즉시 계산해드립니다. 평수·오염도·폐기물량 입력 → 바로 견적 산출. 무료 · 전국 출동 · 365일 24시간 · 현금 분할납부.">
+
+<!-- Open Graph / 카카오톡 링크 미리보기 -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://evergreen365.github.io/trash-quote/">
+<meta property="og:title" content="쓰레기집청소, 포기하지마세요! AI 견적계산기">
+<meta property="og:description" content="사진 한 장으로 청소 후 모습 확인 + 즉시 견적 산출. 원룸 10만원부터 · 전국 출동 · 365일 24시간 · 현금 분할납부">
+<meta property="og:image" content="https://evergreen365.github.io/trash-quote/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="특수청소에버그린">
+
+<!-- 카카오톡 전용 -->
+<meta name="kakao:title" content="쓰레기집청소, 포기하지마세요!">
+<meta name="kakao:description" content="AI가 청소 후 모습과 정확한 비용을 즉시 알려드립니다">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -139,11 +154,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--cr);color:var(--ch);
 .ai-sim-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
 .ai-sim-title{color:#c7d2fe;font-size:14px;font-weight:700}
 .ai-sim-beta{background:rgba(124,58,237,.6);color:#ddd6fe;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px}
-.before-after-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.before-after-wrap{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}
 .ba-item{position:relative}
 .ba-label{background:rgba(0,0,0,.6);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;position:absolute;top:6px;left:6px;z-index:2;letter-spacing:.05em}
-.ba-img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;display:block}
-.ba-placeholder{width:100%;aspect-ratio:4/3;background:rgba(255,255,255,.08);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.ba-img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;display:block}
+.ba-placeholder{width:100%;aspect-ratio:16/9;background:rgba(255,255,255,.08);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
 .ba-placeholder .spin-sm{width:24px;height:24px;border:3px solid rgba(199,210,254,.2);border-top-color:#c7d2fe;border-radius:50%;animation:spin 1s linear infinite}
 .ba-placeholder span{color:rgba(199,210,254,.7);font-size:10px}
 .ai-analysis-box{background:rgba(255,255,255,.08);border-radius:9px;padding:11px 13px}
@@ -284,7 +299,7 @@ footer a{color:var(--g3);text-decoration:none}
   .trust-bar{gap:10px}
   .td{display:none}
   .tn{font-size:16px}
-  .before-after-wrap{grid-template-columns:1fr 1fr}
+  .before-after-wrap{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -641,19 +656,20 @@ footer a{color:var(--g3);text-decoration:none}
       <div class="ab-note" id="workDays"></div>
     </div>
 
-    <div class="free-banner">
-      <div class="fb-icon">🎁</div>
-      <div class="fb-txt">
-        <div class="fbt">타사 대비 절감 혜택 · 기본 소독·탈취 무료 제공</div>
-        <div class="fbs">일반 탈취·소독 작업 (약 20만원 상당) 기본 포함 — 추가 바가지 없음</div>
-      </div>
-    </div>
 
-    <div class="install-banner">
-      <div class="ib-icon">💳</div>
-      <div>
-        <div class="ib-t">🏆 국내유일 현금 분할납부 가능</div>
-        <div class="ib-s">부담 없이 작업 먼저, 납부는 나누어서 · 상담 시 문의</div>
+
+    <div class="install-banner" style="flex-direction:column;align-items:flex-start;gap:8px;padding:18px 20px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="ib-icon">💳</div>
+        <div class="ib-t" style="font-size:18px">🏆 국내유일 현금 분할납부 가능</div>
+      </div>
+      <div style="color:rgba(255,255,255,.9);font-size:13px;line-height:1.8;padding-left:2px">
+        ✔ 목돈 없어도 작업 즉시 가능<br>
+        ✔ 작업 먼저, 납부는 나눠서<br>
+        ✔ 카드·현금·분할 모두 가능 · 이자 없음
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:8px 14px;width:100%;text-align:center">
+        <span style="color:#fef08a;font-size:14px;font-weight:700">💬 분할납부 조건 상담 → 010-8499-0024</span>
       </div>
     </div>
 
@@ -673,23 +689,46 @@ footer a{color:var(--g3);text-decoration:none}
 
     <div class="trust-sec">
       <div class="ts-h">🏅 에버그린을 선택해야 하는 이유</div>
+
+      <!-- 방송 출연 강조 배너 -->
+      <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:14px 16px;margin-bottom:14px;border:1px solid rgba(255,215,0,.2)">
+        <div style="color:#ffd700;font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          📺 지상파 방송 검증 완료
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center">
+            <div style="color:#fff;font-size:13px;font-weight:700">KBS</div>
+            <div style="color:rgba(255,255,255,.5);font-size:10px;margin-top:2px">출연</div>
+          </div>
+          <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center">
+            <div style="color:#fff;font-size:13px;font-weight:700">MBC</div>
+            <div style="color:rgba(255,255,255,.5);font-size:10px;margin-top:2px">출연</div>
+          </div>
+          <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center">
+            <div style="color:#fff;font-size:13px;font-weight:700">SBS</div>
+            <div style="color:rgba(255,255,255,.5);font-size:10px;margin-top:2px">출연</div>
+          </div>
+        </div>
+        <div style="color:rgba(255,215,0,.7);font-size:11px;margin-top:8px;text-align:center">+ JTBC · EBS · Channel A · 20회 이상 출연</div>
+      </div>
+
       <div class="ts-stats">
         <div class="ts-stat"><div class="ts-n">7년+</div><div class="ts-l">전문경력</div></div>
         <div class="ts-stat"><div class="ts-n">1,500+</div><div class="ts-l">누적 작업건수</div></div>
-        <div class="ts-stat"><div class="ts-n">20회+</div><div class="ts-l">MBC·KBS·SBS 방송출연</div></div>
+        <div class="ts-stat"><div class="ts-n">무이자</div><div class="ts-l">현금분할납부</div></div>
       </div>
       <div class="rev-grid">
         <div class="rev">
-          <div class="rev-top"><div><div class="rev-nm">인천 남동구 최○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2026.02.18</div></div>
-          <div class="rev-txt">2년 넘게 방치된 현장인데 하루 만에 완전히 처리해 주셨어요. 현금 분할로 부담도 없었고 추가 요금도 없었습니다.</div>
+          <div class="rev-top"><div><div class="rev-nm">인천 미추홀구 김○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2026.05.11</div></div>
+          <div class="rev-txt">분할납부 된다고 해서 연락했는데 진짜로 나눠서 낼 수 있었어요. 목돈 없어서 망설였는데 작업 먼저 해주시고 부담 없이 해결했습니다. 강력 추천합니다.</div>
         </div>
         <div class="rev">
-          <div class="rev-top"><div><div class="rev-nm">서울 노원구 박○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2026.01.09</div></div>
-          <div class="rev-txt">견적계산기 금액이 실제랑 거의 같아서 믿고 맡겼어요. 3단계 오염인데 냄새도 완전히 잡아주셨고 행정 처리까지 도와주셔서 감사했습니다.</div>
+          <div class="rev-top"><div><div class="rev-nm">서울 강서구 박○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2026.04.27</div></div>
+          <div class="rev-txt">KBS에서 봤던 업체인데 직접 써보니 방송보다 더 전문적이었어요. 4단계 수준인데 하루 만에 다 해결해 주셨고 냄새도 완전히 잡혔습니다.</div>
         </div>
         <div class="rev">
-          <div class="rev-top"><div><div class="rev-nm">경기 부천시 이○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2025.12.03</div></div>
-          <div class="rev-txt">SBS에 나온 업체라 믿었는데 기대 이상이었어요. 쓰레기가 천장까지 쌓인 현장이었는데 깔끔하게 처리해 주시고 무료로 탈취 처리까지 해주셔서 너무 좋았습니다.</div>
+          <div class="rev-top"><div><div class="rev-nm">경기 수원시 최○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2026.05.19</div></div>
+          <div class="rev-txt">SBS 방송 보고 믿고 맡겼어요. 10년 넘게 쌓인 현장인데 정말 깔끔하게 처리해 주셨고 행정사 자격으로 서류까지 도와주셔서 감사했습니다.</div>
         </div>
       </div>
     </div>
@@ -727,7 +766,7 @@ footer a{color:var(--g3);text-decoration:none}
 // 설정
 // ═══════════════════════════════════════════════
 const CFG = {
-  worker_url: 'https://evergreen-proxy-fpolo5mhn-evergreen-s-projects1.vercel.app',
+  worker_url: 'https://evergreen-proxy-git-main-evergreen-s-projects1.vercel.app',
   telegram_token: '8615878395:AAHhMj3uCVQ8HQbo-jem1QB_YMk0ltY7RjU',
   telegram_chat_id: '1701103630',
   email: 'ever24green@gmail.com',
@@ -926,7 +965,7 @@ function removePhoto(e){
 // 1. 사진 분석 (Vision)
 async function analyzePhoto(base64, mime){
   try{
-    const res=await fetch(`${CFG.worker_url}/analyze`,{
+    const res=await fetch(`${CFG.worker_url}/api/analyze`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({base64, mime})
@@ -950,7 +989,7 @@ async function analyzePhoto(base64, mime){
 // 2. After 이미지 생성
 async function generateAfterImage(base64, mime){
   try{
-    const res=await fetch(`${CFG.worker_url}/generate-image`,{
+    const res=await fetch(`${CFG.worker_url}/api/generate-image`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({base64, mime})
