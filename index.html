@@ -312,6 +312,18 @@ footer a{color:var(--g3);text-decoration:none}
     <div class="ls-item" id="ls1">📋 입력 정보 분석 중</div>
     <div class="ls-item" id="ls2">💰 견적 계산 중</div>
   </div>
+  <!-- 이미지 생성 중 광고 -->
+  <div id="loadingAd" style="display:none;margin-top:24px;background:linear-gradient(135deg,#c9a84c,#f0d080);border-radius:14px;padding:16px 24px;text-align:center;max-width:300px">
+    <div style="font-size:11px;color:#1a3a2a;font-weight:700;letter-spacing:.08em;margin-bottom:6px">🏆 NO.1 프리미엄 특수청소</div>
+    <div style="font-size:20px;font-weight:900;color:#1a3a2a;letter-spacing:.02em;margin-bottom:4px">특수청소에버그린</div>
+    <div style="font-size:18px;font-weight:700;color:#1a3a2a">📞 010-8499-0024</div>
+    <div style="font-size:10px;color:#2d5a3d;margin-top:6px">KBS·MBC·SBS 방송출연 · 전국 당일 출동</div>
+    <div id="adRotate" style="font-size:11px;color:#2d5a3d;margin-top:4px;font-weight:600"></div>
+  </div>
+  <div style="margin-top:14px;color:rgba(255,255,255,.5);font-size:11px;text-align:center;line-height:1.8">
+    ⏱ AI 이미지 생성은 <strong style="color:rgba(255,255,255,.75)">30초 이상</strong> 소요될 수 있습니다<br>
+    <span style="font-size:10px">잠시만 기다려 주세요 · 화면을 닫지 마세요</span>
+  </div>
 </div>
 
 <div id="pdfPreview"></div>
@@ -583,13 +595,33 @@ footer a{color:var(--g3);text-decoration:none}
         <span class="beta-badge">BETA</span>
         <span class="hint">AI가 오염도 분석 + 청소 후 모습을 생성합니다</span>
       </label>
-      <div class="photo-upload-area" id="uploadArea" onclick="document.getElementById('photoInput').click()">
-        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhoto(event)">
-        <div class="upload-icon">📷</div>
-        <div class="upload-text" id="uploadText">사진을 탭해서 업로드</div>
-        <div class="upload-sub">JPG · PNG · HEIC 지원 · 최대 1장</div>
+
+      <!-- 잠금 UI (연락처 미입력 시) -->
+      <div id="photoLock" style="background:linear-gradient(135deg,#1a3a2a,#2d6a4f);border-radius:12px;padding:18px;text-align:center;margin-bottom:8px">
+        <div style="font-size:28px;margin-bottom:8px">🔒</div>
+        <div style="color:#f0d080;font-size:14px;font-weight:700;margin-bottom:4px">AI 청소 시뮬레이션 무료 체험</div>
+        <div style="color:rgba(255,255,255,.8);font-size:12px;margin-bottom:12px">연락처를 입력하면 AI 이미지 생성 기능이 활성화됩니다</div>
+        <div style="display:flex;gap:8px;max-width:300px;margin:0 auto">
+          <input type="tel" id="lockPhone" placeholder="010-0000-0000" maxlength="13"
+            style="flex:1;padding:10px 12px;border:none;border-radius:8px;font-size:14px;font-family:inherit"
+            oninput="formatLockPhone(this)">
+          <button onclick="unlockPhoto()" style="background:#f0d080;color:#1a3a2a;border:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer">확인</button>
+        </div>
+        <div id="lockMsg" style="color:#fca5a5;font-size:11px;margin-top:6px"></div>
+        <div style="color:rgba(255,255,255,.4);font-size:10px;margin-top:8px">수집된 연락처는 견적 상담 외 사용되지 않습니다</div>
       </div>
-      <div class="photo-previews" id="photoPreviews"></div>
+
+      <!-- 실제 업로드 영역 (잠금 해제 후) -->
+      <div id="photoUnlocked" style="display:none">
+        <div class="photo-upload-area" id="uploadArea" onclick="document.getElementById('photoInput').click()">
+          <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhoto(event)">
+          <div class="upload-icon">📷</div>
+          <div class="upload-text" id="uploadText">사진을 탭해서 업로드</div>
+          <div class="upload-sub">JPG · PNG · HEIC 지원 · 최대 1장</div>
+        </div>
+        <div class="photo-previews" id="photoPreviews"></div>
+      </div>
+
       <div class="ai-promo" id="aiPromo">
         <div class="ai-promo-icon">🤖</div>
         <div>
@@ -910,9 +942,85 @@ document.getElementById('phone').addEventListener('input',function(){
   else this.value=v;
 });
 
+function formatLockPhone(el){
+  let v=el.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>7) el.value=v.replace(/(\d{3})(\d{4})(\d+)/,'$1-$2-$3');
+  else if(v.length>3) el.value=v.replace(/(\d{3})(\d+)/,'$1-$2');
+  else el.value=v;
+}
+
+function unlockPhoto(){
+  const phone=document.getElementById('lockPhone').value.trim();
+  const msg=document.getElementById('lockMsg');
+  const digits=phone.replace(/\D/g,'');
+  if(!phone.startsWith('010')||digits.length!==11){
+    msg.textContent='올바른 휴대폰 번호를 입력해주세요 (010으로 시작)';
+    return;
+  }
+  // 연락처 저장 (마케팅 데이터)
+  localStorage.setItem('ev_unlock_phone', phone);
+  localStorage.setItem('ev_unlock_time', Date.now());
+
+  // 잠금 해제
+  document.getElementById('photoLock').style.display='none';
+  document.getElementById('photoUnlocked').style.display='block';
+
+  // 텔레그램 알림 (마케팅 데이터 수집)
+  const msg2=`🔓 [AI시뮬레이션 잠금해제]\n📞 ${phone}\n📅 ${new Date().toLocaleString('ko-KR')}`;
+  fetch(\`https://api.telegram.org/bot\${CFG.telegram_token}/sendMessage\`,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({chat_id:CFG.telegram_chat_id,text:msg2})
+  }).catch(()=>{});
+}
+
+// 이미 잠금 해제된 경우 자동 활성화 (24시간 유효)
+(function checkUnlock(){
+  const t=localStorage.getItem('ev_unlock_time');
+  if(t && Date.now()-parseInt(t)<86400000){
+    const lock=document.getElementById('photoLock');
+    const unlocked=document.getElementById('photoUnlocked');
+    if(lock) lock.style.display='none';
+    if(unlocked) unlocked.style.display='block';
+  }
+})();
+
 // ═══════════════════════════════════════════════
 // 사진 업로드 처리
 // ═══════════════════════════════════════════════
+// 워터마크 삽입 함수
+function addWatermark(dataURL, callback){
+  const img=new Image();
+  img.onload=function(){
+    const canvas=document.createElement('canvas');
+    canvas.width=img.width;
+    canvas.height=img.height;
+    const ctx=canvas.getContext('2d');
+    ctx.drawImage(img,0,0);
+
+    // 워터마크 스타일
+    ctx.save();
+    ctx.globalAlpha=0.18;
+    ctx.fillStyle='#ffffff';
+    ctx.font=`bold ${Math.round(img.width*0.055)}px sans-serif`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+
+    // 대각선 반복 워터마크
+    const step=img.width*0.38;
+    ctx.translate(img.width/2, img.height/2);
+    ctx.rotate(-30*Math.PI/180);
+    for(let x=-img.width; x<img.width*1.5; x+=step){
+      for(let y=-img.height; y<img.height*1.5; y+=step*0.7){
+        ctx.fillText('에버그린', x, y);
+      }
+    }
+    ctx.restore();
+
+    callback(canvas.toDataURL('image/jpeg', 0.92));
+  };
+  img.src=dataURL;
+}
+
 // 이미지 압축 함수 (최대 1024px, JPEG 80%)
 function compressImage(dataURL){
   return new Promise((resolve)=>{
@@ -1025,6 +1133,29 @@ async function generateAfterImage(base64, mime){
 // ═══════════════════════════════════════════════
 // 로딩 단계 표시
 // ═══════════════════════════════════════════════
+// 광고 문구 로테이션
+const adMessages = [
+  '💳 현금 분할납부 · 이자 없음',
+  '🚗 오늘 바로 출동 가능',
+  '🎁 기본 소독·탈취 무료 제공',
+  '📋 행정사 자격 보유 업체',
+  '⭐ 누적 작업 1,500건+',
+  '🏠 무료 현장 방문 견적',
+];
+let adIdx=0;
+let adTimer=null;
+function startAdRotation(){
+  const el=document.getElementById('adRotate');
+  if(!el) return;
+  el.textContent=adMessages[0];
+  adTimer=setInterval(()=>{
+    adIdx=(adIdx+1)%adMessages.length;
+    el.style.opacity='0';
+    setTimeout(()=>{ el.textContent=adMessages[adIdx]; el.style.opacity='1'; },300);
+  },2500);
+}
+function stopAdRotation(){ if(adTimer){ clearInterval(adTimer); adTimer=null; } }
+
 function setLoadingStep(step, total){
   const steps={
     1:{title:'📷 AI가 사진을 분석하고 있습니다...',items:['📷 사진 분석 중...','💰 견적 계산 대기 중','🎨 이미지 생성 대기 중']},
@@ -1033,6 +1164,12 @@ function setLoadingStep(step, total){
     0:{title:'💰 견적을 계산하고 있습니다...',items:['📋 입력 정보 분석 중','💰 견적 계산 중']},
   };
   const cfg=steps[step]||steps[0];
+  // step 3 (이미지 생성 중)일 때 광고 표시
+  const adEl=document.getElementById('loadingAd');
+  if(adEl){
+    if(step===3){ adEl.style.display='block'; startAdRotation(); }
+    else{ adEl.style.display='none'; stopAdRotation(); }
+  }
   document.getElementById('loadingTitle').textContent=cfg.title;
   const stepsEl=document.getElementById('loadingSteps');
   stepsEl.innerHTML=cfg.items.map((item,i)=>{
@@ -1137,6 +1274,9 @@ async function calcQuote(){
   };
 
   document.getElementById('loading').classList.remove('on');
+  stopAdRotation();
+  const adEl2=document.getElementById('loadingAd');
+  if(adEl2) adEl2.style.display='none';
   showResult(quoteData);
   sendNotify(quoteData).catch(()=>{});
 }
@@ -1166,9 +1306,12 @@ function showResult(r){
 
     if(r.afterImageDataURL){
       document.getElementById('afterPlaceholder').style.display='none';
-      const afterImg=document.getElementById('afterImg');
-      afterImg.src=r.afterImageDataURL;
-      afterImg.style.display='block';
+      // 워터마크 삽입
+      addWatermark(r.afterImageDataURL, function(watermarkedURL){
+        const afterImg=document.getElementById('afterImg');
+        afterImg.src=watermarkedURL;
+        afterImg.style.display='block';
+      });
     } else {
       // 이미지 생성 실패 시
       document.getElementById('afterPlaceholder').innerHTML=
