@@ -6,20 +6,31 @@
 <title>AI 쓰레기집청소 비용 무료 견적계산기</title>
 <meta name="description" content="AI가 쓰레기집 청소 비용을 즉시 계산해드립니다. 평수·오염도·폐기물량 입력 → 바로 견적 산출. 무료 · 전국 출동 · 365일 24시간 · 현금 분할납부.">
 
-<!-- Open Graph / 카카오톡 링크 미리보기 -->
+<!-- ===== Open Graph / SNS 링크 미리보기 ===== -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://evergreen365.github.io/trash-quote/">
-<meta property="og:title" content="쓰레기집청소, 포기하지마세요! AI 견적계산기">
-<meta property="og:description" content="사진 한 장으로 청소 후 모습 확인 + 즉시 견적 산출. 원룸 10만원부터 · 전국 출동 · 365일 24시간 · 현금 분할납부">
+<meta property="og:title" content="쓰레기집청소, 포기하지마세요! | AI 견적계산기">
+<meta property="og:description" content="사진 한 장으로 청소 후 모습 확인 · 즉시 견적 산출. 원룸 10만원부터 · 전국 출동 · 365일 24시간 · 국내유일 현금 분할납부 · 010-8499-0024">
 <meta property="og:image" content="https://evergreen365.github.io/trash-quote/og-image.png">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="에버그린 AI 쓰레기집청소 견적계산기 - 국내유일 분할납부 가능">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:site_name" content="특수청소에버그린">
 
-<!-- 카카오톡 전용 -->
+<!-- ===== Twitter Card (카카오·네이버 일부 플랫폼 호환) ===== -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="쓰레기집청소, 포기하지마세요! | AI 견적계산기">
+<meta name="twitter:description" content="사진 한 장으로 청소 후 모습 확인 · 즉시 견적 산출. 국내유일 현금 분할납부 · 010-8499-0024">
+<meta name="twitter:image" content="https://evergreen365.github.io/trash-quote/og-image.png">
+<meta name="twitter:image:alt" content="에버그린 AI 쓰레기집청소 견적계산기">
+
+<!-- ===== 카카오톡 전용 ===== -->
 <meta name="kakao:title" content="쓰레기집청소, 포기하지마세요!">
-<meta name="kakao:description" content="AI가 청소 후 모습과 정확한 비용을 즉시 알려드립니다">
+<meta name="kakao:description" content="AI가 청소 후 모습과 정확한 비용을 즉시 알려드립니다 · 국내유일 분할납부 · 010-8499-0024">
+<meta name="kakao:image" content="https://evergreen365.github.io/trash-quote/og-image.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -281,6 +292,51 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--cr);color:var(--ch);
 .notice{background:#fffbeb;border:1px solid #fcd34d;border-radius:9px;padding:10px 14px;font-size:12px;color:#92400e;line-height:1.6;margin-bottom:14px}
 #pdfPreview{position:fixed;left:-9999px;top:0;width:794px;background:#fff;z-index:-1}
 
+/* ── 전화 인증(OTP) ── */
+.phone-row{display:flex;gap:8px}
+.phone-row .inp{flex:1}
+.otp-send-btn{flex-shrink:0;padding:0 16px;border:none;border-radius:10px;background:var(--g2);color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;transition:all .2s}
+.otp-send-btn:hover{background:var(--g3)}
+.otp-send-btn:disabled{background:#cbd5e1;cursor:not-allowed}
+.otp-box{margin-top:10px;background:var(--gp);border-radius:10px;padding:12px 14px;display:none}
+.otp-box.on{display:block;animation:fadeIn .3s ease}
+.otp-row{display:flex;gap:8px;align-items:center}
+.otp-inp{flex:1;padding:11px 14px;border:2px solid var(--g3);border-radius:10px;font-size:18px;font-weight:700;text-align:center;letter-spacing:.3em;font-family:inherit}
+.otp-inp:focus{outline:none;box-shadow:0 0 0 3px rgba(64,145,108,.15)}
+.otp-confirm{flex-shrink:0;padding:0 18px;border:none;border-radius:10px;background:var(--g1);color:#fff;font-weight:700;font-size:13px;cursor:pointer}
+.otp-meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:11px}
+.otp-timer{color:var(--rd);font-weight:600}
+.otp-resend{color:var(--g2);background:none;border:none;font-size:11px;cursor:pointer;text-decoration:underline;font-family:inherit}
+.otp-msg{font-size:11px;margin-top:6px;min-height:14px}
+.otp-msg.err{color:var(--rd)}
+.otp-msg.ok{color:var(--g2);font-weight:600}
+.verified-tag{display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#166534;font-size:11px;font-weight:700;padding:3px 9px;border-radius:8px;margin-left:6px}
+
+/* ── 카카오 채널 게이트 ── */
+.kakao-gate{background:linear-gradient(135deg,#1a3a2a,#2d6a4f);border-radius:14px;padding:20px 18px;text-align:center}
+.kakao-gate .kg-lock{font-size:30px;margin-bottom:8px}
+.kakao-gate .kg-title{color:#f0d080;font-size:15px;font-weight:700;margin-bottom:5px}
+.kakao-gate .kg-sub{color:rgba(255,255,255,.8);font-size:12px;line-height:1.6;margin-bottom:14px}
+.kakao-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;max-width:300px;background:#FEE500;color:#3A1D1D;border:none;border-radius:10px;padding:13px 16px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:transform .2s;text-decoration:none}
+.kakao-btn:hover{transform:translateY(-2px)}
+.kg-step2{display:none;margin-top:14px}
+.kg-step2.on{display:block;animation:fadeIn .3s ease}
+.kg-code-row{display:flex;gap:8px;max-width:300px;margin:0 auto}
+.kg-code-inp{flex:1;padding:11px 12px;border:none;border-radius:9px;font-size:16px;font-weight:700;text-align:center;letter-spacing:.2em;font-family:inherit}
+.kg-code-btn{flex-shrink:0;background:#f0d080;color:#1a3a2a;border:none;border-radius:9px;padding:0 16px;font-size:13px;font-weight:700;cursor:pointer}
+.kg-msg{font-size:11px;margin-top:8px;min-height:14px;color:#fca5a5}
+.kg-msg.ok{color:#86efac;font-weight:600}
+.kg-skip{margin-top:10px}
+.kg-skip button{background:none;border:none;color:rgba(255,255,255,.5);font-size:11px;text-decoration:underline;cursor:pointer;font-family:inherit}
+
+/* ── 결과: 네이버 플레이스 저장 유도 ── */
+.nplace-save{background:linear-gradient(135deg,#03c75a,#02a94d);border-radius:13px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;gap:13px}
+.nplace-icon{width:42px;height:42px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;font-weight:900;color:#fff}
+.nplace-txt{flex:1}
+.nplace-t{color:#fff;font-size:14px;font-weight:700;margin-bottom:2px}
+.nplace-s{color:rgba(255,255,255,.85);font-size:11px;line-height:1.5}
+.nplace-btn{background:#fff;color:#03c75a;border:none;border-radius:9px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:none;flex-shrink:0}
+
 footer{text-align:center;padding:26px 16px;font-size:12px;color:#9ca3af;line-height:1.8}
 footer strong{color:var(--g2)}
 footer a{color:var(--g3);text-decoration:none}
@@ -371,9 +427,31 @@ footer a{color:var(--g3);text-decoration:none}
   <!-- ══ STEP 1 ══ -->
   <div class="step active" id="step1">
     <div class="notice">📢 본 견적은 <strong>기본 작업 기준 시작가</strong>입니다. 실제 금액은 현장 확인 후 최종 확정됩니다.</div>
+
+    <!-- 허니팟 (사람 눈에 안 보임 · 봇만 입력 → 차단용) -->
+    <input type="text" id="hp_company" name="company" tabindex="-1" autocomplete="off"
+      aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
+
     <div class="fg">
-      <label class="lbl">연락처 <span class="req">*</span></label>
-      <input type="tel" class="inp" id="phone" placeholder="010-0000-0000" maxlength="13">
+      <label class="lbl">연락처 <span class="req">*</span><span id="phoneVerifiedTag" class="verified-tag" style="display:none">✓ 인증완료</span></label>
+      <div class="phone-row">
+        <input type="tel" class="inp" id="phone" placeholder="010-0000-0000" maxlength="13">
+        <button type="button" class="otp-send-btn" id="otpSendBtn" onclick="sendOTP()">인증번호 받기</button>
+      </div>
+      <p style="font-size:11px;color:var(--gm);margin-top:6px">📞 입력하신 번호로 <strong style="color:var(--g2)">10분 내 무료 견적 전화</strong>를 드립니다 · 스팸·재판매 절대 없음</p>
+
+      <!-- OTP 입력 박스 -->
+      <div class="otp-box" id="otpBox">
+        <div class="otp-row">
+          <input type="tel" class="otp-inp" id="otpInput" placeholder="● ● ● ● ● ●" maxlength="6" inputmode="numeric">
+          <button type="button" class="otp-confirm" onclick="verifyOTP()">확인</button>
+        </div>
+        <div class="otp-meta">
+          <span class="otp-timer" id="otpTimer"></span>
+          <button type="button" class="otp-resend" id="otpResend" onclick="sendOTP()" style="display:none">인증번호 재발송</button>
+        </div>
+        <div class="otp-msg" id="otpMsg"></div>
+      </div>
     </div>
     <div class="fg">
       <label class="lbl">주소 <span class="req">*</span><span class="hint">도로명 주소</span></label>
@@ -596,19 +674,26 @@ footer a{color:var(--g3);text-decoration:none}
         <span class="hint">AI가 오염도 분석 + 청소 후 모습을 생성합니다</span>
       </label>
 
-      <!-- 잠금 UI (연락처 미입력 시) -->
-      <div id="photoLock" style="background:linear-gradient(135deg,#1a3a2a,#2d6a4f);border-radius:12px;padding:18px;text-align:center;margin-bottom:8px">
-        <div style="font-size:28px;margin-bottom:8px">🔒</div>
-        <div style="color:#f0d080;font-size:14px;font-weight:700;margin-bottom:4px">AI 청소 시뮬레이션 무료 체험</div>
-        <div style="color:rgba(255,255,255,.8);font-size:12px;margin-bottom:12px">연락처를 입력하면 AI 이미지 생성 기능이 활성화됩니다</div>
-        <div style="display:flex;gap:8px;max-width:300px;margin:0 auto">
-          <input type="tel" id="lockPhone" placeholder="010-0000-0000" maxlength="13"
-            style="flex:1;padding:10px 12px;border:none;border-radius:8px;font-size:14px;font-family:inherit"
-            oninput="formatLockPhone(this)">
-          <button onclick="unlockPhoto()" style="background:#f0d080;color:#1a3a2a;border:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer">확인</button>
+      <!-- 잠금 UI: 카카오 채널 추가 후 해제 -->
+      <div id="photoLock" class="kakao-gate" style="margin-bottom:8px">
+        <div class="kg-lock">🔒</div>
+        <div class="kg-title">AI 청소 시뮬레이션 무료 체험</div>
+        <div class="kg-sub">카카오 채널을 추가하면<br>AI 청소 후 이미지 생성이 활성화됩니다</div>
+        <button type="button" class="kakao-btn" onclick="openKakaoChannel()">
+          💬 카카오 채널 추가하고 시작하기
+        </button>
+
+        <!-- 채널 추가 후 인증코드 입력 (백엔드 연동 시) -->
+        <div class="kg-step2" id="kgStep2">
+          <div style="color:rgba(255,255,255,.85);font-size:12px;margin-bottom:8px">채널에서 받은 <strong style="color:#f0d080">인증코드</strong>를 입력하세요</div>
+          <div class="kg-code-row">
+            <input type="tel" class="kg-code-inp" id="kakaoCode" placeholder="인증코드" maxlength="6" inputmode="numeric">
+            <button type="button" class="kg-code-btn" onclick="verifyKakao()">확인</button>
+          </div>
+          <div class="kg-msg" id="kakaoMsg"></div>
         </div>
-        <div id="lockMsg" style="color:#fca5a5;font-size:11px;margin-top:6px"></div>
-        <div style="color:rgba(255,255,255,.4);font-size:10px;margin-top:8px">수집된 연락처는 견적 상담 외 사용되지 않습니다</div>
+
+        <div style="color:rgba(255,255,255,.4);font-size:10px;margin-top:10px">채널 친구에게는 분할납부·이벤트 소식을 보내드립니다</div>
       </div>
 
       <!-- 실제 업로드 영역 (잠금 해제 후) -->
@@ -688,8 +773,6 @@ footer a{color:var(--g3);text-decoration:none}
       <div class="ab-note" id="workDays"></div>
     </div>
 
-
-
     <div class="install-banner" style="flex-direction:column;align-items:flex-start;gap:8px;padding:18px 20px">
       <div style="display:flex;align-items:center;gap:10px">
         <div class="ib-icon">💳</div>
@@ -717,6 +800,16 @@ footer a{color:var(--g3);text-decoration:none}
         <div class="sv-s">위 금액은 기본 시작가이며 실제 현장 상태에 따라 달라집니다.<br>전문가가 직접 방문하여 <strong style="color:#f0d080">정확한 견적을 무료</strong>로 산출해드립니다.</div>
       </div>
       <a href="tel:010-8499-0024" class="sv-btn">📞 바로 연결</a>
+    </div>
+
+    <!-- 네이버 플레이스 저장 유도 (소프트) -->
+    <div class="nplace-save">
+      <div class="nplace-icon">N</div>
+      <div class="nplace-txt">
+        <div class="nplace-t">에버그린 플레이스 저장하기</div>
+        <div class="nplace-s">저장해두면 다음에 바로 찾을 수 있어요 · 후기·실적 확인 가능</div>
+      </div>
+      <a href="https://map.naver.com/" target="_blank" rel="noopener" class="nplace-btn" id="nplaceBtn">저장 →</a>
     </div>
 
     <div class="trust-sec">
@@ -768,7 +861,7 @@ footer a{color:var(--g3);text-decoration:none}
     <div class="act-btns">
       <button class="btn btn-pdf" id="pdfBtn" onclick="dlPDF()">📄 PDF 견적서 저장</button>
       <div class="act-row">
-        <a href="https://open.kakao.com/o/sOTSCZqd" target="_blank" class="btn btn-kakao">💬 카카오톡 상담</a>
+        <a href="https://pf.kakao.com/_xiYxcxfxj/chat" target="_blank" class="btn btn-kakao">💬 카카오톡 상담</a>
         <a href="https://talk.naver.com/ct/w1x4i65" target="_blank" class="btn btn-naver">💚 네이버 톡톡</a>
       </div>
       <a href="tel:010-8499-0024" class="btn btn-tel">📞 010-8499-0024 전화 상담</a>
@@ -794,22 +887,27 @@ footer a{color:var(--g3);text-decoration:none}
 <script>
 'use strict';
 
-// ═══════════════════════════════════════════════
-// 설정
-// ═══════════════════════════════════════════════
 const CFG = {
   worker_url: 'https://evergreen-proxy-git-main-evergreen-s-projects1.vercel.app',
   telegram_token: '8615878395:AAHhMj3uCVQ8HQbo-jem1QB_YMk0ltY7RjU',
   telegram_chat_id: '1701103630',
   email: 'ever24green@gmail.com',
+
+  // ▼▼▼ 여기만 바꾸면 됩니다 ▼▼▼
+  // 카카오 채널 추가 URL (친구추가 전용 /friend 링크)
+  kakao_channel_url: 'https://pf.kakao.com/_xiYxcxfxj/friend',
+  // 네이버 플레이스 URL (플레이스 공유 주소로 교체)
+  naver_place_url: 'https://naver.me/5WOuu6Pr',
+
+  // 백엔드(Vercel worker) 엔드포인트 준비 여부 — 준비되면 true로 변경
+  FEATURES: {
+    smsOtp: false,      // true: Step1 전화번호 SMS 인증 (worker: /api/send-otp, /api/verify-otp 필요)
+    kakaoVerify: false, // true: 카카오 채널 인증코드 검증 (worker: /api/verify-kakao 필요)
+                        // false면 '채널 추가 완료' 확인 방식으로 동작(백엔드 불필요)
+  },
+  // ▲▲▲ 여기만 바꾸면 됩니다 ▲▲▲
 };
 
-// Gemini Vision → OpenAI GPT-4o로 대체됨
-// Gemini Image → OpenAI gpt-image-1로 대체됨
-
-// ═══════════════════════════════════════════════
-// 가격 테이블
-// ═══════════════════════════════════════════════
 const PRICE_TABLE = {
   '5_1':  [100000,  180000,  120000,'원룸(5~10평)'],
   '5_2':  [180000,  280000,  200000,'원룸(5~10평)'],
@@ -875,13 +973,28 @@ const SVC_LABELS = {
   night:  {nm:'심야 비밀 작업',        p:0},
 };
 
-// ═══════════════════════════════════════════════
-// 상태
-// ═══════════════════════════════════════════════
 let curStep=1, tonVal=0, quoteData=null;
 let uploadedPhotoBase64=null, uploadedPhotoMime=null, uploadedPhotoDataURL=null;
 
-// ── UI 업데이트 ──
+// ── 허수 방지 / 인증 상태 ──
+const pageLoadTime = Date.now();   // 봇 감지(너무 빠른 제출)
+let phoneVerified = false;         // SMS 인증 통과 여부
+let otpTimerId = null;             // 인증 유효시간 타이머
+let lastOtpSendTime = 0;           // 인증번호 연타 차단
+let photoUnlockedFlag = false;     // 사진 잠금 해제 여부
+
+// 가짜번호 패턴 차단(동일숫자 반복·연속숫자 등)
+function isFakePhone(phone){
+  const d = (phone||'').replace(/\D/g,'');
+  if(d.length !== 11) return true;
+  if(!d.startsWith('010')) return true;
+  const rest = d.slice(3);                 // 뒤 8자리
+  if(/^(\d)\1{7}$/.test(rest)) return true; // 00000000, 11111111 …
+  if(rest === '12345678' || rest === '87654321') return true;
+  if(/^0{5,}/.test(rest)) return true;      // 00000xxx
+  return false;
+}
+
 const stepCfg=[null,
   {icon:'📋',title:'기본 정보 입력',sub:'연락처와 주소를 입력해주세요'},
   {icon:'🏠',title:'현장 정보 입력',sub:'평수·오염단계·쓰레기양을 선택해주세요'},
@@ -909,9 +1022,21 @@ function updateUI(s){
 
 function go(s){
   if(s===2){
-    if(!document.getElementById('phone').value.trim()){alert('연락처를 입력해주세요.');return;}
+    const phone=document.getElementById('phone').value.trim();
+    // 1) 허니팟: 봇이 숨은 필드를 채우면 차단(조용히 막음)
+    if(document.getElementById('hp_company').value!==''){ return; }
+    // 2) 봇 의심: 페이지 연 지 2초 내 제출
+    if(Date.now()-pageLoadTime < 2000){ alert('잠시 후 다시 시도해주세요.'); return; }
+    // 3) 기본 입력 검증
+    if(!phone){alert('연락처를 입력해주세요.');return;}
+    if(isFakePhone(phone)){alert('올바른 휴대폰 번호를 입력해주세요. (010으로 시작하는 11자리)');return;}
     if(!document.getElementById('addr').value.trim()){alert('주소를 입력해주세요.');return;}
     if(!document.getElementById('consent').checked){alert('개인정보 수집·이용에 동의해주세요.');return;}
+    // 4) SMS 인증을 켠 경우 인증 통과 필수
+    if(CFG.FEATURES.smsOtp && !phoneVerified){
+      alert('휴대폰 인증을 완료해주세요. ["인증번호 받기"]');
+      return;
+    }
   }
   curStep=s; updateUI(s);
 }
@@ -940,44 +1065,168 @@ document.getElementById('phone').addEventListener('input',function(){
   if(v.length>7) this.value=v.replace(/(\d{3})(\d{4})(\d+)/,'$1-$2-$3');
   else if(v.length>3) this.value=v.replace(/(\d{3})(\d+)/,'$1-$2');
   else this.value=v;
+  // 번호가 바뀌면 인증 무효화
+  if(phoneVerified){
+    phoneVerified=false;
+    document.getElementById('phoneVerifiedTag').style.display='none';
+    document.getElementById('otpBox').classList.remove('on');
+    document.getElementById('otpSendBtn').disabled=false;
+    document.getElementById('otpSendBtn').textContent='인증번호 받기';
+  }
 });
 
-function formatLockPhone(el){
-  let v=el.value.replace(/\D/g,'').slice(0,11);
-  if(v.length>7) el.value=v.replace(/(\d{3})(\d{4})(\d+)/,'$1-$2-$3');
-  else if(v.length>3) el.value=v.replace(/(\d{3})(\d+)/,'$1-$2');
-  else el.value=v;
-}
+// ═══════════════════════════════════════════════
+// SMS 인증번호 (Solapi 등 — worker 엔드포인트 사용)
+// ═══════════════════════════════════════════════
+async function sendOTP(){
+  const phone=document.getElementById('phone').value.trim();
+  const sendBtn=document.getElementById('otpSendBtn');
+  const msg=document.getElementById('otpMsg');
+  msg.className='otp-msg';
 
-function unlockPhoto(){
-  const phone=document.getElementById('lockPhone').value.trim();
-  const msg=document.getElementById('lockMsg');
-  const digits=phone.replace(/\D/g,'');
-  if(!phone.startsWith('010')||digits.length!==11){
-    msg.textContent='올바른 휴대폰 번호를 입력해주세요 (010으로 시작)';
+  if(isFakePhone(phone)){ msg.classList.add('err'); msg.textContent='올바른 휴대폰 번호를 입력해주세요.'; return; }
+  // 연타 차단: 30초 이내 재발송 금지
+  if(Date.now()-lastOtpSendTime < 30000){
+    msg.classList.add('err'); msg.textContent='잠시 후 다시 시도해주세요.'; return;
+  }
+
+  // 백엔드 미연동 모드: 인증 단계 생략 안내
+  if(!CFG.FEATURES.smsOtp){
+    msg.classList.add('err');
+    msg.textContent='SMS 인증은 준비 중입니다. (관리자 설정 필요)';
     return;
   }
-  // 연락처 저장 (마케팅 데이터)
-  localStorage.setItem('ev_unlock_phone', phone);
-  localStorage.setItem('ev_unlock_time', Date.now());
 
-  // 잠금 해제
+  sendBtn.disabled=true; sendBtn.textContent='발송 중...';
+  try{
+    const res=await fetch(`${CFG.worker_url}/api/send-otp`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({phone})
+    });
+    if(!res.ok) throw new Error('send fail');
+    lastOtpSendTime=Date.now();
+    document.getElementById('otpBox').classList.add('on');
+    document.getElementById('otpInput').value='';
+    document.getElementById('otpInput').focus();
+    sendBtn.textContent='발송됨';
+    msg.classList.add('ok'); msg.textContent='인증번호를 발송했습니다. 문자를 확인해주세요.';
+    startOtpTimer(180);  // 3분
+  }catch(e){
+    sendBtn.disabled=false; sendBtn.textContent='인증번호 받기';
+    msg.classList.add('err'); msg.textContent='발송에 실패했습니다. 잠시 후 다시 시도해주세요.';
+  }
+}
+
+function startOtpTimer(sec){
+  const timerEl=document.getElementById('otpTimer');
+  const resendEl=document.getElementById('otpResend');
+  resendEl.style.display='none';
+  if(otpTimerId) clearInterval(otpTimerId);
+  let remain=sec;
+  const tick=()=>{
+    const m=Math.floor(remain/60), s=String(remain%60).padStart(2,'0');
+    timerEl.textContent=`남은 시간 ${m}:${s}`;
+    if(remain<=0){
+      clearInterval(otpTimerId); otpTimerId=null;
+      timerEl.textContent='인증 시간이 만료되었습니다.';
+      resendEl.style.display='inline';
+    }
+    remain--;
+  };
+  tick(); otpTimerId=setInterval(tick,1000);
+}
+
+async function verifyOTP(){
+  const phone=document.getElementById('phone').value.trim();
+  const code=document.getElementById('otpInput').value.trim();
+  const msg=document.getElementById('otpMsg');
+  msg.className='otp-msg';
+  if(code.length<4){ msg.classList.add('err'); msg.textContent='인증번호를 입력해주세요.'; return; }
+
+  try{
+    const res=await fetch(`${CFG.worker_url}/api/verify-otp`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({phone, code})
+    });
+    const data=await res.json().catch(()=>({}));
+    if(res.ok && data.verified){
+      phoneVerified=true;
+      if(otpTimerId){ clearInterval(otpTimerId); otpTimerId=null; }
+      document.getElementById('otpBox').classList.remove('on');
+      document.getElementById('phoneVerifiedTag').style.display='inline-flex';
+      document.getElementById('otpSendBtn').disabled=true;
+      document.getElementById('otpSendBtn').textContent='인증완료';
+    }else{
+      msg.classList.add('err'); msg.textContent='인증번호가 일치하지 않습니다.';
+    }
+  }catch(e){
+    msg.classList.add('err'); msg.textContent='확인에 실패했습니다. 잠시 후 다시 시도해주세요.';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// 카카오 채널 게이트 (사진 시뮬레이션 잠금 해제)
+// ═══════════════════════════════════════════════
+function openKakaoChannel(){
+  window.open(CFG.kakao_channel_url, '_blank', 'noopener');
+  if(CFG.FEATURES.kakaoVerify){
+    // 백엔드 연동: 채널에서 받은 인증코드 입력 단계 노출
+    document.getElementById('kgStep2').classList.add('on');
+    const t=setTimeout(()=>{ document.getElementById('kakaoCode')?.focus(); },800);
+  }else{
+    // 백엔드 미연동: 추가 완료 확인 버튼으로 해제(채널 친구 수가 실제 지표)
+    const step2=document.getElementById('kgStep2');
+    step2.classList.add('on');
+    step2.innerHTML='<div style="color:rgba(255,255,255,.9);font-size:12px;margin-bottom:10px">채널 추가를 완료하셨나요?</div>'
+      +'<button type="button" class="kg-code-btn" style="width:100%;max-width:300px;padding:11px 0" onclick="confirmKakaoAdded()">✓ 추가 완료, 시뮬레이션 시작하기</button>';
+  }
+}
+
+function confirmKakaoAdded(){
+  unlockPhotoFeature('honor');
+}
+
+async function verifyKakao(){
+  const code=document.getElementById('kakaoCode').value.trim();
+  const msg=document.getElementById('kakaoMsg');
+  msg.className='kg-msg';
+  if(code.length<4){ msg.textContent='인증코드를 입력해주세요.'; return; }
+  try{
+    const res=await fetch(`${CFG.worker_url}/api/verify-kakao`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({code})
+    });
+    const data=await res.json().catch(()=>({}));
+    if(res.ok && data.verified){
+      msg.classList.add('ok'); msg.textContent='인증 완료! 잠금이 해제되었습니다.';
+      setTimeout(()=>unlockPhotoFeature('kakao'),400);
+    }else{
+      msg.textContent='인증코드가 일치하지 않습니다.';
+    }
+  }catch(e){
+    msg.textContent='확인에 실패했습니다. 잠시 후 다시 시도해주세요.';
+  }
+}
+
+function unlockPhotoFeature(via){
+  photoUnlockedFlag=true;
+  localStorage.setItem('ev_photo_unlock_time', Date.now());
   document.getElementById('photoLock').style.display='none';
   document.getElementById('photoUnlocked').style.display='block';
-
-  // 텔레그램 알림 (마케팅 데이터 수집)
-  const msg2=`🔓 [AI시뮬레이션 잠금해제]\n📞 ${phone}\n📅 ${new Date().toLocaleString('ko-KR')}`;
-  const tgUrl='https://api.telegram.org/bot'+CFG.telegram_token+'/sendMessage';
-  fetch(tgUrl,{
+  // 채널 추가/해제 알림(텔레그램)
+  const tag = via==='kakao' ? '카카오인증' : '채널추가확인';
+  const msg2=`🔓 [AI시뮬레이션 잠금해제 · ${tag}]\n📅 ${new Date().toLocaleString('ko-KR')}`;
+  fetch('https://api.telegram.org/bot'+CFG.telegram_token+'/sendMessage',{
     method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({chat_id:CFG.telegram_chat_id,text:msg2})
   }).catch(()=>{});
 }
 
-// 이미 잠금 해제된 경우 자동 활성화 (24시간 유효)
+// 24시간 내 이미 해제했다면 자동 유지
 (function checkUnlock(){
-  const t=localStorage.getItem('ev_unlock_time');
+  const t=localStorage.getItem('ev_photo_unlock_time');
   if(t && Date.now()-parseInt(t)<86400000){
+    photoUnlockedFlag=true;
     const lock=document.getElementById('photoLock');
     const unlocked=document.getElementById('photoUnlocked');
     if(lock) lock.style.display='none';
@@ -985,54 +1234,33 @@ function unlockPhoto(){
   }
 })();
 
-// ═══════════════════════════════════════════════
-// 사진 업로드 처리
-// ═══════════════════════════════════════════════
-// 워터마크 삽입 함수
 function addWatermark(dataURL, callback){
   const img=new Image();
   img.onload=function(){
     const canvas=document.createElement('canvas');
-    canvas.width=img.width;
-    canvas.height=img.height;
+    canvas.width=img.width; canvas.height=img.height;
     const ctx=canvas.getContext('2d');
     ctx.drawImage(img,0,0);
-
-    // 워터마크 스타일
-    ctx.save();
-    ctx.globalAlpha=0.18;
-    ctx.fillStyle='#ffffff';
+    ctx.save(); ctx.globalAlpha=0.18; ctx.fillStyle='#ffffff';
     ctx.font=`bold ${Math.round(img.width*0.055)}px sans-serif`;
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-
-    // 대각선 반복 워터마크
+    ctx.textAlign='center'; ctx.textBaseline='middle';
     const step=img.width*0.38;
-    ctx.translate(img.width/2, img.height/2);
-    ctx.rotate(-30*Math.PI/180);
+    ctx.translate(img.width/2, img.height/2); ctx.rotate(-30*Math.PI/180);
     for(let x=-img.width; x<img.width*1.5; x+=step){
-      for(let y=-img.height; y<img.height*1.5; y+=step*0.7){
-        ctx.fillText('에버그린', x, y);
-      }
+      for(let y=-img.height; y<img.height*1.5; y+=step*0.7){ ctx.fillText('에버그린', x, y); }
     }
     ctx.restore();
-
     callback(canvas.toDataURL('image/jpeg', 0.92));
   };
   img.src=dataURL;
 }
 
-// 이미지 압축 함수 (최대 1024px, JPEG 80%)
 function compressImage(dataURL){
   return new Promise((resolve)=>{
     const img=new Image();
     img.onload=()=>{
-      const MAX=1024;
-      let w=img.width, h=img.height;
-      if(w>MAX||h>MAX){
-        if(w>h){h=Math.round(h*MAX/w);w=MAX;}
-        else{w=Math.round(w*MAX/h);h=MAX;}
-      }
+      const MAX=1024; let w=img.width, h=img.height;
+      if(w>MAX||h>MAX){ if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;} }
       const canvas=document.createElement('canvas');
       canvas.width=w; canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
@@ -1045,27 +1273,17 @@ function compressImage(dataURL){
 function handlePhoto(event){
   const file=event.target.files[0];
   if(!file) return;
-
   const reader=new FileReader();
   reader.onload=async function(e){
-    // 이미지 압축
     const compressed=await compressImage(e.target.result);
     uploadedPhotoDataURL=compressed;
     const parts=compressed.split(',');
-    uploadedPhotoBase64=parts[1];
-    uploadedPhotoMime='image/jpeg';
-
-    // 미리보기 (원본 사진으로)
+    uploadedPhotoBase64=parts[1]; uploadedPhotoMime='image/jpeg';
     const area=document.getElementById('uploadArea');
     area.classList.add('has-photo');
     document.getElementById('uploadText').textContent='사진 등록됨 ✓';
-
     const previews=document.getElementById('photoPreviews');
-    previews.innerHTML=`
-      <div class="photo-thumb">
-        <img src="${compressed}" alt="업로드된 사진">
-        <button class="del-btn" onclick="removePhoto(event)">✕</button>
-      </div>`;
+    previews.innerHTML=`<div class="photo-thumb"><img src="${compressed}" alt="업로드된 사진"><button class="del-btn" onclick="removePhoto(event)">✕</button></div>`;
     document.getElementById('aiPromo').style.background='linear-gradient(135deg,#065f46,#064e3b)';
   };
   reader.readAsDataURL(file);
@@ -1073,9 +1291,7 @@ function handlePhoto(event){
 
 function removePhoto(e){
   e.stopPropagation();
-  uploadedPhotoBase64=null;
-  uploadedPhotoMime=null;
-  uploadedPhotoDataURL=null;
+  uploadedPhotoBase64=null; uploadedPhotoMime=null; uploadedPhotoDataURL=null;
   document.getElementById('photoPreviews').innerHTML='';
   document.getElementById('uploadText').textContent='사진을 탭해서 업로드';
   document.getElementById('uploadArea').classList.remove('has-photo');
@@ -1083,20 +1299,10 @@ function removePhoto(e){
   document.getElementById('aiPromo').style.background='';
 }
 
-// ═══════════════════════════════════════════════
-// Gemini API 호출
-// ═══════════════════════════════════════════════
-
-// 1. 사진 분석 (Vision)
 async function analyzePhoto(base64, mime){
   try{
-    const res=await fetch(`${CFG.worker_url}/api/analyze`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({base64, mime})
-    });
+    const res=await fetch(`${CFG.worker_url}/api/analyze`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({base64, mime})});
     const data=await res.json();
-    console.log('[OpenAI Vision]',JSON.stringify(data).slice(0,400));
     const text=data.choices?.[0]?.message?.content||'{}';
     const match=text.match(/\{[\s\S]*\}/);
     if(!match) return null;
@@ -1105,59 +1311,29 @@ async function analyzePhoto(base64, mime){
     parsed.trash_amount=String(parsed.trash_amount||'').toLowerCase().trim();
     if(!['low','medium','high'].includes(parsed.trash_amount)) parsed.trash_amount=null;
     return parsed;
-  }catch(e){
-    console.error('[OpenAI Vision] error:',e);
-    return null;
-  }
+  }catch(e){ return null; }
 }
 
-// 2. After 이미지 생성
 async function generateAfterImage(base64, mime){
   try{
-    const res=await fetch(`${CFG.worker_url}/api/generate-image`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({base64, mime})
-    });
+    const res=await fetch(`${CFG.worker_url}/api/generate-image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({base64, mime})});
     const data=await res.json();
-    console.log('[Worker ImageGen]',JSON.stringify(data).slice(0,300));
     if(data.data?.[0]?.b64_json) return `data:image/png;base64,${data.data[0].b64_json}`;
     if(data.data?.[0]?.url) return data.data[0].url;
-    console.error('[Worker] Error:',data.error);
     return null;
-  }catch(e){
-    console.error('[Worker ImageGen] Exception:',e);
-    return null;
-  }
+  }catch(e){ return null; }
 }
 
-// ═══════════════════════════════════════════════
-// 로딩 단계 표시
-// ═══════════════════════════════════════════════
-// 광고 문구 로테이션
-const adMessages = [
-  '💳 현금 분할납부 · 이자 없음',
-  '🚗 오늘 바로 출동 가능',
-  '🎁 기본 소독·탈취 무료 제공',
-  '📋 행정사 자격 보유 업체',
-  '⭐ 누적 작업 1,500건+',
-  '🏠 무료 현장 방문 견적',
-];
-let adIdx=0;
-let adTimer=null;
+const adMessages = ['💳 현금 분할납부 · 이자 없음','🚗 오늘 바로 출동 가능','🎁 기본 소독·탈취 무료 제공','📋 행정사 자격 보유 업체','⭐ 누적 작업 1,500건+','🏠 무료 현장 방문 견적'];
+let adIdx=0, adTimer=null;
 function startAdRotation(){
-  const el=document.getElementById('adRotate');
-  if(!el) return;
+  const el=document.getElementById('adRotate'); if(!el) return;
   el.textContent=adMessages[0];
-  adTimer=setInterval(()=>{
-    adIdx=(adIdx+1)%adMessages.length;
-    el.style.opacity='0';
-    setTimeout(()=>{ el.textContent=adMessages[adIdx]; el.style.opacity='1'; },300);
-  },2500);
+  adTimer=setInterval(()=>{ adIdx=(adIdx+1)%adMessages.length; el.style.opacity='0'; setTimeout(()=>{ el.textContent=adMessages[adIdx]; el.style.opacity='1'; },300); },2500);
 }
 function stopAdRotation(){ if(adTimer){ clearInterval(adTimer); adTimer=null; } }
 
-function setLoadingStep(step, total){
+function setLoadingStep(step){
   const steps={
     1:{title:'📷 AI가 사진을 분석하고 있습니다...',items:['📷 사진 분석 중...','💰 견적 계산 대기 중','🎨 이미지 생성 대기 중']},
     2:{title:'💰 견적을 계산하고 있습니다...',items:['✅ 사진 분석 완료','💰 견적 계산 중...','🎨 이미지 생성 대기 중']},
@@ -1165,84 +1341,46 @@ function setLoadingStep(step, total){
     0:{title:'💰 견적을 계산하고 있습니다...',items:['📋 입력 정보 분석 중','💰 견적 계산 중']},
   };
   const cfg=steps[step]||steps[0];
-  // step 3 (이미지 생성 중)일 때 광고 표시
   const adEl=document.getElementById('loadingAd');
-  if(adEl){
-    if(step===3){ adEl.style.display='block'; startAdRotation(); }
-    else{ adEl.style.display='none'; stopAdRotation(); }
-  }
+  if(adEl){ if(step===3){ adEl.style.display='block'; startAdRotation(); }else{ adEl.style.display='none'; stopAdRotation(); } }
   document.getElementById('loadingTitle').textContent=cfg.title;
   const stepsEl=document.getElementById('loadingSteps');
   stepsEl.innerHTML=cfg.items.map((item,i)=>{
     let cls='ls-item';
     if(step===0){ cls+= i===1?' active':''; }
-    else{
-      if(item.startsWith('✅')) cls+=' done';
-      else if(item.includes('중...')) cls+=' active';
-    }
+    else{ if(item.startsWith('✅')) cls+=' done'; else if(item.includes('중...')) cls+=' active'; }
     return `<div class="${cls}">${item}</div>`;
   }).join('');
 }
 
-// ═══════════════════════════════════════════════
-// 핵심 계산
-// ═══════════════════════════════════════════════
 async function calcQuote(){
-  const py    = parseInt(document.getElementById('pyeong').value)||10;
-  const cont  = parseInt(document.querySelector('input[name=cont]:checked')?.value||1);
-  const trash = parseFloat(document.querySelector('input[name=trash]:checked')?.value||1.0);
-  const elev  = parseFloat(document.querySelector('input[name=elev]:checked')?.value||1.0);
-  const svcs  = Array.from(document.querySelectorAll('input[name=svc]:checked')).map(e=>e.value);
-  const phone = document.getElementById('phone').value.trim();
-  const addr  = document.getElementById('addr').value.trim();
-  const wdate = document.getElementById('wdate').value;
-  const cname = document.getElementById('cname').value.trim();
-  const memo  = document.getElementById('memo').value.trim();
+  const py=parseInt(document.getElementById('pyeong').value)||10;
+  const cont=parseInt(document.querySelector('input[name=cont]:checked')?.value||1);
+  const trash=parseFloat(document.querySelector('input[name=trash]:checked')?.value||1.0);
+  const elev=parseFloat(document.querySelector('input[name=elev]:checked')?.value||1.0);
+  const svcs=Array.from(document.querySelectorAll('input[name=svc]:checked')).map(e=>e.value);
+  const phone=document.getElementById('phone').value.trim();
+  const addr=document.getElementById('addr').value.trim();
+  const wdate=document.getElementById('wdate').value;
+  const cname=document.getElementById('cname').value.trim();
+  const memo=document.getElementById('memo').value.trim();
 
   document.getElementById('loading').classList.add('on');
+  let aiResult=null, afterImageDataURL=null, adjustedCont=cont, adjustedTrash=trash;
 
-  let aiResult=null;
-  let afterImageDataURL=null;
-  let adjustedCont=cont;
-  let adjustedTrash=trash;
-
-  // ── 사진 있으면 AI 분석 ──
   if(uploadedPhotoBase64){
-    // Step 1: 사진 분석
     setLoadingStep(1);
-    try{
-      aiResult=await analyzePhoto(uploadedPhotoBase64, uploadedPhotoMime);
+    try{ aiResult=await analyzePhoto(uploadedPhotoBase64, uploadedPhotoMime);
       if(aiResult){
-        // AI 분석 결과로 값 보정
-        if(aiResult.contamination_level && aiResult.contamination_level!==cont){
-          adjustedCont=Math.min(4,Math.max(1,aiResult.contamination_level));
-        }
-        if(aiResult.trash_amount){
-          const tMap={low:0.8,medium:1.0,high:1.35};
-          adjustedTrash=tMap[aiResult.trash_amount]||trash;
-        }
+        if(aiResult.contamination_level && aiResult.contamination_level!==cont) adjustedCont=Math.min(4,Math.max(1,aiResult.contamination_level));
+        if(aiResult.trash_amount){ const tMap={low:0.8,medium:1.0,high:1.35}; adjustedTrash=tMap[aiResult.trash_amount]||trash; }
       }
-    }catch(err){
-      console.error('Vision API error:',err);
-    }
-
-    // Step 2: 견적 계산
-    setLoadingStep(2);
-    await new Promise(r=>setTimeout(r,400));
-
-    // Step 3: After 이미지 생성
+    }catch(err){}
+    setLoadingStep(2); await new Promise(r=>setTimeout(r,400));
     setLoadingStep(3);
-    try{
-      afterImageDataURL=await generateAfterImage(uploadedPhotoBase64, uploadedPhotoMime);
-    }catch(err){
-      console.error('Image gen error:',err);
-    }
-  } else {
-    setLoadingStep(0);
-    await new Promise(r=>setTimeout(r,600));
-  }
+    try{ afterImageDataURL=await generateAfterImage(uploadedPhotoBase64, uploadedPhotoMime); }catch(err){}
+  } else { setLoadingStep(0); await new Promise(r=>setTimeout(r,600)); }
 
-  // ── 계산 ──
   const key=`${pyKey(py)}_${adjustedCont}`;
   const row=PRICE_TABLE[key]||[300000,500000,250000,''];
   let baseMin=row[0], baseMax=row[1];
@@ -1253,42 +1391,21 @@ async function calcQuote(){
   const adjMax=baseMax?Math.round(baseMax*factor*nightFactor/10000)*10000:null;
   const wasteAmt=(tonVal>0&&tonVal<5)?tonVal*400000:0;
   const wasteSite=(tonVal>=5);
-  let svcTotal=0;
-  const svcRows=[];
-  svcs.filter(s=>s!=='night').forEach(s=>{
-    const info=SVC_LABELS[s];
-    if(!info||info.p===0) return;
-    svcTotal+=info.p;
-    svcRows.push({nm:info.nm,p:info.p});
-  });
+  let svcTotal=0; const svcRows=[];
+  svcs.filter(s=>s!=='night').forEach(s=>{ const info=SVC_LABELS[s]; if(!info||info.p===0) return; svcTotal+=info.p; svcRows.push({nm:info.nm,p:info.p}); });
   const subtotal=adjMin+wasteAmt+svcTotal;
   const vatTotal=Math.round(subtotal*1.1/10000)*10000;
   const workDays=py<=15?1:py<=30?'1~2':py<=50?'2':py<=70?'2~3':'별도확인';
 
-  quoteData={
-    py,cont,adjustedCont,trash,adjustedTrash,elev,svcs,tonVal,
-    baseMin,baseMax,adjMin,adjMax,factor,nightFactor,
-    wasteAmt,wasteSite,svcTotal,svcRows,subtotal,vatTotal,workDays,
-    phone,addr,wdate,cname,memo,
-    aiResult, afterImageDataURL,
-    ts:new Date().toISOString(),
-  };
-
+  quoteData={py,cont,adjustedCont,trash,adjustedTrash,elev,svcs,tonVal,baseMin,baseMax,adjMin,adjMax,factor,nightFactor,wasteAmt,wasteSite,svcTotal,svcRows,subtotal,vatTotal,workDays,phone,addr,wdate,cname,memo,aiResult,afterImageDataURL,ts:new Date().toISOString()};
   document.getElementById('loading').classList.remove('on');
-  stopAdRotation();
-  const adEl2=document.getElementById('loadingAd');
-  if(adEl2) adEl2.style.display='none';
-  showResult(quoteData);
-  sendNotify(quoteData).catch(()=>{});
+  stopAdRotation(); const adEl2=document.getElementById('loadingAd'); if(adEl2) adEl2.style.display='none';
+  showResult(quoteData); sendNotify(quoteData).catch(()=>{});
 }
 
-// ═══════════════════════════════════════════════
-// 결과 표시
-// ═══════════════════════════════════════════════
 const fmt=n=>typeof n==='number'?n.toLocaleString('ko-KR')+'원':'—';
 const contNm={1:'1단계 일반',2:'2단계 중간',3:'3단계 심각',4:'4단계 특수'};
 const trashNm={'0.8':'적음(×0.8)','1.0':'보통(기준)','1.35':'심함(×1.35)'};
-const elevNm={'1.0':'1층/엘베있음','1.1':'2층이상 엘베있음(×1.1)','1.25':'2층이상 엘베없음(×1.25)'};
 const trashAmtNm={low:'적음',medium:'보통',high:'심함'};
 const contLvNm={1:'1단계 일반',2:'2단계 중간',3:'3단계 심각',4:'4단계 특수'};
 const confidenceNm={high:'높음',medium:'보통',low:'낮음'};
@@ -1296,151 +1413,71 @@ const confidenceNm={high:'높음',medium:'보통',low:'낮음'};
 function showResult(r){
   curStep=4; updateUI(4);
   const now=new Date();
-  document.getElementById('rdate').textContent=
-    `${now.toLocaleDateString('ko-KR')} ${now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})} 기준 산출`;
+  document.getElementById('rdate').textContent=`${now.toLocaleDateString('ko-KR')} ${now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})} 기준 산출`;
 
-  // ── AI 시뮬레이션 섹션 ──
   const simSec=document.getElementById('aiSimSection');
   if(r.uploadedPhotoDataURL||uploadedPhotoDataURL){
     simSec.style.display='block';
     document.getElementById('beforeImg').src=uploadedPhotoDataURL||r.uploadedPhotoDataURL;
-
     if(r.afterImageDataURL){
       document.getElementById('afterPlaceholder').style.display='none';
-      // 워터마크 삽입
-      addWatermark(r.afterImageDataURL, function(watermarkedURL){
-        const afterImg=document.getElementById('afterImg');
-        afterImg.src=watermarkedURL;
-        afterImg.style.display='block';
-      });
+      addWatermark(r.afterImageDataURL, function(watermarkedURL){ const afterImg=document.getElementById('afterImg'); afterImg.src=watermarkedURL; afterImg.style.display='block'; });
     } else {
-      // 이미지 생성 실패 시
-      document.getElementById('afterPlaceholder').innerHTML=
-        '<span style="color:rgba(199,210,254,.5);font-size:11px;text-align:center;padding:10px">이미지 생성에 실패했습니다.<br>현장 방문 후 Before/After를<br>직접 확인해드립니다.</span>';
+      document.getElementById('afterPlaceholder').innerHTML='<span style="color:rgba(199,210,254,.5);font-size:11px;text-align:center;padding:10px">이미지 생성에 실패했습니다.<br>현장 방문 후 Before/After를<br>직접 확인해드립니다.</span>';
     }
-
-    // AI 분석 결과 표시
     if(r.aiResult){
-      const box=document.getElementById('aiAnalysisBox');
-      box.style.display='block';
+      const box=document.getElementById('aiAnalysisBox'); box.style.display='block';
       const aiCont=parseInt(r.aiResult.contamination_level)||null;
       const aiTrash=r.aiResult.trash_amount||null;
       const contMatch=aiCont===r.cont;
       const trashValMap={'low':'적음','medium':'보통','high':'심함'};
       const inputTrashVal={'0.8':'적음','1.0':'보통','1.35':'심함'}[String(r.trash)];
       const trashMatch=trashValMap[aiTrash]===inputTrashVal;
-
       const contDisplay=aiCont?contLvNm[aiCont]:'분석불가';
       const trashDisplay=aiTrash?trashValMap[aiTrash]:'분석불가';
-
       document.getElementById('aiAnalysisRows').innerHTML=`
-        <div class="aa-row">
-          <span class="aa-lbl">AI 감지 오염 단계</span>
-          <span class="aa-val ${aiCont?(contMatch?'match':'warn'):''}">${contDisplay} ${aiCont?(contMatch?'✓ 일치':'⚠ 조정됨'):''}</span>
-        </div>
-        <div class="aa-row">
-          <span class="aa-lbl">AI 감지 쓰레기 양</span>
-          <span class="aa-val ${aiTrash?(trashMatch?'match':'warn'):''}">${trashDisplay} ${aiTrash?(trashMatch?'✓ 일치':'⚠ 조정됨'):''}</span>
-        </div>
-        ${r.aiResult.special_notes&&r.aiResult.special_notes!=='없음'?`
-        <div class="aa-row">
-          <span class="aa-lbl">특이사항 감지</span>
-          <span class="aa-val warn">⚠ ${r.aiResult.special_notes}</span>
-        </div>`:''}
-        <div class="aa-row">
-          <span class="aa-lbl">분석 신뢰도</span>
-          <span class="aa-val">${confidenceNm[r.aiResult.confidence]||'보통'}</span>
-        </div>`;
+        <div class="aa-row"><span class="aa-lbl">AI 감지 오염 단계</span><span class="aa-val ${aiCont?(contMatch?'match':'warn'):''}">${contDisplay} ${aiCont?(contMatch?'✓ 일치':'⚠ 조정됨'):''}</span></div>
+        <div class="aa-row"><span class="aa-lbl">AI 감지 쓰레기 양</span><span class="aa-val ${aiTrash?(trashMatch?'match':'warn'):''}">${trashDisplay} ${aiTrash?(trashMatch?'✓ 일치':'⚠ 조정됨'):''}</span></div>
+        ${r.aiResult.special_notes&&r.aiResult.special_notes!=='없음'?`<div class="aa-row"><span class="aa-lbl">특이사항 감지</span><span class="aa-val warn">⚠ ${r.aiResult.special_notes}</span></div>`:''}
+        <div class="aa-row"><span class="aa-lbl">분석 신뢰도</span><span class="aa-val">${confidenceNm[r.aiResult.confidence]||'보통'}</span></div>`;
     }
-  } else {
-    simSec.style.display='none';
-  }
+  } else { simSec.style.display='none'; }
 
-  // ── 견적 보정 배너 ──
   const banner=document.getElementById('adjustBanner');
   if(r.aiResult&&(r.adjustedCont!==r.cont||r.adjustedTrash!==r.trash)){
     banner.style.display='block';
     const lines=[];
     if(r.adjustedCont!==r.cont) lines.push(`오염 단계: ${contNm[r.cont]} → ${contNm[r.adjustedCont]}`);
     if(r.adjustedTrash!==r.trash) lines.push(`쓰레기 양: ${trashNm[String(r.trash)]} → ${trashAmtNm[r.aiResult.trash_amount]}`);
-    document.getElementById('adjustDesc').textContent=
-      'AI 사진 분석 결과 ' + lines.join(', ') + '으로 조정하여 견적을 재계산했습니다.';
-  } else {
-    banner.style.display='none';
-  }
+    document.getElementById('adjustDesc').textContent='AI 사진 분석 결과 '+lines.join(', ')+'으로 조정하여 견적을 재계산했습니다.';
+  } else { banner.style.display='none'; }
 
-  // ── 앵커가 ──
   document.getElementById('anchorPrice').textContent=fmt(r.adjMin)+'~';
-  document.getElementById('workDays').textContent=
-    `예상 작업일수: ${r.workDays}일 · 현장 방문 후 최종 금액 확정`;
+  document.getElementById('workDays').textContent=`예상 작업일수: ${r.workDays}일 · 현장 방문 후 최종 금액 확정`;
 
-  // ── 비용 내역 ──
   const rows=[];
-  rows.push({
-    icon:'🧹',lbl:`기본 청소비 (${r.py}평 · ${contNm[r.adjustedCont]})`,
-    val:fmt(r.adjMin)+'~',cls:'',
-    sub:r.factor!==1?`보정계수 ×${r.factor.toFixed(2)}${r.nightFactor>1?' · 심야×1.5':''} 적용`:'',
-  });
+  rows.push({icon:'🧹',lbl:`기본 청소비 (${r.py}평 · ${contNm[r.adjustedCont]})`,val:fmt(r.adjMin)+'~',cls:'',sub:r.factor!==1?`보정계수 ×${r.factor.toFixed(2)}${r.nightFactor>1?' · 심야×1.5':''} 적용`:''});
   rows.push({icon:'🎁',lbl:'기본 소독 · 생활 악취 탈취',val:'무료 제공',cls:'free',tag:'무료'});
   if(r.wasteSite) rows.push({icon:'🚛',lbl:`폐기물 처리비 (${r.tonVal}톤 이상)`,val:'📞 현장 별도 확인',cls:'waste'});
   else if(r.wasteAmt>0) rows.push({icon:'🚛',lbl:`폐기물 처리비 (${r.tonVal}톤 × 40만원)`,val:fmt(r.wasteAmt),cls:'waste'});
   r.svcRows.forEach(s=>rows.push({icon:'➕',lbl:s.nm,val:fmt(s.p),cls:'svc'}));
 
-  const html=rows.map(row=>`
-    <div class="bk-row">
-      <span class="bk-lbl">${row.icon} ${row.lbl}${row.sub?`<br><small style="font-size:10px;color:var(--gm)">${row.sub}</small>`:''}</span>
-      <span class="bk-val ${row.cls||''}">${row.val}${row.tag?` <span class="free-tag">${row.tag}</span>`:''}</span>
-    </div>`).join('');
-
-  const totalRow=r.wasteSite?'':`
-    <div class="bk-row total">
-      <span class="bk-lbl">소계 (VAT 별도)</span>
-      <span class="bk-val">${fmt(r.subtotal)}~</span>
-    </div>`;
-
+  const html=rows.map(row=>`<div class="bk-row"><span class="bk-lbl">${row.icon} ${row.lbl}${row.sub?`<br><small style="font-size:10px;color:var(--gm)">${row.sub}</small>`:''}</span><span class="bk-val ${row.cls||''}">${row.val}${row.tag?` <span class="free-tag">${row.tag}</span>`:''}</span></div>`).join('');
+  const totalRow=r.wasteSite?'':`<div class="bk-row total"><span class="bk-lbl">소계 (VAT 별도)</span><span class="bk-val">${fmt(r.subtotal)}~</span></div>`;
   document.getElementById('bkRows').innerHTML=html+totalRow;
-  document.getElementById('bkVat').innerHTML=r.wasteSite
-    ?'※ 폐기물 비용은 현장 방문 후 별도 산출됩니다'
-    :`VAT(10%) 포함 예상 총액: <strong>${fmt(r.vatTotal)}~</strong>`;
+  document.getElementById('bkVat').innerHTML=r.wasteSite?'※ 폐기물 비용은 현장 방문 후 별도 산출됩니다':`VAT(10%) 포함 예상 총액: <strong>${fmt(r.vatTotal)}~</strong>`;
 }
 
-// ═══════════════════════════════════════════════
-// 텔레그램 알림
-// ═══════════════════════════════════════════════
 async function sendNotify(r){
   const trashLabel={'0.8':'적음','1.0':'보통','1.35':'심함'};
   const elevLabel={'1.0':'1층/있음','1.1':'2층이상 있음','1.25':'2층이상 없음'};
   const svcLabel={pest:'해충제거',odor:'악취탈취',wash:'세탁서비스',clean:'입주청소',ladder:'사다리차',night:'심야비밀작업'};
-
-  const aiLine=r.aiResult
-    ?`\n🤖 AI분석: 오염${r.aiResult.contamination_level}단계·쓰레기${trashAmtNm[r.aiResult.trash_amount]||'-'}·신뢰도${r.aiResult.confidence||'-'}${r.aiResult.special_notes&&r.aiResult.special_notes!=='없음'?`\n⚠ 특이: ${r.aiResult.special_notes}`:''}`
-    :'';
+  const aiLine=r.aiResult?`\n🤖 AI분석: 오염${r.aiResult.contamination_level}단계·쓰레기${trashAmtNm[r.aiResult.trash_amount]||'-'}·신뢰도${r.aiResult.confidence||'-'}${r.aiResult.special_notes&&r.aiResult.special_notes!=='없음'?`\n⚠ 특이: ${r.aiResult.special_notes}`:''}`:'';
   const photoLine=uploadedPhotoDataURL?'\n📷 사진 첨부됨':'';
-
-  const msg=`🔔 [에버그린 새 견적 접수]
-━━━━━━━━━━━━━━
-📅 ${new Date(r.ts).toLocaleString('ko-KR')}
-📞 ${r.phone}
-📍 ${r.addr}
-📐 ${r.py}평 | 오염 ${contNm[r.adjustedCont]}
-🗑️ 쓰레기양: ${trashLabel[String(r.adjustedTrash)]||r.adjustedTrash}
-🛗 ${elevLabel[String(r.elev)]||r.elev}
-📦 폐기물: ${r.tonVal>=5?'5톤+ 현장확인':r.tonVal===0?'없음':r.tonVal+'톤'}
-➕ 추가: ${r.svcs.length?r.svcs.map(s=>svcLabel[s]||s).join(', '):'없음'}
-📝 메모: ${r.memo||'없음'}
-💰 표시견적: ${fmt(r.adjMin)}~${aiLine}${photoLine}
-🗓️ 희망일: ${r.wdate||'미정'}
-━━━━━━━━━━━━━━`;
-
-  await fetch(`https://api.telegram.org/bot${CFG.telegram_token}/sendMessage`,{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({chat_id:CFG.telegram_chat_id,text:msg})
-  }).catch(()=>{});
+  const msg=`🔔 [에버그린 새 견적 접수]\n━━━━━━━━━━━━━━\n📅 ${new Date(r.ts).toLocaleString('ko-KR')}\n📞 ${r.phone}\n📍 ${r.addr}\n📐 ${r.py}평 | 오염 ${contNm[r.adjustedCont]}\n🗑️ 쓰레기양: ${trashLabel[String(r.adjustedTrash)]||r.adjustedTrash}\n📦 폐기물: ${r.tonVal>=5?'5톤+ 현장확인':r.tonVal===0?'없음':r.tonVal+'톤'}\n➕ 추가: ${r.svcs.length?r.svcs.map(s=>svcLabel[s]||s).join(', '):'없음'}\n📝 메모: ${r.memo||'없음'}\n💰 표시견적: ${fmt(r.adjMin)}~${aiLine}${photoLine}\n🗓️ 희망일: ${r.wdate||'미정'}\n━━━━━━━━━━━━━━`;
+  await fetch(`https://api.telegram.org/bot${CFG.telegram_token}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CFG.telegram_chat_id,text:msg})}).catch(()=>{});
 }
 
-// ═══════════════════════════════════════════════
-// PDF (기존 유지)
-// ═══════════════════════════════════════════════
 async function dlPDF(){
   if(!quoteData) return;
   const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -1449,13 +1486,8 @@ async function dlPDF(){
 }
 
 function mobilePDF(){
-  const r=quoteData;
-  const now=new Date();
-  const dateStr=now.toLocaleDateString('ko-KR');
+  const r=quoteData; const now=new Date(); const dateStr=now.toLocaleDateString('ko-KR');
   const f=n=>typeof n==='number'?n.toLocaleString('ko-KR')+'원':'-';
-  const trashLbl={'0.8':'적음','1.0':'보통','1.35':'심함'};
-  const elevLbl={'1.0':'1층/있음','1.1':'2층이상 있음','1.25':'2층이상 없음'};
-
   let rows='';
   rows+=`<tr style="background:#f9fafb"><td style="padding:8px 10px">기본 청소비 (${r.py}평 · ${contNm[r.adjustedCont]})</td><td style="padding:8px 10px;text-align:right;font-weight:700;color:#2d6a4f">${f(r.adjMin)}~</td></tr>`;
   rows+=`<tr style="background:#f0fdf4"><td style="padding:8px 10px">기본 소독 · 생활 악취 탈취 <span style="background:#dcfce7;color:#166534;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px">무료</span></td><td style="padding:8px 10px;text-align:right;color:#166534;font-weight:700">0원</td></tr>`;
@@ -1466,48 +1498,8 @@ function mobilePDF(){
     rows+=`<tr style="background:#d8f3dc"><td style="padding:9px 10px;font-weight:700;color:#1a3a2a">소계 (VAT 별도)</td><td style="padding:9px 10px;text-align:right;font-weight:700;color:#1a3a2a">${f(r.subtotal)}~</td></tr>`;
     rows+=`<tr style="background:#fff8e7"><td style="padding:8px 10px;color:#92400e">VAT 포함 예상 총액</td><td style="padding:8px 10px;text-align:right;font-weight:700;color:#92400e">${f(r.vatTotal)}~</td></tr>`;
   }
-
-  const style=[
-    'body{font-family:sans-serif;margin:0;padding:0;background:#fff}',
-    '.hdr{background:linear-gradient(135deg,#1a3a2a,#2d6a4f);padding:18px 20px;display:flex;justify-content:space-between;align-items:center}',
-    '.hl{color:#74c69d;font-size:16px;font-weight:900}.hls{color:rgba(255,255,255,.7);font-size:10px;margin-top:2px}',
-    '.hr{text-align:right;color:#f0d080;font-size:13px;font-weight:700}.hrs{color:rgba(255,255,255,.7);font-size:10px;margin-top:2px}',
-    '.gl{height:3px;background:linear-gradient(90deg,#c9a84c,#f0d080)}',
-    '.sec{padding:12px 16px 0}.st{font-size:12px;font-weight:700;color:#1a3a2a;border-bottom:2px solid #2d6a4f;padding-bottom:4px;margin-bottom:8px}',
-    '.row{display:flex;padding:5px 0;font-size:12px;border-bottom:1px solid #f3f4f6}.rl{color:#6b7280;width:75px;flex-shrink:0}.rv{font-weight:600;color:#1c1c1c;flex:1}',
-    'table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}',
-    'th{background:#1a3a2a;color:#fff;padding:7px 10px;text-align:left}th:last-child{text-align:right}',
-    'td{padding:7px 10px;border-bottom:1px solid #e5e7eb}',
-    '.ins{background:linear-gradient(135deg,#7c2d12,#b45309);border-radius:8px;padding:11px 14px;margin:10px 16px 0;color:#fff}',
-    '.ntc{background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:8px 12px;margin:8px 16px 0;font-size:10px;color:#92400e;line-height:1.6}',
-    '.sbtn{display:block;background:#2d6a4f;color:#fff;text-align:center;padding:13px;font-size:14px;font-weight:700;margin:14px 16px;border-radius:10px;border:none;width:calc(100% - 32px);cursor:pointer}',
-    '.ftr{background:#1a3a2a;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}',
-    '.fl{color:#74c69d;font-size:11px;font-weight:700}.fls{color:rgba(255,255,255,.6);font-size:9px;margin-top:2px}',
-    '.fr{text-align:right;color:#f0d080;font-size:12px;font-weight:700}.frs{color:rgba(255,255,255,.6);font-size:9px;margin-top:2px}',
-  ].join('');
-
-  const html='<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>에버그린 견적서</title><style>'+style+'</style></head><body>'
-    +'<div class="hdr"><div><div class="hl">EVERGREEN</div><div class="hls">특수청소에버그린</div></div><div class="hr">견&nbsp;적&nbsp;서<div class="hrs">발행일: '+dateStr+' | 유효 14일</div></div></div>'
-    +'<div class="gl"></div>'
-    +'<div class="sec"><div class="st">고객 정보</div>'
-    +'<div class="row"><span class="rl">고객명</span><span class="rv">'+(r.cname||'-')+'</span></div>'
-    +'<div class="row"><span class="rl">연락처</span><span class="rv">'+r.phone+'</span></div>'
-    +'<div class="row"><span class="rl">주소</span><span class="rv">'+r.addr+'</span></div>'
-    +'<div class="row"><span class="rl">작업희망일</span><span class="rv">'+(r.wdate||'미정')+'</span></div>'
-    +'</div>'
-    +'<div class="sec"><div class="st">현장 정보</div>'
-    +'<div class="row"><span class="rl">평수</span><span class="rv">'+r.py+'평</span></div>'
-    +'<div class="row"><span class="rl">오염단계</span><span class="rv">'+contNm[r.adjustedCont]+(r.adjustedCont!==r.cont?' (AI 보정)':'')+'</span></div>'
-    +'<div class="row"><span class="rl">폐기물</span><span class="rv">'+(r.tonVal>=5?'5톤+ 현장확인':r.tonVal===0?'없음':r.tonVal+'톤')+'</span></div>'
-    +'</div>'
-    +'<div class="sec"><div class="st">견적 내역 (VAT 별도)</div>'
-    +'<table><tr><th>항목</th><th>금액</th></tr>'+rows+'</table></div>'
-    +'<div class="ins"><div style="font-size:12px;font-weight:700">💳 국내유일 현금 분할납부 가능</div><div style="font-size:10px;color:rgba(255,255,255,.8);margin-top:2px">부담 없이 작업 먼저, 납부는 나누어서</div></div>'
-    +'<div class="ntc">⚠️ 위 금액은 기본 작업 기준 최저가입니다. 실제 현장 상태에 따라 달라질 수 있습니다.</div>'
-    +'<button class="sbtn" onclick="window.print()">📄 이 페이지 저장 / 인쇄하기</button>'
-    +'<div class="ftr"><div><div class="fl">특수청소에버그린</div><div class="fls">대표: 김현섭 · 전국 출동 · 365일 24시간</div><div class="fls">www.evergreen24.co.kr</div></div><div class="fr">010-8499-0024<div class="frs">카카오톡 · 네이버 톡톡</div></div></div>'
-    +'</body></html>';
-
+  const style=['body{font-family:sans-serif;margin:0;padding:0;background:#fff}','.hdr{background:linear-gradient(135deg,#1a3a2a,#2d6a4f);padding:18px 20px;display:flex;justify-content:space-between;align-items:center}','.hl{color:#74c69d;font-size:16px;font-weight:900}.hls{color:rgba(255,255,255,.7);font-size:10px;margin-top:2px}','.hr{text-align:right;color:#f0d080;font-size:13px;font-weight:700}.hrs{color:rgba(255,255,255,.7);font-size:10px;margin-top:2px}','.gl{height:3px;background:linear-gradient(90deg,#c9a84c,#f0d080)}','.sec{padding:12px 16px 0}.st{font-size:12px;font-weight:700;color:#1a3a2a;border-bottom:2px solid #2d6a4f;padding-bottom:4px;margin-bottom:8px}','.row{display:flex;padding:5px 0;font-size:12px;border-bottom:1px solid #f3f4f6}.rl{color:#6b7280;width:75px;flex-shrink:0}.rv{font-weight:600;color:#1c1c1c;flex:1}','table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}','th{background:#1a3a2a;color:#fff;padding:7px 10px;text-align:left}th:last-child{text-align:right}','td{padding:7px 10px;border-bottom:1px solid #e5e7eb}','.ins{background:linear-gradient(135deg,#7c2d12,#b45309);border-radius:8px;padding:11px 14px;margin:10px 16px 0;color:#fff}','.ntc{background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:8px 12px;margin:8px 16px 0;font-size:10px;color:#92400e;line-height:1.6}','.sbtn{display:block;background:#2d6a4f;color:#fff;text-align:center;padding:13px;font-size:14px;font-weight:700;margin:14px 16px;border-radius:10px;border:none;width:calc(100% - 32px);cursor:pointer}','.ftr{background:#1a3a2a;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}','.fl{color:#74c69d;font-size:11px;font-weight:700}.fls{color:rgba(255,255,255,.6);font-size:9px;margin-top:2px}','.fr{text-align:right;color:#f0d080;font-size:12px;font-weight:700}.frs{color:rgba(255,255,255,.6);font-size:9px;margin-top:2px}'].join('');
+  const html='<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>에버그린 견적서</title><style>'+style+'</style></head><body>'+'<div class="hdr"><div><div class="hl">EVERGREEN</div><div class="hls">특수청소에버그린</div></div><div class="hr">견&nbsp;적&nbsp;서<div class="hrs">발행일: '+dateStr+' | 유효 14일</div></div></div>'+'<div class="gl"></div>'+'<div class="sec"><div class="st">고객 정보</div>'+'<div class="row"><span class="rl">고객명</span><span class="rv">'+(r.cname||'-')+'</span></div>'+'<div class="row"><span class="rl">연락처</span><span class="rv">'+r.phone+'</span></div>'+'<div class="row"><span class="rl">주소</span><span class="rv">'+r.addr+'</span></div>'+'<div class="row"><span class="rl">작업희망일</span><span class="rv">'+(r.wdate||'미정')+'</span></div>'+'</div>'+'<div class="sec"><div class="st">현장 정보</div>'+'<div class="row"><span class="rl">평수</span><span class="rv">'+r.py+'평</span></div>'+'<div class="row"><span class="rl">오염단계</span><span class="rv">'+contNm[r.adjustedCont]+(r.adjustedCont!==r.cont?' (AI 보정)':'')+'</span></div>'+'<div class="row"><span class="rl">폐기물</span><span class="rv">'+(r.tonVal>=5?'5톤+ 현장확인':r.tonVal===0?'없음':r.tonVal+'톤')+'</span></div>'+'</div>'+'<div class="sec"><div class="st">견적 내역 (VAT 별도)</div>'+'<table><tr><th>항목</th><th>금액</th></tr>'+rows+'</table></div>'+'<div class="ins"><div style="font-size:12px;font-weight:700">💳 국내유일 현금 분할납부 가능</div><div style="font-size:10px;color:rgba(255,255,255,.8);margin-top:2px">부담 없이 작업 먼저, 납부는 나누어서</div></div>'+'<div class="ntc">⚠️ 위 금액은 기본 작업 기준 최저가입니다. 실제 현장 상태에 따라 달라질 수 있습니다.</div>'+'<button class="sbtn" onclick="window.print()">📄 이 페이지 저장 / 인쇄하기</button>'+'<div class="ftr"><div><div class="fl">특수청소에버그린</div><div class="fls">대표: 김현섭 · 전국 출동 · 365일 24시간</div><div class="fls">www.evergreen24.co.kr</div></div><div class="fr">010-8499-0024<div class="frs">카카오톡 · 네이버 톡톡</div></div></div>'+'</body></html>';
   const blob=new Blob([html],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const win=window.open(url,'_blank');
@@ -1515,75 +1507,10 @@ function mobilePDF(){
 }
 
 async function pcPDF(){
-  const r=quoteData;
-  const now=new Date();
-  const dateStr=now.toLocaleDateString('ko-KR');
+  const r=quoteData; const now=new Date(); const dateStr=now.toLocaleDateString('ko-KR');
   const preview=document.getElementById('pdfPreview');
-  preview.style.left='0';preview.style.position='absolute';
-  preview.style.top=document.documentElement.scrollTop+'px';
-
-  preview.innerHTML=`
-  <div style="width:794px;background:#fff;font-family:'Noto Sans KR',sans-serif;padding:0">
-    <div style="background:linear-gradient(135deg,#1a3a2a,#2d6a4f);padding:28px 40px;display:flex;justify-content:space-between;align-items:center">
-      <div><div style="color:#74c69d;font-size:22px;font-weight:900;letter-spacing:2px">EVERGREEN</div><div style="color:rgba(255,255,255,.7);font-size:11px;margin-top:3px">특수청소에버그린</div></div>
-      <div style="text-align:right"><div style="color:#f0d080;font-size:18px;font-weight:700">견 적 서</div><div style="color:rgba(255,255,255,.7);font-size:11px;margin-top:3px">발행일: ${dateStr} | 유효기간: 14일</div></div>
-    </div>
-    <div style="height:4px;background:linear-gradient(90deg,#c9a84c,#f0d080)"></div>
-    <div style="padding:22px 40px 0">
-      <div style="font-size:12px;font-weight:700;color:#1a3a2a;border-bottom:2px solid #2d6a4f;padding-bottom:5px;margin-bottom:10px">고객 정보</div>
-      <table style="width:100%;font-size:11px;border-collapse:collapse">
-        <tr><td style="padding:4px 0;color:#6b7280;width:80px">고객명</td><td style="padding:4px 0;font-weight:600">${r.cname||'-'}</td><td style="padding:4px 0;color:#6b7280;width:80px">연락처</td><td style="padding:4px 0;font-weight:600">${r.phone}</td></tr>
-        <tr><td style="padding:4px 0;color:#6b7280">주소</td><td colspan="3" style="padding:4px 0;font-weight:600">${r.addr}</td></tr>
-        <tr><td style="padding:4px 0;color:#6b7280">작업희망일</td><td style="padding:4px 0;font-weight:600">${r.wdate||'미정'}</td></tr>
-      </table>
-    </div>
-    <div style="padding:14px 40px 0">
-      <div style="font-size:12px;font-weight:700;color:#1a3a2a;border-bottom:2px solid #2d6a4f;padding-bottom:5px;margin-bottom:10px">현장 정보 (AI 분석 반영)</div>
-      <table style="width:100%;font-size:11px;border-collapse:collapse">
-        <tr><td style="padding:4px 0;color:#6b7280;width:100px">평수</td><td style="padding:4px 0;font-weight:600">${r.py}평</td><td style="padding:4px 0;color:#6b7280;width:100px">오염 단계</td><td style="padding:4px 0;font-weight:600">${contNm[r.adjustedCont]}${r.adjustedCont!==r.cont?' (AI 보정)':''}</td></tr>
-        <tr><td style="padding:4px 0;color:#6b7280">폐기물</td><td colspan="3" style="padding:4px 0;font-weight:600">${r.tonVal>=5?'5톤+ (현장확인)':r.tonVal===0?'없음':r.tonVal+'톤'}</td></tr>
-        ${r.svcs.length?`<tr><td style="padding:4px 0;color:#6b7280">추가서비스</td><td colspan="3" style="padding:4px 0;font-weight:600">${r.svcs.map(s=>SVC_LABELS[s]?.nm||s).join(', ')}</td></tr>`:''}
-        ${r.memo?`<tr><td style="padding:4px 0;color:#6b7280">특이사항</td><td colspan="3" style="padding:4px 0">${r.memo}</td></tr>`:''}
-      </table>
-    </div>
-    <div style="padding:14px 40px 0">
-      <div style="font-size:12px;font-weight:700;color:#1a3a2a;border-bottom:2px solid #2d6a4f;padding-bottom:5px;margin-bottom:10px">견적 내역 (VAT 별도)</div>
-      <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <tr style="background:#1a3a2a"><th style="padding:8px 12px;color:#fff;text-align:left">항목</th><th style="padding:8px 12px;color:#fff;text-align:right">금액</th></tr>
-        <tr style="background:#f9fafb"><td style="padding:8px 12px">기본 청소비 (${r.py}평 · ${contNm[r.adjustedCont]})</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#2d6a4f">${fmt(r.adjMin)}~</td></tr>
-        <tr style="background:#f0fdf4"><td style="padding:8px 12px">기본 소독 · 생활 악취 탈취 <span style="background:#dcfce7;color:#166534;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px">무료</span></td><td style="padding:8px 12px;text-align:right;color:#166534;font-weight:700">0원</td></tr>
-        ${r.wasteAmt>0?`<tr style="background:#fff7ed"><td style="padding:8px 12px">폐기물 처리비 (${r.tonVal}톤 × 40만원)</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#b45309">${fmt(r.wasteAmt)}</td></tr>`:''}
-        ${r.wasteSite?`<tr style="background:#fff7ed"><td style="padding:8px 12px">폐기물 처리비 (5톤+)</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#dc2626">현장 방문 별도 확인</td></tr>`:''}
-        ${r.svcRows.map((s,i)=>`<tr style="background:${i%2===0?'#f9fafb':'#fff'}"><td style="padding:8px 12px">${s.nm}</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#2d6a4f">${fmt(s.p)}</td></tr>`).join('')}
-        ${!r.wasteSite?`<tr style="background:#d8f3dc"><td style="padding:9px 12px;font-weight:700;color:#1a3a2a">소계 (VAT 별도)</td><td style="padding:9px 12px;text-align:right;font-weight:700;color:#1a3a2a;font-size:12px">${fmt(r.subtotal)}~</td></tr>
-        <tr style="background:#fff8e7"><td style="padding:8px 12px;color:#92400e">VAT 포함 예상 총액</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#92400e">${fmt(r.vatTotal)}~</td></tr>`:''}
-      </table>
-    </div>
-    <div style="padding:12px 40px 0">
-      <div style="background:linear-gradient(135deg,#7c2d12,#b45309);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px">
-        <div style="font-size:20px">💳</div>
-        <div><div style="color:#fff;font-size:14px;font-weight:700">🏆 국내유일 현금 분할납부 가능</div>
-        <div style="color:rgba(255,255,255,.8);font-size:10px;margin-top:2px">부담 없이 작업 먼저, 납부는 나누어서 · 상담 시 문의</div></div>
-      </div>
-    </div>
-    <div style="padding:10px 40px 0">
-      <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:8px 12px;font-size:10px;color:#92400e">
-        ⚠️ 위 금액은 기본 작업 기준 최저가입니다. 실제 현장 상태에 따라 최종 금액이 달라질 수 있습니다.
-      </div>
-    </div>
-    <div style="background:#1a3a2a;margin-top:18px;padding:18px 40px;display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="color:#74c69d;font-size:12px;font-weight:700">특수청소에버그린 | 주식회사 리커버리프로</div>
-        <div style="color:rgba(255,255,255,.6);font-size:10px;margin-top:3px">대표: 김현섭 · 행정사 면허 보유 · 전국 출동</div>
-        <div style="color:rgba(255,255,255,.6);font-size:10px">www.evergreen24.co.kr</div>
-      </div>
-      <div style="text-align:right">
-        <div style="color:#f0d080;font-size:13px;font-weight:700">010-8499-0024</div>
-        <div style="color:rgba(255,255,255,.6);font-size:10px;margin-top:3px">카카오 오픈채팅 · 네이버 톡톡</div>
-      </div>
-    </div>
-  </div>`;
-
+  preview.style.left='0'; preview.style.position='absolute'; preview.style.top=document.documentElement.scrollTop+'px';
+  preview.innerHTML=`<div style="width:794px;background:#fff;font-family:'Noto Sans KR',sans-serif;padding:0"><div style="background:linear-gradient(135deg,#1a3a2a,#2d6a4f);padding:28px 40px;display:flex;justify-content:space-between;align-items:center"><div><div style="color:#74c69d;font-size:22px;font-weight:900;letter-spacing:2px">EVERGREEN</div><div style="color:rgba(255,255,255,.7);font-size:11px;margin-top:3px">특수청소에버그린</div></div><div style="text-align:right"><div style="color:#f0d080;font-size:18px;font-weight:700">견 적 서</div><div style="color:rgba(255,255,255,.7);font-size:11px;margin-top:3px">발행일: ${dateStr} | 유효기간: 14일</div></div></div><div style="height:4px;background:linear-gradient(90deg,#c9a84c,#f0d080)"></div><div style="padding:22px 40px 0"><div style="font-size:12px;font-weight:700;color:#1a3a2a;border-bottom:2px solid #2d6a4f;padding-bottom:5px;margin-bottom:10px">고객 정보</div><table style="width:100%;font-size:11px;border-collapse:collapse"><tr><td style="padding:4px 0;color:#6b7280;width:80px">고객명</td><td style="padding:4px 0;font-weight:600">${r.cname||'-'}</td><td style="padding:4px 0;color:#6b7280;width:80px">연락처</td><td style="padding:4px 0;font-weight:600">${r.phone}</td></tr><tr><td style="padding:4px 0;color:#6b7280">주소</td><td colspan="3" style="padding:4px 0;font-weight:600">${r.addr}</td></tr><tr><td style="padding:4px 0;color:#6b7280">작업희망일</td><td style="padding:4px 0;font-weight:600">${r.wdate||'미정'}</td></tr></table></div><div style="padding:14px 40px 0"><div style="font-size:12px;font-weight:700;color:#1a3a2a;border-bottom:2px solid #2d6a4f;padding-bottom:5px;margin-bottom:10px">현장 정보</div><table style="width:100%;font-size:11px;border-collapse:collapse"><tr><td style="padding:4px 0;color:#6b7280;width:100px">평수</td><td style="padding:4px 0;font-weight:600">${r.py}평</td><td style="padding:4px 0;color:#6b7280;width:100px">오염 단계</td><td style="padding:4px 0;font-weight:600">${contNm[r.adjustedCont]}${r.adjustedCont!==r.cont?' (AI 보정)':''}</td></tr><tr><td style="padding:4px 0;color:#6b7280">폐기물</td><td colspan="3" style="padding:4px 0;font-weight:600">${r.tonVal>=5?'5톤+ (현장확인)':r.tonVal===0?'없음':r.tonVal+'톤'}</td></tr>${r.svcs.length?`<tr><td style="padding:4px 0;color:#6b7280">추가서비스</td><td colspan="3" style="padding:4px 0;font-weight:600">${r.svcs.map(s=>SVC_LABELS[s]?.nm||s).join(', ')}</td></tr>`:''}${r.memo?`<tr><td style="padding:4px 0;color:#6b7280">특이사항</td><td colspan="3" style="padding:4px 0">${r.memo}</td></tr>`:''}</table></div><div style="padding:14px 40px 0"><div style="font-size:12px;font-weight:700;color:#1a3a2a;border-bottom:2px solid #2d6a4f;padding-bottom:5px;margin-bottom:10px">견적 내역 (VAT 별도)</div><table style="width:100%;border-collapse:collapse;font-size:11px"><tr style="background:#1a3a2a"><th style="padding:8px 12px;color:#fff;text-align:left">항목</th><th style="padding:8px 12px;color:#fff;text-align:right">금액</th></tr><tr style="background:#f9fafb"><td style="padding:8px 12px">기본 청소비 (${r.py}평 · ${contNm[r.adjustedCont]})</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#2d6a4f">${fmt(r.adjMin)}~</td></tr><tr style="background:#f0fdf4"><td style="padding:8px 12px">기본 소독 · 생활 악취 탈취 <span style="background:#dcfce7;color:#166534;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px">무료</span></td><td style="padding:8px 12px;text-align:right;color:#166534;font-weight:700">0원</td></tr>${r.wasteAmt>0?`<tr style="background:#fff7ed"><td style="padding:8px 12px">폐기물 처리비 (${r.tonVal}톤 × 40만원)</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#b45309">${fmt(r.wasteAmt)}</td></tr>`:''}${r.wasteSite?`<tr style="background:#fff7ed"><td style="padding:8px 12px">폐기물 처리비 (5톤+)</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#dc2626">현장 방문 별도 확인</td></tr>`:''}${r.svcRows.map((s,i)=>`<tr style="background:${i%2===0?'#f9fafb':'#fff'}"><td style="padding:8px 12px">${s.nm}</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#2d6a4f">${fmt(s.p)}</td></tr>`).join('')}${!r.wasteSite?`<tr style="background:#d8f3dc"><td style="padding:9px 12px;font-weight:700;color:#1a3a2a">소계 (VAT 별도)</td><td style="padding:9px 12px;text-align:right;font-weight:700;color:#1a3a2a;font-size:12px">${fmt(r.subtotal)}~</td></tr><tr style="background:#fff8e7"><td style="padding:8px 12px;color:#92400e">VAT 포함 예상 총액</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#92400e">${fmt(r.vatTotal)}~</td></tr>`:''}</table></div><div style="padding:12px 40px 0"><div style="background:linear-gradient(135deg,#7c2d12,#b45309);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px"><div style="font-size:20px">💳</div><div><div style="color:#fff;font-size:14px;font-weight:700">🏆 국내유일 현금 분할납부 가능</div><div style="color:rgba(255,255,255,.8);font-size:10px;margin-top:2px">부담 없이 작업 먼저, 납부는 나누어서 · 상담 시 문의</div></div></div></div><div style="padding:10px 40px 0"><div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:8px 12px;font-size:10px;color:#92400e">⚠️ 위 금액은 기본 작업 기준 최저가입니다. 실제 현장 상태에 따라 최종 금액이 달라질 수 있습니다.</div></div><div style="background:#1a3a2a;margin-top:18px;padding:18px 40px;display:flex;justify-content:space-between;align-items:center"><div><div style="color:#74c69d;font-size:12px;font-weight:700">특수청소에버그린 | 주식회사 리커버리프로</div><div style="color:rgba(255,255,255,.6);font-size:10px;margin-top:3px">대표: 김현섭 · 행정사 면허 보유 · 전국 출동</div><div style="color:rgba(255,255,255,.6);font-size:10px">www.evergreen24.co.kr</div></div><div style="text-align:right"><div style="color:#f0d080;font-size:13px;font-weight:700">010-8499-0024</div><div style="color:rgba(255,255,255,.6);font-size:10px;margin-top:3px">카카오 오픈채팅 · 네이버 톡톡</div></div></div></div>`;
   try{
     const canvas=await html2canvas(preview.firstElementChild,{scale:2,useCORS:true,logging:false,backgroundColor:'#ffffff'});
     const {jsPDF}=window.jspdf;
@@ -1594,37 +1521,47 @@ async function pcPDF(){
     if(imgH<=ph) doc.addImage(imgData,'PNG',0,0,pw,imgH);
     else{let y=0;while(y<imgH){if(y>0)doc.addPage();doc.addImage(imgData,'PNG',0,-y,pw,imgH);y+=ph;}}
     doc.save(`에버그린_쓰레기집청소견적서_${dateStr.replace(/\./g,'')}.pdf`);
-  }catch(e){
-    alert('PDF 저장 중 오류가 발생했습니다.');
-  }finally{
-    preview.style.left='-9999px';preview.innerHTML='';
-  }
+  }catch(e){ alert('PDF 저장 중 오류가 발생했습니다.'); }
+  finally{ preview.style.left='-9999px'; preview.innerHTML=''; }
 }
 
-// ── 초기화 ──
 function reset(){
-  curStep=1;updateUI(1);
+  curStep=1; updateUI(1);
   ['phone','addr','wdate','cname','memo'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('consent').checked=false;
+  // 인증 상태 초기화
+  phoneVerified=false;
+  document.getElementById('phoneVerifiedTag').style.display='none';
+  document.getElementById('otpBox').classList.remove('on');
+  const sb=document.getElementById('otpSendBtn');
+  if(CFG.FEATURES.smsOtp){ sb.disabled=false; sb.textContent='인증번호 받기'; }
+  document.getElementById('otpMsg').textContent='';
+  if(otpTimerId){ clearInterval(otpTimerId); otpTimerId=null; }
   document.getElementById('pyeong').value=10;
   document.querySelectorAll('input[name=cont]')[0].checked=true;
   document.querySelectorAll('input[name=trash]')[1].checked=true;
   document.querySelectorAll('input[name=elev]')[0].checked=true;
   document.querySelectorAll('input[name=svc]').forEach(e=>e.checked=false);
   const btns=document.querySelectorAll('.ton-btn');
-  btns.forEach(b=>b.classList.remove('active'));
-  btns[0].classList.add('active');
-  tonVal=0;
-  document.getElementById('tonResult').textContent='포함 안 함';
-  quoteData=null;
-  removePhoto({stopPropagation:()=>{}});
+  btns.forEach(b=>b.classList.remove('active')); btns[0].classList.add('active');
+  tonVal=0; document.getElementById('tonResult').textContent='포함 안 함';
+  quoteData=null; removePhoto({stopPropagation:()=>{}});
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
+  // 모바일 PDF 버튼 라벨
   if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
     const btn=document.getElementById('pdfBtn');
     if(btn) btn.innerHTML='📄 견적서 보기 · 저장';
   }
+  // SMS 인증 미사용 시 '인증번호 받기' 버튼 숨김(UI 깔끔)
+  if(!CFG.FEATURES.smsOtp){
+    const sb=document.getElementById('otpSendBtn');
+    if(sb) sb.style.display='none';
+  }
+  // 네이버 플레이스 저장 버튼 URL 연결
+  const np=document.getElementById('nplaceBtn');
+  if(np) np.href=CFG.naver_place_url;
 });
 </script>
 </body>
