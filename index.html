@@ -892,8 +892,6 @@ footer a{color:var(--g3);text-decoration:none}
 
 const CFG = {
   worker_url: 'https://evergreen-proxy-git-main-evergreen-s-projects1.vercel.app',
-  telegram_token: '8615878395:AAHhMj3uCVQ8HQbo-jem1QB_YMk0ltY7RjU',
-  telegram_chat_id: '1701103630',
   email: 'ever24green@gmail.com',
 
   // ▼▼▼ 여기만 바꾸면 됩니다 ▼▼▼
@@ -1252,10 +1250,7 @@ function unlockPhotoFeature(via){
   // 채널 추가/해제 알림(텔레그램)
   const tag = via==='kakao' ? '카카오인증' : '채널추가확인';
   const msg2=`🔓 [AI시뮬레이션 잠금해제 · ${tag}]\n📅 ${new Date().toLocaleString('ko-KR')}`;
-  fetch('https://api.telegram.org/bot'+CFG.telegram_token+'/sendMessage',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({chat_id:CFG.telegram_chat_id,text:msg2})
-  }).catch(()=>{});
+  sendTelegram(msg2);
 }
 
 // 24시간 내 이미 해제했다면 자동 유지
@@ -1504,6 +1499,11 @@ function showResult(r){
   document.getElementById('bkVat').innerHTML=r.wasteSite?'※ 폐기물 비용은 현장 방문 후 별도 산출됩니다':`VAT(10%) 포함 예상 총액: <strong>${fmt(r.vatTotal)}~</strong>`;
 }
 
+// 알림은 서버(Vercel)를 거쳐 전송 — 토큰은 페이지에 두지 않음
+function sendTelegram(text){
+  return fetch(`${CFG.worker_url}/api/notify`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})}).catch(()=>{});
+}
+
 async function sendNotify(r){
   const trashLabel={'0.8':'적음','1.0':'보통','1.35':'심함'};
   const elevLabel={'1.0':'1층/있음','1.1':'2층이상 있음','1.25':'2층이상 없음'};
@@ -1511,7 +1511,7 @@ async function sendNotify(r){
   const aiLine=r.aiResult?`\n🤖 AI분석: 오염${r.aiResult.contamination_level}단계·쓰레기${trashAmtNm[r.aiResult.trash_amount]||'-'}·신뢰도${r.aiResult.confidence||'-'}${r.aiResult.special_notes&&r.aiResult.special_notes!=='없음'?`\n⚠ 특이: ${r.aiResult.special_notes}`:''}`:'';
   const photoLine=uploadedPhotoDataURL?'\n📷 사진 첨부됨':'';
   const msg=`🔔 [에버그린 새 견적 접수]\n━━━━━━━━━━━━━━\n📅 ${new Date(r.ts).toLocaleString('ko-KR')}\n📞 ${r.phone}\n📍 ${r.addr}\n📐 ${r.py}평 | 오염 ${contNm[r.adjustedCont]}\n🗑️ 쓰레기양: ${trashLabel[String(r.adjustedTrash)]||r.adjustedTrash}\n📦 폐기물: ${r.tonVal>=5?'5톤+ 현장확인':r.tonVal===0?'없음':r.tonVal+'톤'}\n➕ 추가: ${r.svcs.length?r.svcs.map(s=>svcLabel[s]||s).join(', '):'없음'}\n📝 메모: ${r.memo||'없음'}\n💰 표시견적: ${fmt(r.adjMin)}~${aiLine}${photoLine}\n🗓️ 희망일: ${r.wdate||'미정'}\n━━━━━━━━━━━━━━`;
-  await fetch(`https://api.telegram.org/bot${CFG.telegram_token}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CFG.telegram_chat_id,text:msg})}).catch(()=>{});
+  await sendTelegram(msg);
 }
 
 async function dlPDF(){
