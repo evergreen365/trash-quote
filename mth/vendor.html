@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>무브투헤븐 업체 화면</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#15181C">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+<script src="common.js"></script>
+<script>
+const { rpc, upload, photoUrl, won, man, esc, dt, toast, busy, store, stampNow } = MTH;
+const app = document.getElementById('app');
+const ITEMS = [['sort', '분류·중요한 유품 보관'], ['haul', '반출(인력·차량)'], ['waste', '폐기물 처리'], ['clean', '기본 청소'], ['special', '소독·냄새 제거'], ['buyback', '가전·가구 매입 차감']];
+const KIND = { before: '작업 전', valuable: '귀중품 발견', after: '작업 후' };
+let key = new URLSearchParams(location.hash.slice(1)).get('k') || store.get('mth_vkey', '');
+if (key) store.set('mth_vkey', key);
+let tab = 'new', me = null;
+
+async function load() {
+  if (!key) { app.innerHTML = '<main class="sec"><div class="empty">운영자에게 받은 업체 전용 주소로 들어와 주세요.</div></main>'; return; }
+  try { me = await rpc('vendor_me', { p_key: key }); } catch (e) { app.innerHTML = `<main class="sec"><div class="empty">${esc(e.message)}</div></main>`; return; }
+  render();
+}
+
+function render() {
+  const c = me.company, all = me.requests;
+  const groups = {
+    new: all.filter(x => x.request.status === 'open'),
+    work: all.filter(x => x.won && x.job && x.job.status === 'in_progress'),
+    done: all.filter(x => x.lost || (x.won && x.job && x.job.status !== 'in_progress') || (!x.won && x.request.status !== 'open'))
+  };
+  const tabs = [['new', '새 요청'], ['work', '작업 중'], ['done', '끝난 일']];
+  app.innerHTML = `<header class="hd"><span class="t">${esc(c.name)}</span><div class="r"><button class="btn sm gray" id="rf" type="button">새로고침</button></div></header>
+  <div class="sec soft" style="padding:14px 16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+    <div class="box" style="background:#fff;text-align:center;padding:10px"><span class="note">추가금 0원</span><b style="display:block;font-size:18px;color:var(--accent)">${c.stats.zero_rate == null ? '-' : c.stats.zero_rate + '%'}</b></div>
+    <div class="box" style="background:#fff;text-align:center;padding:10px"><span class="note">후기</span><b style="display:block;font-size:18px">${c.stats.n_reviews}건</b></div>
+    <div class="box" style="background:#fff;text-align:center;padding:10px"><span class="note">별점</span><b style="display:block;font-size:18px">${c.stats.n_reviews ? Number(c.stats.avg).toFixed(2) : '-'}</b></div>
+  </div>
+  <nav style="display:flex;border-bottom:1px solid var(--line)">${tabs.map(([k, l]) => `<button type="button" data-tab="${k}" style="flex:1;min-height:48px;border:0;background:none;font-family:inherit;font-size:15px;cursor:pointer;${tab === k ? 'font-weight:800;border-bottom:2px solid var(--ink)' : 'color:var(--sub);border-bottom:2px solid transparent'}">${l} ${groups[k].length}</button>`).join('')}</nav>
+  <main class="sec stack">${groups[tab].map(card).join('') || '<div class="empty">없습니다.</div>'}</main>`;
+  app.querySelector('#rf').onclick = load;
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); });
+  bind();
+}
+
+function reqInfo(r) {
+  return `<div class="box stack" style="gap:4px;font-size:14px">
+    <div><b>${esc(r.size)}</b> · 짐 ${esc(r.load)} · ${esc(r.floor)}${r.odor ? ' · <b style="color:var(--warn)">냄새·오염 있음</b>' : ''}</div>
+    <div class="note">${esc(r.address_dong || r.region)} · 희망 ${esc(r.wish_date || '-')} · 요청 ${dt(r.created_at)}</div>
+    ${r.keep_items && r.keep_items.length ? `<div>찾을 물건: ${esc(r.keep_items.join(', '))}</div>` : ''}
+    ${r.keep_note ? `<div>전할 말: ${esc(r.keep_note)}</div>` : ''}
+    ${r.photo_paths && r.photo_paths.length ? `<div class="photos" style="margin-top:4px">${r.photo_paths.map(p => `<a href="${photoUrl(p)}" target="_blank" rel="noopener"><img src="${photoUrl(p)}" alt="현장 사진" loading="lazy"></a>`).join('')}</div>` : ''}
+  </div>`;
+}
+
+function card(x) {
+  const r = x.request, q = x.my_quote, j = x.job;
+  let h = `<article class="co" data-id="${r.id}">`;
+  if (r.status === 'open') {
+    const it = (q && q.items) || {};
+    h += `<div style="display:flex;justify-content:space-between"><b>견적 요청</b><span class="note">함께 받은 업체 ${x.n_targets}곳</span></div>${reqInfo(r)}
+      <form class="stack qf" style="gap:8px" novalidate>
+        <p class="note" style="margin:0">항목별 금액을 <b>만 원</b> 단위로 적어 주세요. 고객은 이 금액을 확정 견적으로 받습니다.</p>
+        ${ITEMS.map(([k, l]) => `<label style="display:flex;align-items:center;gap:8px;font-size:14px"><span style="flex:1">${l}</span><input name="${k}" type="number" inputmode="decimal" min="0" step="1" style="width:110px;height:44px;text-align:right" value="${it[k] ? it[k] / 10000 : ''}"><span>만</span></label>`).join('')}
+        <div class="kv" style="font-size:16px"><span>합계</span><b class="tot">${q ? won(q.total) : '0원'}</b></div>
+        <label class="lbl">고객에게 전할 말<textarea name="note" placeholder="포함·제외 항목, 작업 인원과 시간 등">${esc((q && q.note) || '')}</textarea></label>
+        <label style="display:flex;gap:10px;align-items:center;font-size:14px"><input type="checkbox" name="visit" ${q && q.visit_needed ? 'checked' : ''}>방문 확인이 필요합니다</label>
+        <button class="btn" type="submit">${q ? '견적 고치기' : '견적 보내기'}</button>
+        <p class="note" style="margin:0">고객이 업체를 고르기 전까지 고칠 수 있습니다. 고르면 금액이 고정됩니다.</p>
+      </form>`;
+  } else if (x.won && j) {
+    const ev = x.evidence || [], ch = x.changes || [];
+    const pend = ch.filter(c => c.status === 'pending').length;
+    h += `<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:16px">${esc(r.contact_name)} 고객님</b>
+        <span class="badge ${j.status === 'in_progress' ? '' : 'gray'}">${{ in_progress: '작업 중', completed: '고객 확인 대기', confirmed: '완료' }[j.status]}</span></div>
+      <a class="btn line sm" style="width:100%" href="tel:${esc(r.phone)}">전화 ${esc(r.phone)}</a>
+      ${reqInfo(r)}
+      <div class="box"><div class="kv"><span>확정 견적</span><b>${won(j.confirmed_total)}</b></div>${j.final_total != null ? `<div class="kv"><span>최종 금액</span><b>${won(j.final_total)}</b></div>` : ''}</div>
+      <div class="stack" style="gap:8px"><b>작업 기록</b>
+        ${['before', 'valuable', 'after'].map(k => { const a = ev.filter(e => e.kind === k); return `<div>
+          <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;font-weight:700">${KIND[k]} ${a.length}장</span>
+          ${j.status === 'in_progress' ? `<label class="btn sm line" style="cursor:pointer">사진 올리기<input type="file" accept="image/*" capture="environment" multiple data-up="${k}" style="position:absolute;width:1px;height:1px;opacity:0"></label>` : ''}</div>
+          ${a.length ? `<div class="photos" style="margin-top:6px">${a.map(e => `<a href="${photoUrl(e.photo_path)}" target="_blank" rel="noopener"><img src="${photoUrl(e.photo_path)}" alt="${KIND[k]} 사진" loading="lazy"></a>`).join('')}</div>` : ''}</div>`; }).join('')}
+        <p class="note" style="margin:0">사진에는 업체명과 날짜·시간이 자동으로 찍히고, 올린 뒤에는 지울 수 없습니다.</p></div>
+      ${ch.length ? `<div class="stack" style="gap:6px"><b>금액 변경 요청</b>${ch.map(c => `<div class="box" style="font-size:14px">${c.amount_delta > 0 ? '+' : ''}${won(c.amount_delta)} · ${esc(c.reason)} <span class="badge ${c.status === 'approved' ? '' : c.status === 'pending' ? 'gray' : 'warn'}">${{ pending: '고객 답 기다림', approved: '동의함', rejected: '거절함' }[c.status]}</span></div>`).join('')}</div>` : ''}
+      ${j.status === 'in_progress' ? `<details><summary>금액 변경 요청하기</summary>
+        <p>고객이 알린 내용과 현장이 다를 때만 요청하세요. 고객이 동의하기 전에는 받을 수 없습니다.</p>
+        <form class="stack cf" style="gap:8px;margin-top:8px" novalidate>
+          <label class="lbl">바꿀 금액 (만 원, 줄이면 앞에 -)<input name="delta" type="number" inputmode="decimal" step="1"></label>
+          <label class="lbl">사유<textarea name="reason" placeholder="예) 다락방에 짐이 1톤 더 있었습니다"></textarea></label>
+          <label class="filebtn">📷 사유 사진 (필수)<input type="file" name="ph" accept="image/*" capture="environment"></label>
+          <button class="btn warn" type="submit">고객에게 동의 요청 보내기</button></form></details>
+        <details><summary>작업 완료 올리기</summary>
+          <p>작업 전·후 사진이 있어야 완료할 수 있습니다. 최종 금액은 확정 견적과 고객이 동의한 변경만으로 계산됩니다.${pend ? ' <b>고객이 아직 답하지 않은 변경 요청이 있습니다.</b>' : ''}</p>
+          <form class="stack df" style="gap:8px;margin-top:8px" novalidate>
+            <label class="lbl">귀중품 인계 목록<textarea name="ho" placeholder="예) 통장 2개, 도장 1개, 앨범 3권 — 택배 발송"></textarea></label>
+            <button class="btn" type="submit">작업 완료</button></form></details>` : ''}`;
+  } else {
+    h += `<b>${x.lost ? '고객이 다른 업체를 골랐습니다' : '진행되지 않은 요청'}</b>${reqInfo(r)}${q ? `<div class="kv"><span>보낸 견적</span><b>${won(q.total)}</b></div>` : ''}`;
+  }
+  return h + '</article>';
+}
+
+function bind() {
+  app.querySelectorAll('.qf').forEach(f => {
+    const rid = f.closest('[data-id]').dataset.id;
+    const items = () => { const o = {}; ITEMS.forEach(([k]) => { const v = parseFloat(f.elements[k].value); if (v > 0) o[k] = Math.round(v * 10000); }); return o; };
+    const sum = () => { const o = items(); return ['sort', 'haul', 'waste', 'clean', 'special'].reduce((a, k) => a + (o[k] || 0), 0) - (o.buyback || 0); };
+    f.oninput = () => { f.querySelector('.tot').textContent = won(sum()); };
+    f.onsubmit = (e) => {
+      e.preventDefault();
+      if (sum() <= 0) return toast('금액을 적어 주세요');
+      busy(f.querySelector('button[type=submit]'), () => rpc('vendor_quote', { p_key: key, p_request: rid, p_items: items(), p_note: f.elements.note.value, p_visit: f.elements.visit.checked }))
+        .then(() => { toast('견적을 보냈습니다'); load(); });
+    };
+  });
+  app.querySelectorAll('[data-up]').forEach(inp => inp.onchange = async () => {
+    const card = inp.closest('[data-id]'); const x = me.requests.find(r => r.request.id === card.dataset.id);
+    const files = [...inp.files]; if (!files.length) return;
+    let note = '';
+    if (inp.dataset.up === 'valuable') note = prompt('찾은 물건을 적어 주세요 (예: 통장 1개, 현금 30만원)') || '';
+    toast('사진을 올리는 중…');
+    try {
+      for (const f of files) {
+        const path = await upload('job/' + x.job.id, f, `무브투헤븐 · ${me.company.name}\n${KIND[inp.dataset.up]} ${stampNow()}`);
+        await rpc('vendor_evidence', { p_key: key, p_job: x.job.id, p_kind: inp.dataset.up, p_path: path, p_note: note });
+      }
+      toast('사진을 올렸습니다'); load();
+    } catch (e) { toast(e.message); }
+  });
+  app.querySelectorAll('.cf').forEach(f => f.onsubmit = (e) => {
+    e.preventDefault();
+    const card = f.closest('[data-id]'); const x = me.requests.find(r => r.request.id === card.dataset.id);
+    const d = parseFloat(f.elements.delta.value), reason = f.elements.reason.value.trim(), file = f.elements.ph.files[0];
+    if (!d) return toast('바꿀 금액을 적어 주세요');
+    if (!reason) return toast('사유를 적어 주세요');
+    if (!file) return toast('사유 사진을 올려 주세요');
+    busy(f.querySelector('button'), async () => {
+      const path = await upload('job/' + x.job.id, file, `무브투헤븐 · ${me.company.name}\n변경 사유 ${stampNow()}`);
+      await rpc('vendor_change', { p_key: key, p_job: x.job.id, p_delta: Math.round(d * 10000), p_reason: reason, p_path: path });
+    }).then(() => { toast('고객에게 동의 요청을 보냈습니다'); load(); });
+  });
+  app.querySelectorAll('.df').forEach(f => f.onsubmit = (e) => {
+    e.preventDefault();
+    const card = f.closest('[data-id]'); const x = me.requests.find(r => r.request.id === card.dataset.id);
+    busy(f.querySelector('button'), () => rpc('vendor_complete', { p_key: key, p_job: x.job.id, p_handover: f.elements.ho.value }))
+      .then(r => { toast('완료했습니다. 최종 ' + won(r.final_total)); load(); });
+  });
+}
+load();
+</script>
+</body>
+</html>

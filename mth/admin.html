@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>무브투헤븐 운영자</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#15181C">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+<script src="common.js"></script>
+<script>
+const { rpc, upload, photoUrl, won, esc, dt, toast, busy, store } = MTH;
+const app = document.getElementById('app');
+let key = new URLSearchParams(location.hash.slice(1)).get('k') || store.get('mth_akey', '');
+if (key) store.set('mth_akey', key);
+let tab = 'today', D = null, edit = null;
+const base = location.href.split('/').slice(0, -1).join('/');
+const hours = s => (Date.now() - new Date(s)) / 36e5;
+
+async function load() {
+  if (!key) { app.innerHTML = '<main class="sec"><div class="empty">운영자 주소로 들어와 주세요.</div></main>'; return; }
+  try { D = await rpc('admin_overview', { p_key: key }); } catch (e) { app.innerHTML = `<main class="sec"><div class="empty">${esc(e.message)}</div></main>`; return; }
+  render();
+}
+
+function render() {
+  const lateQ = D.requests.filter(r => r.status === 'open' && r.n_quotes < r.n_targets && hours(r.created_at) > 12);
+  const noPhoto = D.jobs.filter(j => (j.status === 'in_progress' && hours(j.created_at) > 48 && !j.n_before) || (j.status !== 'in_progress' && (!j.n_before || !j.n_after)));
+  const openRep = D.reports.filter(r => r.status === 'open');
+  const qs = [['late', '견적 지연', lateQ.length], ['photo', '사진 누락', noPhoto.length], ['report', '추가금 신고', openRep.length], ['review', '새 후기', D.reviews.filter(v => hours(v.created_at) < 72).length]];
+  const tabs = [['today', '오늘 할 일'], ['req', '요청·거래'], ['co', '업체']];
+  let body = '';
+  if (tab === 'today') {
+    body = `<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">${qs.map(([k, l, n]) => `<div class="box" style="${n ? 'background:var(--accent);color:#fff' : ''}"><span style="font-size:13px;font-weight:700">${l}</span><b style="display:block;font-size:28px">${n}건</b></div>`).join('')}</div>
+      ${openRep.length ? `<h2 style="font-size:17px;font-weight:800;margin-top:8px">추가금 신고</h2>${openRep.map(r => `<div class="co" data-rep="${r.id}">
+        <div style="display:flex;justify-content:space-between"><b>${esc(r.company)}</b><span class="note">${dt(r.created_at)}</span></div>
+        <p style="margin:0;font-size:14px">${esc(r.body)}</p>
+        <div class="box" style="font-size:13px"><div class="kv"><span>확정 견적</span><b>${won(r.confirmed_total)}</b></div><div class="kv"><span>최종(기록)</span><b>${won(r.final_total)}</b></div>
+          ${r.changes.map(c => `<div class="kv"><span>${c.amount_delta > 0 ? '+' : ''}${won(c.amount_delta)} ${esc(c.reason)}</span><b>${{ pending: '대기', approved: '고객 동의', rejected: '고객 거절' }[c.status]}</b></div>`).join('') || '<p class="note" style="margin:4px 0 0">금액 변경 기록 없음 → 동의 없는 추가금이면 환급 대상</p>'}</div>
+        <textarea placeholder="판정 메모 (고객에게 보입니다)"></textarea>
+        <div style="display:flex;gap:8px"><button class="btn" data-dec="refund">환급 결정</button><button class="btn gray" data-dec="rejected">기록상 동의 확인</button></div></div>`).join('')}` : ''}
+      ${lateQ.length ? `<h2 style="font-size:17px;font-weight:800;margin-top:8px">견적 지연</h2>${lateQ.map(r => `<div class="co"><b>${esc(r.contact_name)} · ${esc(r.region)} ${esc(r.size)}</b><span class="note">${dt(r.created_at)} · ${r.n_quotes}/${r.n_targets}곳 응답</span>
+        <div class="tags">${(r.targets || []).map(t => `<span class="tag" style="${t.quoted ? '' : 'background:var(--warn-l);color:var(--warn)'}">${esc(t.name)} ${t.quoted ? '응답' : '미응답'}</span>`).join('')}</div>
+        <a class="btn sm line" href="tel:${esc(r.phone)}">고객 전화 ${esc(r.phone)}</a></div>`).join('')}` : ''}
+      ${noPhoto.length ? `<h2 style="font-size:17px;font-weight:800;margin-top:8px">사진 누락</h2>${noPhoto.map(j => `<div class="co"><b>${esc(j.company)}</b><span class="note">작업 전 ${j.n_before} · 귀중품 ${j.n_valuable} · 작업 후 ${j.n_after} · ${dt(j.created_at)}</span></div>`).join('')}` : ''}
+      ${!openRep.length && !lateQ.length && !noPhoto.length ? '<div class="empty">오늘 처리할 일이 없습니다.</div>' : ''}`;
+  } else if (tab === 'req') {
+    body = `<h2 style="font-size:17px;font-weight:800">최근 요청 (60일)</h2>${D.requests.map(r => `<div class="co"><div style="display:flex;justify-content:space-between"><b>${esc(r.contact_name)} · ${esc(r.size)}</b><span class="badge gray">${{ open: '견적 중', selected: '업체 선택', done: '완료', cancelled: '취소' }[r.status]}</span></div>
+      <span class="note">${dt(r.created_at)} · ${esc(r.region)} · 견적 ${r.n_quotes}/${r.n_targets} · ${esc(r.phone)}</span></div>`).join('') || '<div class="empty">없습니다.</div>'}
+      <h2 style="font-size:17px;font-weight:800;margin-top:8px">거래</h2>${D.jobs.map(j => `<div class="co"><div style="display:flex;justify-content:space-between"><b>${esc(j.company)}</b><span class="badge ${j.final_total != null && j.final_total > j.confirmed_total ? 'warn' : ''}">${{ in_progress: '작업 중', completed: '고객 확인 대기', confirmed: '완료' }[j.status]}</span></div>
+      <span class="note">확정 ${won(j.confirmed_total)} · 최종 ${won(j.final_total)} · 사진 ${j.n_before}/${j.n_valuable}/${j.n_after}${j.pending_changes ? ' · 변경 대기 ' + j.pending_changes : ''}</span></div>`).join('') || '<div class="empty">없습니다.</div>'}
+      <h2 style="font-size:17px;font-weight:800;margin-top:8px">후기</h2>${D.reviews.map(v => `<div class="co" data-rv="${v.id}"><div style="display:flex;justify-content:space-between"><b>${esc(v.company)} ★${v.rating}</b><button class="btn sm ${v.visible ? 'gray' : 'line'}" data-vis="${v.visible ? 0 : 1}">${v.visible ? '숨기기' : '다시 보이기'}</button></div><p style="margin:0;font-size:14px">${esc(v.body || '')}</p></div>`).join('') || '<div class="empty">없습니다.</div>'}`;
+  } else {
+    body = `<button class="btn" id="add">업체 추가</button>
+      ${edit ? coForm(edit) : ''}
+      ${D.companies.map(c => `<div class="co"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(c.name)}</b><span class="badge ${c.status === 'active' ? '' : 'gray'}">${c.status === 'active' ? '노출' : '숨김'}</span></div>
+        <span class="note">${esc(c.region)} · 순서 ${c.manual_rank ?? '-'} · 후기 ${c.stats.n_reviews} · 추가금 0원 ${c.stats.zero_rate ?? '-'}% · ${esc(c.phone || '연락처 없음')}</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm gray" data-edit="${c.id}">고치기</button><button class="btn sm line" data-link="${c.id}">업체 주소 새로 만들기</button>
+        <button class="btn sm gray" data-hide="${c.id}" data-st="${c.status === 'active' ? 'hidden' : 'active'}">${c.status === 'active' ? '숨기기' : '노출'}</button></div></div>`).join('')}`;
+  }
+  app.innerHTML = `<header class="hd"><span class="t">무브투헤븐 운영자</span><div class="r"><button class="btn sm gray" id="rf">새로고침</button></div></header>
+    <nav style="display:flex;border-bottom:1px solid var(--line)">${tabs.map(([k, l]) => `<button type="button" data-tab="${k}" style="flex:1;min-height:48px;border:0;background:none;font-family:inherit;font-size:15px;cursor:pointer;${tab === k ? 'font-weight:800;border-bottom:2px solid var(--ink)' : 'color:var(--sub);border-bottom:2px solid transparent'}">${l}</button>`).join('')}</nav>
+    <main class="sec stack">${body}</main>`;
+  bind();
+}
+
+function coForm(c) {
+  const v = (k) => esc(c[k] ?? '');
+  return `<form class="co stack" id="cf" style="gap:10px" novalidate><b>${c.id ? '업체 고치기' : '새 업체'}</b>
+    <label class="lbl">업체명<input name="name" value="${v('name')}"></label>
+    <label class="lbl">지역 (목록 탭 이름)<input name="region" value="${v('region')}" placeholder="예) 서울 서부"></label>
+    <label class="lbl">출동 지역 설명<input name="area_desc" value="${v('area_desc')}"></label>
+    <label class="lbl">업체 연락처 (선택된 고객에게만 보임)<input name="phone" value="${v('phone')}"></label>
+    <label class="lbl">표시 (쉼표로 구분)<input name="tags" value="${esc((c.tags || []).join(', '))}" placeholder="후불, 분할, 유품 매입"></label>
+    <label class="lbl">한 줄 소개<textarea name="intro">${v('intro')}</textarea></label>
+    <label class="lbl">확인한 서류 (줄마다 「서류명 | 확인일」)<textarea name="docs">${esc((c.docs || []).map(d => d.name + ' | ' + d.date).join('\n'))}</textarea></label>
+    <label class="lbl">목록 순서 (후기 5건 전까지)<input name="manual_rank" type="number" value="${v('manual_rank')}"></label>
+    <label style="display:flex;gap:10px;align-items:center;font-size:14px"><input type="checkbox" name="is_related" ${c.is_related ? 'checked' : ''}>운영사 관계업체로 표시</label>
+    <label class="filebtn">📷 대표 사진 ${c.photo_url ? '바꾸기' : '올리기'}<input type="file" name="ph" accept="image/*"></label>
+    <div style="display:flex;gap:8px"><button class="btn" type="submit">저장</button><button class="btn gray" type="button" id="cx">닫기</button></div></form>`;
+}
+
+async function showLink(vk, name) {
+  const u = `${base}/vendor.html#k=${vk}`;
+  try { await navigator.clipboard.writeText(u); toast(name + ' 업체 주소를 복사했습니다'); } catch (e) { }
+  prompt(name + ' 업체 전용 주소입니다. 업체에 전달하세요. (이 주소는 다시 볼 수 없습니다)', u);
+}
+
+function bind() {
+  app.querySelector('#rf').onclick = load;
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); });
+  app.querySelectorAll('[data-dec]').forEach(b => b.onclick = () => {
+    const box = b.closest('[data-rep]');
+    busy(b, () => rpc('admin_decide_report', { p_key: key, p_report: box.dataset.rep, p_status: b.dataset.dec, p_note: box.querySelector('textarea').value })).then(load);
+  });
+  app.querySelectorAll('[data-vis]').forEach(b => b.onclick = () => busy(b, () => rpc('admin_review_visible', { p_key: key, p_review: b.closest('[data-rv]').dataset.rv, p_visible: b.dataset.vis === '1' })).then(load));
+  const add = app.querySelector('#add'); if (add) add.onclick = () => { edit = { tags: [], docs: [] }; render(); };
+  app.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => { edit = D.companies.find(c => c.id === b.dataset.edit); render(); window.scrollTo(0, 0); });
+  app.querySelectorAll('[data-hide]').forEach(b => b.onclick = () => busy(b, () => rpc('admin_upsert_company', { p_key: key, p: { id: b.dataset.hide, status: b.dataset.st } })).then(load));
+  app.querySelectorAll('[data-link]').forEach(b => b.onclick = () => {
+    if (b.dataset.ok !== '1') { b.dataset.ok = '1'; b.textContent = '기존 주소가 막힙니다. 한 번 더 누르기'; return; }
+    busy(b, () => rpc('admin_reset_vendor_key', { p_key: key, p_company: b.dataset.link })).then(r => showLink(r.vendor_key, D.companies.find(c => c.id === b.dataset.link).name));
+  });
+  const cx = app.querySelector('#cx'); if (cx) cx.onclick = () => { edit = null; render(); };
+  const f = app.querySelector('#cf');
+  if (f) f.onsubmit = (e) => {
+    e.preventDefault();
+    const g = n => f.elements[n].value.trim();
+    if (!g('name') || !g('region')) return toast('업체명과 지역을 적어 주세요');
+    busy(f.querySelector('[type=submit]'), async () => {
+      const p = { name: g('name'), region: g('region'), area_desc: g('area_desc'), phone: g('phone'), intro: g('intro'),
+        tags: g('tags').split(',').map(s => s.trim()).filter(Boolean),
+        docs: g('docs').split('\n').map(l => l.split('|').map(s => s.trim())).filter(a => a[0]).map(a => ({ name: a[0], date: a[1] || '' })),
+        manual_rank: g('manual_rank'), is_related: f.elements.is_related.checked };
+      const file = f.elements.ph.files[0];
+      if (file) p.photo_url = await upload('co', file);
+      if (edit.id) p.id = edit.id;
+      return rpc('admin_upsert_company', { p_key: key, p });
+    }).then(r => { const name = g('name'); edit = null; if (r.vendor_key) showLink(r.vendor_key, name); else toast('저장했습니다'); load(); });
+  };
+}
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>무브투헤븐 | 추가금 0원 유품정리 업체 비교</title>
+<meta name="description" content="추가금 0원을 약속한 유품정리 업체만 모았습니다. 거래 확인 후기로 비교하고 업체 3곳의 견적을 받아 보세요. 작업 후 결제·분할 납부 가능 업체.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#15181C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+<script src="common.js"></script>
+<script>
+const { rpc, upload, photoUrl, won, man, esc, dt, toast, busy, store } = MTH;
+const app = document.getElementById('app');
+const SHIELD = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><polyline points="8.5 12 11 14.5 15.5 10"/></svg>';
+const BACK = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>';
+const ITEMS = [['sort', '분류·중요한 유품 보관'], ['haul', '반출(인력·차량)'], ['waste', '폐기물 처리'], ['clean', '기본 청소'], ['special', '소독·냄새 제거'], ['buyback', '가전·가구 매입 차감']];
+const KIND = { before: '작업 전', valuable: '귀중품 발견', after: '작업 후' };
+
+let state = { region: store.get('mth_region', null), regions: [], companies: [], sel: store.get('mth_sel', []) };
+const saveSel = () => store.set('mth_sel', state.sel);
+
+function header(opts = {}) {
+  if (opts.back) {
+    return `<header class="hd"><a class="back" href="${opts.back}" aria-label="뒤로">${BACK}</a><span class="t">${esc(opts.title || '')}</span>
+      <div class="r">${opts.right || ''}</div></header>`;
+  }
+  return `<div class="topbar"><b>추가금 0원</b>을 약속한 유품정리 업체만 소개합니다</div>
+  <header class="hd"><a class="logo" href="#/"><i>${SHIELD}</i><span><b>무브투헤븐<sup style="font-size:9px;font-weight:500">®</sup></b><small>유품정리 업체 비교</small></span></a>
+    <div class="r"><a href="#/my">내 견적</a></div></header>`;
+}
+
+function stickyBar() {
+  const n = state.sel.length;
+  return `<div class="sticky" role="region" aria-label="선택한 업체">
+    <div class="info"><b>${n} / 3곳 선택</b><span>${n ? esc(state.sel.map(s => s.name).join(', ')) : '추가금 0원 · 작업 후 결제 · 분할 납부'}</span></div>
+    <a class="btn" href="#/request">견적 요청</a></div>`;
+}
+
+function toggleSel(c) {
+  const i = state.sel.findIndex(s => s.id === c.id);
+  if (i >= 0) state.sel.splice(i, 1);
+  else {
+    if (state.sel.length >= 3) { toast('최대 3곳까지 담을 수 있어요'); return; }
+    if (state.sel.length && state.sel[0].region !== c.region) { toast('같은 지역 업체만 함께 담을 수 있어요'); return; }
+    state.sel.push({ id: c.id, name: c.name, region: c.region });
+  }
+  saveSel();
+  const y = window.scrollY;
+  Promise.resolve(route()).then(() => window.scrollTo(0, y));
+}
+
+function coCard(c, i) {
+  const s = c.stats || {};
+  const on = state.sel.some(x => x.id === c.id);
+  const zero = s.zero_rate == null ? '집계 전' : s.zero_rate + '%';
+  const tags = (c.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join('') + (c.is_related ? '<span class="tag rel">운영사 관계업체</span>' : '');
+  return `<article class="co ${on ? 'sel' : ''}">
+    <div class="row">
+      <div class="ph">${c.photo_url ? `<img src="${esc(photoUrl(c.photo_url))}" alt="${esc(c.name)} 사진" loading="lazy">` : '업체 사진'}
+        ${i != null ? `<span class="rank ${i > 2 ? 'lo' : ''}">${i + 1}</span>` : ''}</div>
+      <div style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:4px">
+        <a class="nm" href="#/c/${c.id}">${esc(c.name)}</a>
+        <span class="mt">${s.n_reviews ? `<b>★ ${Number(s.avg).toFixed(2)}</b> · 거래 확인 후기 ${s.n_reviews}건` : '후기 모으는 중 · 신규'}</span>
+        <span class="mt" style="font-size:12px">${esc(c.area_desc || c.region)}</span>
+        <div class="tags">${tags}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div class="zero"><span>추가금 0원 달성</span><b>${zero}</b></div>
+      <button type="button" class="btn sm ${on ? '' : 'line'}" style="min-width:96px" aria-pressed="${on}" data-sel="${c.id}">${on ? '✓ 담음' : '비교 담기'}</button>
+    </div></article>`;
+}
+
+function bindSel(list) {
+  app.querySelectorAll('[data-sel]').forEach(b => b.onclick = () => toggleSel(list.find(c => c.id === b.dataset.sel)));
+}
+
+// ── 홈 ──
+const CALC = {
+  size: [['원룸', '10평 이하', 60, 90], ['투룸', '11~20평', 110, 160], ['3룸', '21~30평', 170, 240], ['30평 이상', '아파트·주택', 250, 350]],
+  load: [['적어요', '가구만 조금', .85], ['보통이에요', '살던 그대로', 1], ['많아요', '방마다 가득', 1.3]],
+  floor: [['1층·엘리베이터', '바로 반출', 1], ['2~3층 계단', '엘리베이터 없음', 1.1], ['4층 이상 계단', '사다리차 필요할 수 있음', 1.2]]
+};
+let calc = { size: 1, load: 1, floor: 0 };
+
+async function home() {
+  if (!state.companies.length) app.innerHTML = header() + '<main><div class="empty">불러오는 중…</div></main>';
+  try {
+    if (!state.regions.length) state.regions = await rpc('list_regions');
+    if (!state.region || !state.regions.includes(state.region)) state.region = state.regions[0] || null;
+    state.companies = state.region ? await rpc('list_companies', { p_region: state.region }) : [];
+  } catch (e) { toast(e.message); }
+  const r5 = v => Math.round(v / 5) * 5;
+  const s = CALC.size[calc.size], l = CALC.load[calc.load], f = CALC.floor[calc.floor];
+  const lo = r5(s[2] * l[2] * f[2]), hi = r5(s[3] * l[2] * f[2]);
+  const opt = (k) => CALC[k].map((o, i) => `<button type="button" class="opt" aria-pressed="${calc[k] === i}" data-calc="${k}:${i}"><b>${o[0]}</b><span>${o[1]}</span></button>`).join('');
+  app.innerHTML = header() + `<main>
+  <section class="sec soft" style="display:flex;flex-direction:column;gap:14px">
+    <span class="pill" style="align-self:flex-start">우리 지역 유품정리 업체 비교</span>
+    <h1><span class="hero-t1">추가금 0원</span><span class="hero-t2">약속한 업체만 모았습니다</span></h1>
+    <p style="margin:0;font-size:16px;color:#3A4048">후기와 견적을 비교하고 고르세요.<br>약속을 어기면 돌려받게 해 드립니다.</p>
+    <div class="card stack">
+      <label class="lbl">어느 지역인가요?
+        <select id="region">${state.regions.map(r => `<option ${r === state.region ? 'selected' : ''}>${esc(r)}</option>`).join('') || '<option>준비 중</option>'}</select></label>
+      <a class="btn" href="#list">업체 보기</a>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-bottom:8px">
+    <div style="display:flex;gap:6px">
+      <div class="box" style="flex:1;text-align:center;padding:10px 6px"><b style="font-size:12px;display:block">고객</b><span style="font-size:13px">한 번만 적기</span></div>
+      <div class="box" style="flex:1;text-align:center;padding:10px 6px;background:var(--accent);color:#fff"><b style="font-size:12px;display:block">무브투헤븐</b><span style="font-size:13px">심사·기록</span></div>
+      <div class="box" style="flex:1;text-align:center;padding:10px 6px"><b style="font-size:12px;display:block">입점 업체</b><span style="font-size:13px">같은 항목 견적</span></div>
+    </div>
+    <p class="note" style="text-align:center;margin:10px 0 0">무브투헤븐은 업체를 심사하고 기록을 지키는 곳입니다. 작업은 고른 업체가 합니다.</p>
+  </section>
+
+  <section class="sec" id="list">
+    <h2 class="h2">${esc(state.region || '')} 업체</h2>
+    <p class="desc" style="margin-bottom:12px">후기 순 · 최대 3곳을 담아 견적을 비교하세요</p>
+    <div class="chips" role="tablist" aria-label="지역" style="margin-bottom:14px">${state.regions.map(r => `<button type="button" class="chip" role="tab" aria-selected="${r === state.region}" data-region="${esc(r)}">${esc(r)}</button>`).join('')}</div>
+    <div class="stack">${state.companies.map((c, i) => coCard(c, i)).join('') || '<div class="empty">이 지역은 업체를 모으는 중입니다.</div>'}</div>
+    <p class="note" style="margin-top:10px">광고비로 순위를 살 수 없습니다. 후기 5건이 쌓이기 전에는 운영자가 확인한 순서로 보여 드립니다.</p>
+  </section>
+
+  <section class="sec dark">
+    <h2 style="font-size:24px;font-weight:800">업체, 이 세 가지로 고르세요</h2>
+    <p style="margin:6px 0 16px;font-size:14px;color:#B7BEC6">모든 업체를 같은 기준으로 보여 드립니다.</p>
+    <div class="stack">
+      <div class="crit"><span class="n">01</span><div><b>추가금 0원 달성률</b><span>확정 견적 그대로 끝난 거래의 비율입니다.</span></div></div>
+      <div class="crit"><span class="n">02</span><div><b>거래 확인 후기</b><span>실제로 맡긴 고객만 씁니다. 순위도 후기로 정합니다.</span></div></div>
+      <div class="crit"><span class="n">03</span><div><b>운영자가 확인한 서류</b><span>사업자, 폐기물 처리 계약, 배상보험을 확인합니다.</span></div></div>
+    </div>
+  </section>
+
+  <section class="sec stack" style="gap:16px">
+    <h2 class="h2">다른 곳과 다른 점</h2>
+    <div class="box"><b style="font-size:16px">동의 없이 받은 추가금, 돌려받게 해 드립니다</b><p class="note" style="margin:4px 0 0;font-size:13px">금액을 바꾸려면 업체가 사진을 올리고 고객이 휴대폰으로 동의해야 합니다. 기록이 없으면 업체가 돌려 드립니다.</p></div>
+    <div class="box"><b style="font-size:16px">찾은 귀중품은 사진과 목록으로 남깁니다</b><p class="note" style="margin:4px 0 0;font-size:13px">현금, 통장, 사진이 나오면 업체가 바로 사진을 올립니다. 시간이 함께 찍혀 지울 수 없습니다.</p></div>
+    <div class="box"><b style="font-size:16px">작업 전·후 사진이 기록으로 남습니다</b><p class="note" style="margin:4px 0 0;font-size:13px">현장에 가지 않아도 휴대폰으로 과정을 확인할 수 있습니다.</p></div>
+  </section>
+
+  <section class="sec" id="estimate">
+    <h2 class="h2">예상 비용</h2>
+    <p class="desc" style="margin-bottom:16px">세 가지만 고르세요. 연락처는 필요 없습니다.</p>
+    <div class="stack" style="gap:16px">
+      <fieldset style="border:0;margin:0;padding:0"><legend style="font-size:15px;font-weight:800;margin-bottom:8px">1. 집 크기</legend><div class="grid2">${opt('size')}</div></fieldset>
+      <fieldset style="border:0;margin:0;padding:0"><legend style="font-size:15px;font-weight:800;margin-bottom:8px">2. 짐의 양</legend><div class="grid2">${opt('load')}</div></fieldset>
+      <fieldset style="border:0;margin:0;padding:0"><legend style="font-size:15px;font-weight:800;margin-bottom:8px">3. 층수</legend><div class="grid2">${opt('floor')}</div></fieldset>
+      <div class="res" aria-live="polite">
+        <span style="font-size:13px;color:#C3C9D0">${s[0]} · 짐 ${['적음', '보통', '많음'][calc.load]} · 예상 범위</span>
+        <span class="big">${lo}만 ~ ${hi}만 원</span>
+        <div class="zbar"><span style="font-size:13px;font-weight:700">확정 견적 후 추가금</span><b>0원</b></div>
+        <a class="btn white" href="#list">업체 골라서 견적 받기</a>
+        <span style="font-size:11px;color:#9EA6AF">[시안 단가] 실제 금액은 업체가 사진을 보고 확정합니다.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec stack" style="gap:8px">
+    <h2 class="h2" style="margin-bottom:6px">자주 묻는 질문</h2>
+    <details><summary>무브투헤븐이 직접 작업하나요?</summary><p>아니요. 업체를 심사하고 비교하게 도와드리는 곳입니다. 작업은 고른 업체가 합니다.</p></details>
+    <details><summary>정말 추가금이 없나요?</summary><p>확정 견적에서 더 받으려면 업체가 사진을 보여주고 동의를 먼저 받아야 합니다. 동의 없이 받은 돈은 돌려받게 해 드립니다.</p></details>
+    <details><summary>견적만 받아도 되나요?</summary><p>네, 무료입니다. 고르지 않은 업체에는 연락처가 가지 않습니다.</p></details>
+    <details><summary>후불이나 분할 납부가 되나요?</summary><p>업체마다 다릅니다. 업체 카드의 「후불」「분할」 표시를 확인해 주세요.</p></details>
+  </section>
+  </main>
+  <footer>
+    <nav><a href="#/my">내 견적 확인</a><a href="#">업체 입점</a><a href="#">이용약관</a><a href="#" style="font-weight:700;color:var(--ink)">개인정보처리방침</a></nav>
+    <p style="margin:0">[상호] · 대표 [이름] · 사업자등록번호 [번호] · 통신판매업 [번호] · 문의 [이메일]</p>
+    <p style="margin:0">「추가금 0원」은 입점 업체가 확정 견적 이후 고객 동의 없이 추가 금액을 받지 않는다는 약속입니다. 고객이 알린 정보와 현장이 다르면 사진과 함께 동의를 받아 바꿀 수 있습니다.</p>
+    <p style="margin:0">무브투헤븐®은 등록상표입니다. 무브투헤븐은 중개 서비스이며, 작업은 고객이 고른 업체가 합니다.</p>
+  </footer>` + stickyBar();
+
+  app.querySelector('#region').onchange = e => { state.region = e.target.value; store.set('mth_region', state.region); home(); };
+  app.querySelectorAll('[data-region]').forEach(b => b.onclick = () => { state.region = b.dataset.region; store.set('mth_region', state.region); home(); });
+  app.querySelectorAll('[data-calc]').forEach(b => b.onclick = () => { const [k, i] = b.dataset.calc.split(':'); calc[k] = +i; const y = window.scrollY; home().then(() => window.scrollTo(0, y)); });
+  bindSel(state.companies);
+  app.querySelectorAll('a[href="#list"]').forEach(a => a.onclick = (e) => { e.preventDefault(); document.getElementById('list').scrollIntoView({ behavior: 'smooth' }); });
+}
+
+// ── 업체 상세 ──
+async function company(id) {
+  app.innerHTML = header({ back: '#/', title: '업체 정보' }) + '<main><div class="empty">불러오는 중…</div></main>';
+  let c;
+  try { c = await rpc('get_company', { p_id: id }); } catch (e) { toast(e.message); }
+  if (!c) { app.querySelector('main').innerHTML = '<div class="empty">업체를 찾을 수 없습니다.</div>'; return; }
+  const s = c.stats || {};
+  const on = state.sel.some(x => x.id === c.id);
+  const stars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+  app.innerHTML = header({ back: '#/', title: '업체 정보' }) + `<main>
+    <div style="height:240px;background:#EEF0F3;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:13px;font-weight:700">
+      ${c.photo_url ? `<img src="${esc(photoUrl(c.photo_url))}" alt="${esc(c.name)} 대표 사진" style="width:100%;height:100%;object-fit:cover">` : '업체 대표 사진'}</div>
+    <section class="sec stack" style="gap:8px">
+      <h1 style="font-size:26px;font-weight:800">${esc(c.name)}</h1>
+      <p style="margin:0;font-size:13px;color:#4B525B">출동 지역 ${esc(c.area_desc || c.region)}</p>
+      <div class="tags">${(c.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}${c.is_related ? '<span class="tag rel">운영사 관계업체</span>' : ''}</div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:6px">
+        <div class="box" style="background:var(--accent-l);text-align:center;padding:10px"><span style="font-size:11px;font-weight:700;color:var(--accent-d);display:block">추가금 0원</span><b style="font-size:20px;color:var(--accent-d)">${s.zero_rate == null ? '-' : s.zero_rate + '%'}</b></div>
+        <div class="box" style="text-align:center;padding:10px"><span style="font-size:11px;font-weight:700;color:var(--sub);display:block">별점</span><b style="font-size:20px">${s.n_reviews ? Number(s.avg).toFixed(2) : '-'}</b></div>
+        <div class="box" style="text-align:center;padding:10px"><span style="font-size:11px;font-weight:700;color:var(--sub);display:block">거래 후기</span><b style="font-size:20px">${s.n_reviews || 0}건</b></div>
+      </div>
+      ${c.intro ? `<p style="margin:8px 0 0;font-size:14px">${esc(c.intro)}</p>` : ''}
+    </section>
+    <div class="divider"></div>
+    <section class="sec stack">
+      <h2 style="font-size:18px;font-weight:800">이 업체가 지키는 약속</h2>
+      <div style="font-size:14px"><b>추가금 0원</b> · 확정 견적에서 더 받으려면 사진과 동의를 먼저 받습니다.</div>
+      <div style="font-size:14px"><b>귀중품 기록</b> · 나온 물건은 시간이 찍힌 사진으로 바로 올립니다.</div>
+      <div style="font-size:14px"><b>작업 사진</b> · 작업 전·후 사진을 남깁니다.</div>
+    </section>
+    <div class="divider"></div>
+    <section class="sec stack">
+      <h2 style="font-size:18px;font-weight:800">운영자가 확인한 서류</h2>
+      ${(c.docs || []).map(d => `<div class="kv box" style="padding:12px 14px"><b>${esc(d.name)}</b><span>${esc(d.date)}</span></div>`).join('') || '<p class="note">확인 중입니다.</p>'}
+      <p class="note">확인한 날짜와 범위만 표시합니다. 모든 작업을 보증한다는 뜻은 아닙니다.</p>
+    </section>
+    <div class="divider"></div>
+    <section class="sec stack">
+      <h2 style="font-size:18px;font-weight:800">거래 확인 후기 ${(c.reviews || []).length}건</h2>
+      ${(c.reviews || []).map(v => `<article class="box stack" style="gap:6px">
+        <div><b style="color:var(--accent)">${stars(v.rating)}</b> <span class="badge ${v.zero ? '' : 'gray'}">${v.zero ? '추가금 0원' : '동의 후 변경'}</span> <span class="note">${esc(v.size)} · ${dt(v.created_at)}</span></div>
+        ${v.body ? `<p style="margin:0;font-size:14px">${esc(v.body)}</p>` : ''}
+        ${v.returned_items ? `<p class="note" style="margin:0">돌려받은 유품: ${esc(v.returned_items)}</p>` : ''}</article>`).join('') || '<p class="note">아직 후기가 없습니다. 작업을 마친 고객만 후기를 쓸 수 있습니다.</p>'}
+    </section>
+  </main>
+  <div class="sticky"><button type="button" class="btn ${on ? 'gray' : 'line'}" style="width:auto" id="selbtn">${on ? '✓ 담음' : '비교 담기'}</button><a class="btn" href="#/request" style="flex:1 1 auto">견적 요청 (${state.sel.length}/3)</a></div>`;
+  app.querySelector('#selbtn').onclick = () => toggleSel(c);
+}
+
+// ── 견적 요청 ──
+let form = { size: '', load: '', floor: '', odor: false, keep: ['사진·앨범', '통장·도장·중요 서류'], photos: [] };
+function request() {
+  const sel = state.sel;
+  const ch = (k, arr) => arr.map(v => `<button type="button" class="opt" aria-pressed="${form[k] === v}" data-f="${k}" data-v="${esc(v)}"><b>${esc(v)}</b></button>`).join('');
+  const KEEP = ['사진·앨범', '통장·도장·중요 서류', '현금·귀금속', '휴대폰·컴퓨터', '따로 없어요'];
+  app.innerHTML = header({ back: '#/', title: '무료 견적 요청' }) + `<main><form id="rf" class="sec stack" style="gap:20px" novalidate>
+    <div class="box">
+      <b style="font-size:14px">받는 업체 ${sel.length}곳</b>
+      <p style="margin:4px 0 0;font-size:14px">${sel.length ? esc(sel.map(s => s.name).join(', ')) : '아직 고른 업체가 없습니다.'}</p>
+      <a href="#/" style="font-size:13px;font-weight:700">${sel.length ? '업체 바꾸기' : '업체 고르러 가기'}</a>
+    </div>
+    <fieldset style="border:0;margin:0;padding:0"><legend style="font-size:16px;font-weight:800;margin-bottom:8px">집 크기</legend><div class="grid2">${ch('size', ['원룸', '투룸', '3룸', '30평 이상'])}</div></fieldset>
+    <fieldset style="border:0;margin:0;padding:0"><legend style="font-size:16px;font-weight:800;margin-bottom:8px">짐의 양</legend><div class="grid2">${ch('load', ['적어요', '보통이에요', '많아요'])}</div></fieldset>
+    <fieldset style="border:0;margin:0;padding:0"><legend style="font-size:16px;font-weight:800;margin-bottom:8px">층수</legend><div class="grid2">${ch('floor', ['1층·엘리베이터', '2~3층 계단', '4층 이상 계단'])}</div></fieldset>
+    <label style="display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;font-size:15px;font-weight:700">집 안에 냄새나 오염이 있나요?<input type="checkbox" id="odor" ${form.odor ? 'checked' : ''}></label>
+    <label class="lbl">현장 주소 (동까지만)<input id="dong" placeholder="예) 서울 강서구 화곡동" value="${esc(form.dong || '')}"></label>
+    <fieldset style="border:0;margin:0;padding:0"><legend style="font-size:16px;font-weight:800;margin-bottom:4px">꼭 찾거나 보관할 물건</legend>
+      <p class="note" style="margin:0 0 8px">고르신 물건은 따로 찾아 보관한 뒤 전해 드립니다.</p>
+      <div class="chips" style="flex-wrap:wrap">${KEEP.map(v => `<button type="button" class="chip ac" aria-pressed="${form.keep.includes(v)}" data-keep="${esc(v)}">${esc(v)}</button>`).join('')}</div></fieldset>
+    <label class="lbl">그 밖에 찾아야 할 물건이나 전할 말<textarea id="note" placeholder="예) 아버지 손목시계, 보험 서류">${esc(form.note || '')}</textarea></label>
+    <div><label class="filebtn">📷 현장 사진 올리기 (선택)<input type="file" id="ph" accept="image/*" multiple></label>
+      <p class="note" style="margin:6px 0 0">사진이 있으면 견적이 정확해집니다. 고른 업체에만 보입니다.</p>
+      <div class="photos" id="phs" style="margin-top:8px">${form.photos.map(p => `<a><img src="${photoUrl(p)}" alt="올린 현장 사진"></a>`).join('')}</div></div>
+    <label class="lbl">희망 일정<select id="wish">${['가능한 빨리', '1주일 이내', '2주일 이내', '업체와 협의'].map(v => `<option ${form.wish === v ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+    <label class="lbl">이름<input id="nm" autocomplete="name" value="${esc(form.nm || '')}"></label>
+    <label class="lbl">휴대폰 번호<input id="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000" value="${esc(form.tel || '')}"></label>
+    <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px"><input type="checkbox" id="agree"><span>요청 내용과 연락처를 고른 업체에 전달하는 데 동의합니다. 연락처는 내가 고른 업체에만 보입니다.</span></label>
+    <button type="submit" class="btn" id="go">업체 ${sel.length}곳에 견적 요청</button>
+    <p class="note" style="text-align:center;margin:0">추가금 0원 · 작업 후 결제·분할 납부 가능 업체 있음</p>
+  </form></main>`;
+  const keepForm = () => { const g = id => app.querySelector('#' + id); form.odor = g('odor').checked; form.dong = g('dong').value; form.note = g('note').value; form.wish = g('wish').value; form.nm = g('nm').value; form.tel = g('tel').value; };
+  app.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { keepForm(); form[b.dataset.f] = b.dataset.v; request(); });
+  app.querySelectorAll('[data-keep]').forEach(b => b.onclick = () => { keepForm(); const v = b.dataset.keep; form.keep = form.keep.includes(v) ? form.keep.filter(x => x !== v) : form.keep.concat([v]); request(); });
+  app.querySelector('#ph').onchange = async (e) => {
+    keepForm();
+    const files = [...e.target.files].slice(0, 10);
+    toast('사진을 올리는 중…');
+    try { for (const f of files) form.photos.push(await upload('req', f)); toast('사진을 올렸어요'); } catch (er) { toast(er.message); }
+    request();
+  };
+  app.querySelector('#rf').onsubmit = (e) => {
+    e.preventDefault(); keepForm();
+    if (!sel.length) return toast('먼저 업체를 1곳 이상 담아 주세요');
+    if (!form.size || !form.load || !form.floor) return toast('집 크기, 짐의 양, 층수를 골라 주세요');
+    if (!form.nm.trim() || form.tel.replace(/\D/g, '').length < 10) return toast('이름과 휴대폰 번호를 확인해 주세요');
+    if (!app.querySelector('#agree').checked) return toast('전달 동의에 체크해 주세요');
+    busy(app.querySelector('#go'), async () => {
+      const r = await rpc('create_request', { p: { region: sel[0].region, size: form.size, load: form.load, floor: form.floor, odor: form.odor,
+        address_dong: form.dong, keep_items: form.keep, keep_note: form.note, photo_paths: form.photos, contact_name: form.nm.trim(),
+        phone: form.tel.trim(), wish_date: form.wish }, p_companies: sel.map(s => s.id) });
+      const my = store.get('mth_my', []); my.unshift({ id: r.id, key: r.key, at: new Date().toISOString(), names: sel.map(s => s.name) }); store.set('mth_my', my);
+      state.sel = []; saveSel(); form = { size: '', load: '', floor: '', odor: false, keep: ['사진·앨범', '통장·도장·중요 서류'], photos: [] };
+      location.hash = `#/r/${r.id}/${r.key}?new=1`;
+    });
+  };
+}
+
+// ── 내 견적 (요청 상태) ──
+async function status(id, key, isNew) {
+  app.innerHTML = header({ back: '#/my', title: '내 견적' }) + '<main><div class="empty">불러오는 중…</div></main>';
+  let d;
+  try { d = await rpc('customer_get', { p_id: id, p_key: key }); } catch (e) { app.querySelector('main').innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  const r = d.request, j = d.job;
+  const stage = !j ? (d.targets.some(t => t.quote) ? 1 : 0) : j.status === 'in_progress' ? 2 : j.status === 'completed' ? 3 : 4;
+  const steps = ['견적 받기', '업체 고르기', '작업 중', '완료 확인', '후기'];
+  const stepHtml = `<div style="display:flex;flex-wrap:wrap;gap:8px 12px">${steps.map((s, i) => `<span class="step ${i === stage ? 'on' : i < stage ? 'done' : ''}"><i>${i < stage ? '✓' : i + 1}</i>${s}</span>`).join('')}</div>`;
+  let body = '';
+  if (isNew) body += `<section class="sec soft stack"><b style="font-size:17px">요청을 보냈습니다</b>
+    <p style="margin:0;font-size:14px">견적이 오면 이 화면에서 비교합니다. <b>이 화면 주소를 꼭 저장해 두세요.</b> 이 휴대폰에서는 「내 견적」에서 다시 볼 수 있습니다.</p>
+    <button type="button" class="btn line" id="copy">이 화면 주소 복사</button></section>`;
+  body += `<section class="sec stack">${stepHtml}
+    <div class="box" style="font-size:13px">${esc(r.region)} · ${esc(r.size)} · 짐 ${esc(r.load)} · ${esc(r.floor)}${r.odor ? ' · 냄새·오염 있음' : ''} · ${esc(r.wish_date || '')}</div></section>`;
+
+  if (!j) {
+    const quoted = d.targets.filter(t => t.quote);
+    body += `<section class="sec stack" style="padding-top:0"><h2 class="h2">견적 비교 <span style="font-size:15px;color:var(--sub)">${quoted.length}/${d.targets.length}곳 도착</span></h2>`;
+    if (quoted.length) {
+      body += `<div style="overflow-x:auto"><table class="qt"><thead><tr><th></th>${quoted.map(t => `<th>${esc(t.company.name.replace('예시업체 ', ''))}</th>`).join('')}</tr></thead><tbody>
+        ${ITEMS.map(([k, l]) => `<tr><td>${l}</td>${quoted.map(t => `<td>${t.quote.items[k] ? (k === 'buyback' ? '−' : '') + man(t.quote.items[k]) : '-'}</td>`).join('')}</tr>`).join('')}
+        <tr class="tot"><td>합계</td>${quoted.map(t => `<td>${won(t.quote.total)}</td>`).join('')}</tr></tbody></table></div>`;
+    }
+    body += d.targets.map(t => `<article class="co"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <a class="nm" href="#/c/${t.company.id}">${esc(t.company.name)}</a>
+        <span class="mt">추가금 0원 ${t.company.stats.zero_rate == null ? '집계 전' : t.company.stats.zero_rate + '%'}</span></div>
+        ${t.quote ? `<div class="kv"><span>확정 견적</span><b style="font-size:18px">${won(t.quote.total)}</b></div>
+          ${t.quote.visit_needed ? '<span class="badge gray">방문 확인 필요</span>' : ''}
+          ${t.quote.note ? `<p style="margin:0;font-size:13px">${esc(t.quote.note)}</p>` : ''}
+          <button type="button" class="btn" data-pick="${t.quote.id}">이 업체로 정하기</button>`
+        : '<p class="note" style="margin:0">견적을 기다리는 중입니다.</p>'}</article>`).join('');
+    body += `<p class="note">업체를 정하면 이 금액이 확정 견적으로 고정됩니다. 이후 금액을 바꾸려면 업체가 사진과 함께 요청하고, 내가 동의해야 합니다.</p></section>`;
+  } else {
+    const appr = d.changes.filter(x => x.status === 'approved').reduce((a, x) => a + x.amount_delta, 0);
+    const pending = d.changes.filter(x => x.status === 'pending');
+    body += `<section class="sec stack" style="padding-top:0">
+      <h2 class="h2">${esc(j.company_name)}</h2>
+      ${j.company_phone ? `<a class="btn line" href="tel:${esc(j.company_phone)}">업체에 전화하기 ${esc(j.company_phone)}</a>` : ''}
+      <div class="box"><div class="kv"><span>확정 견적</span><b>${won(j.confirmed_total)}</b></div>
+        <div class="kv"><span>동의한 변경</span><b>${appr ? (appr > 0 ? '+' : '') + won(appr) : '없음'}</b></div>
+        ${j.final_total != null ? `<div class="kv" style="border-top:1px dashed #D5D9DE;margin-top:6px;padding-top:10px"><span>최종 금액</span><b style="font-size:18px">${won(j.final_total)}</b></div>
+          <div class="kv"><span>추가금</span><b style="color:var(--accent);font-size:18px">${j.final_total <= j.confirmed_total ? '0원' : won(j.final_total - j.confirmed_total) + ' (동의함)'}</b></div>` : ''}
+      </div></section>`;
+    if (pending.length) body += `<section class="sec stack" style="padding-top:0">${pending.map(x => `<div class="box stack" style="background:var(--warn-l)">
+        <b>업체가 금액 변경을 요청했습니다: ${x.amount_delta > 0 ? '+' : ''}${won(x.amount_delta)}</b>
+        <p style="margin:0;font-size:14px">${esc(x.reason)}</p>
+        ${x.photo_path ? `<div class="photos"><a href="${photoUrl(x.photo_path)}" target="_blank" rel="noopener"><img src="${photoUrl(x.photo_path)}" alt="변경 사유 사진"></a></div>` : ''}
+        <p class="note" style="margin:0">동의하기 전에는 이 금액을 받을 수 없습니다.</p>
+        <div style="display:flex;gap:8px"><button type="button" class="btn" data-ch="${x.id}:1">동의</button><button type="button" class="btn warn" data-ch="${x.id}:0">거절</button></div></div>`).join('')}</section>`;
+    const ev = d.evidence;
+    body += `<section class="sec stack" style="padding-top:0"><h2 style="font-size:18px;font-weight:800">작업 기록</h2>
+      ${['before', 'valuable', 'after'].map(k => { const a = ev.filter(e => e.kind === k); return `<div><b style="font-size:14px">${KIND[k]} ${a.length}장</b>
+        ${a.length ? `<div class="photos" style="margin-top:6px">${a.map(e => `<a href="${photoUrl(e.photo_path)}" target="_blank" rel="noopener"><img src="${photoUrl(e.photo_path)}" alt="${KIND[k]} 사진" loading="lazy"></a>`).join('')}</div>` : ''}
+        ${a.filter(e => e.note).map(e => `<p class="note" style="margin:4px 0 0">${dt(e.created_at)} · ${esc(e.note)}</p>`).join('')}</div>`; }).join('')}
+      ${j.handover_note ? `<div class="box"><b style="font-size:14px">인계 목록</b><p style="margin:4px 0 0;font-size:14px;white-space:pre-line">${esc(j.handover_note)}</p></div>` : ''}
+      </section>`;
+    if (j.status === 'completed') body += `<section class="sec" style="padding-top:0"><button type="button" class="btn" id="confirm">작업이 끝난 것을 확인했습니다</button></section>`;
+    if (j.status !== 'in_progress' && !d.review) body += `<section class="sec soft stack"><h2 style="font-size:18px;font-weight:800">후기 남기기</h2>
+      ${[['rating', '전체 만족도'], ['r_handling', '물건 취급'], ['r_cost', '설명과 비용'], ['r_finish', '마무리']].map(([k, l]) => `<div><b style="font-size:14px">${l}</b><div class="chips" style="margin-top:6px" data-rate="${k}">${[1, 2, 3, 4, 5].map(n => `<button type="button" class="chip ac" aria-pressed="false" data-n="${n}">${n}점</button>`).join('')}</div></div>`).join('')}
+      <label class="lbl">돌려받은 유품<input id="ri" placeholder="예) 앨범 3권, 통장"></label>
+      <label class="lbl">후기<textarea id="rb" placeholder="다음 가족에게 도움이 될 이야기를 남겨 주세요"></textarea></label>
+      <button type="button" class="btn" id="rv">후기 올리기</button></section>`;
+    if (d.review) body += `<section class="sec soft"><b>후기를 남겨 주셔서 감사합니다.</b></section>`;
+    body += `<section class="sec stack"><details><summary>동의하지 않은 돈을 냈나요?</summary>
+      <p>동의하지 않은 추가금을 냈다면 알려 주세요. 운영자가 사진과 동의 기록을 확인해, 기록이 없으면 업체가 돌려 드리게 합니다.</p>
+      <textarea id="rp" placeholder="언제, 얼마를, 어떤 이유로 냈는지 적어 주세요" style="margin-top:8px"></textarea>
+      <button type="button" class="btn warn" id="rpb" style="margin-top:8px">신고하기</button></details>
+      ${d.reports.map(x => `<div class="box" style="font-size:13px">신고 ${dt(x.created_at)} · <span class="badge ${x.status === 'open' ? 'gray' : x.status === 'refund' ? '' : 'warn'}">${{ open: '확인 중', refund: '환급 결정', rejected: '기록상 동의 확인' }[x.status]}</span>${x.decision_note ? `<p style="margin:4px 0 0">${esc(x.decision_note)}</p>` : ''}</div>`).join('')}</section>`;
+  }
+  app.innerHTML = header({ back: '#/my', title: '내 견적' }) + `<main>${body}</main>`;
+  const reload = () => status(id, key, false);
+  const cp = app.querySelector('#copy');
+  if (cp) cp.onclick = async () => { const u = location.href.replace('?new=1', ''); try { await navigator.clipboard.writeText(u); toast('주소를 복사했어요. 카톡 나와의 채팅에 붙여 두세요'); } catch (e) { prompt('이 주소를 저장해 두세요', u); } };
+  app.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => {
+    if (b.dataset.ok !== '1') { b.dataset.ok = '1'; b.textContent = '한 번 더 누르면 확정됩니다'; return; }
+    busy(b, () => rpc('customer_select', { p_id: id, p_key: key, p_quote: b.dataset.pick })).then(() => { toast('업체를 정했습니다'); reload(); });
+  });
+  app.querySelectorAll('[data-ch]').forEach(b => b.onclick = () => { const [cid, ok] = b.dataset.ch.split(':'); busy(b, () => rpc('customer_decide_change', { p_id: id, p_key: key, p_change: cid, p_ok: ok === '1' })).then(reload); });
+  const cf = app.querySelector('#confirm'); if (cf) cf.onclick = () => busy(cf, () => rpc('customer_confirm', { p_id: id, p_key: key })).then(reload);
+  const rate = {};
+  app.querySelectorAll('[data-rate]').forEach(g => g.querySelectorAll('[data-n]').forEach(b => b.onclick = () => { rate[g.dataset.rate] = +b.dataset.n; g.querySelectorAll('[data-n]').forEach(x => x.setAttribute('aria-pressed', String(+x.dataset.n === rate[g.dataset.rate]))); }));
+  const rv = app.querySelector('#rv'); if (rv) rv.onclick = () => { if (!rate.rating) return toast('전체 만족도를 골라 주세요'); busy(rv, () => rpc('customer_review', { p_id: id, p_key: key, p: { ...rate, body: app.querySelector('#rb').value, returned_items: app.querySelector('#ri').value } })).then(reload); };
+  const rp = app.querySelector('#rpb'); if (rp) rp.onclick = () => { const t = app.querySelector('#rp').value.trim(); if (!t) return toast('내용을 적어 주세요'); busy(rp, () => rpc('customer_report', { p_id: id, p_key: key, p_body: t })).then(() => { toast('신고를 받았습니다'); reload(); }); };
+}
+
+function my() {
+  const list = store.get('mth_my', []);
+  app.innerHTML = header({ back: '#/', title: '내 견적' }) + `<main class="sec stack">
+    ${list.map(x => `<a class="co" style="text-decoration:none;color:var(--ink)" href="#/r/${x.id}/${x.key}"><b>${esc((x.names || []).join(', '))}</b><span class="mt">${dt(x.at)} 요청</span></a>`).join('') || '<div class="empty">이 휴대폰에서 보낸 요청이 없습니다.<br>저장해 둔 주소로 들어오시면 볼 수 있습니다.</div>'}
+    <a class="btn gray" href="#/">업체 둘러보기</a></main>`;
+}
+
+function route() {
+  const h = location.hash.replace(/^#/, '') || '/';
+  const [path, qs] = h.split('?');
+  const p = path.split('/').filter(Boolean);
+  if (p[0] === 'c' && p[1]) return company(p[1]);
+  if (p[0] === 'request') return request();
+  if (p[0] === 'r' && p[1] && p[2]) return status(p[1], p[2], (qs || '').includes('new=1'));
+  if (p[0] === 'my') return my();
+  return home();
+}
+window.addEventListener('hashchange', () => { route(); window.scrollTo(0, 0); });
+route();
+</script>
+</body>
+</html>
