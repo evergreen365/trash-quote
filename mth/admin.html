@@ -28,10 +28,11 @@ async function load() {
 }
 
 function render() {
-  const lateQ = D.requests.filter(r => r.status === 'open' && r.n_quotes < r.n_targets && hours(r.created_at) > 12);
+  const needLink = D.requests.filter(r => r.status === 'open' && r.n_targets < 1);
+  const lateQ = D.requests.filter(r => r.status === 'open' && r.n_targets > 0 && r.n_quotes < r.n_targets && hours(r.created_at) > 12);
   const noPhoto = D.jobs.filter(j => (j.status === 'in_progress' && hours(j.created_at) > 48 && !j.n_before) || (j.status !== 'in_progress' && (!j.n_before || !j.n_after)));
   const openRep = D.reports.filter(r => r.status === 'open');
-  const qs = [['late', '견적 지연', lateQ.length], ['photo', '사진 누락', noPhoto.length], ['report', '추가금 신고', openRep.length], ['review', '새 후기', D.reviews.filter(v => hours(v.created_at) < 72).length]];
+  const qs = [['link', '업체 연결 필요', needLink.length], ['late', '견적 지연', lateQ.length], ['photo', '사진 누락', noPhoto.length], ['report', '추가금 신고', openRep.length], ['review', '새 후기', D.reviews.filter(v => hours(v.created_at) < 72).length]];
   const tabs = [['today', '오늘 할 일'], ['req', '요청·거래'], ['co', '업체']];
   let body = '';
   if (tab === 'today') {
@@ -43,11 +44,16 @@ function render() {
           ${r.changes.map(c => `<div class="kv"><span>${c.amount_delta > 0 ? '+' : ''}${won(c.amount_delta)} ${esc(c.reason)}</span><b>${{ pending: '대기', approved: '고객 동의', rejected: '고객 거절' }[c.status]}</b></div>`).join('') || '<p class="note" style="margin:4px 0 0">금액 변경 기록 없음 → 동의 없는 추가금이면 환급 대상</p>'}</div>
         <textarea placeholder="판정 메모 (고객에게 보입니다)"></textarea>
         <div style="display:flex;gap:8px"><button class="btn" data-dec="refund">환급 결정</button><button class="btn gray" data-dec="rejected">기록상 동의 확인</button></div></div>`).join('')}` : ''}
+      ${needLink.length ? `<h2 style="font-size:17px;font-weight:800;margin-top:8px">업체 연결 필요</h2>${needLink.map(r => `<div class="co" data-req="${r.id}"><b>${esc(r.contact_name)} · ${esc(r.region)} ${esc(r.size)}</b><span class="note">${dt(r.created_at)} · 업체가 없는 지역에서 들어온 요청입니다</span>
+        <a class="btn sm line" href="tel:${esc(r.phone)}">고객 전화 ${esc(r.phone)}</a>
+        <label class="lbl">연결할 업체<select>${D.companies.filter(c => c.status === 'active').sort((a, b) => (b.region.startsWith(r.region.split(' ')[0]) ? 1 : 0) - (a.region.startsWith(r.region.split(' ')[0]) ? 1 : 0)).map(c => `<option value="${c.id}">${esc(c.name)} (${esc(c.region)})</option>`).join('')}</select></label>
+        <button class="btn sm" data-assign="1">이 업체 연결</button>
+        <p class="note" style="margin:0">명단에 없는 업체라면 「업체」 탭에서 먼저 등록한 뒤 연결하세요. 최대 3곳.</p></div>`).join('')}` : ''}
       ${lateQ.length ? `<h2 style="font-size:17px;font-weight:800;margin-top:8px">견적 지연</h2>${lateQ.map(r => `<div class="co"><b>${esc(r.contact_name)} · ${esc(r.region)} ${esc(r.size)}</b><span class="note">${dt(r.created_at)} · ${r.n_quotes}/${r.n_targets}곳 응답</span>
         <div class="tags">${(r.targets || []).map(t => `<span class="tag" style="${t.quoted ? '' : 'background:var(--warn-l);color:var(--warn)'}">${esc(t.name)} ${t.quoted ? '응답' : '미응답'}</span>`).join('')}</div>
         <a class="btn sm line" href="tel:${esc(r.phone)}">고객 전화 ${esc(r.phone)}</a></div>`).join('')}` : ''}
       ${noPhoto.length ? `<h2 style="font-size:17px;font-weight:800;margin-top:8px">사진 누락</h2>${noPhoto.map(j => `<div class="co"><b>${esc(j.company)}</b><span class="note">작업 전 ${j.n_before} · 귀중품 ${j.n_valuable} · 작업 후 ${j.n_after} · ${dt(j.created_at)}</span></div>`).join('')}` : ''}
-      ${!openRep.length && !lateQ.length && !noPhoto.length ? '<div class="empty">오늘 처리할 일이 없습니다.</div>' : ''}`;
+      ${!needLink.length && !openRep.length && !lateQ.length && !noPhoto.length ? '<div class="empty">오늘 처리할 일이 없습니다.</div>' : ''}`;
   } else if (tab === 'req') {
     body = `<h2 style="font-size:17px;font-weight:800">최근 요청 (60일)</h2>${D.requests.map(r => `<div class="co"><div style="display:flex;justify-content:space-between"><b>${esc(r.contact_name)} · ${esc(r.size)}</b><span class="badge gray">${{ open: '견적 중', selected: '업체 선택', done: '완료', cancelled: '취소' }[r.status]}</span></div>
       <span class="note">${dt(r.created_at)} · ${esc(r.region)} · 견적 ${r.n_quotes}/${r.n_targets} · ${esc(r.phone)}</span></div>`).join('') || '<div class="empty">없습니다.</div>'}
@@ -72,7 +78,7 @@ function coForm(c) {
   const v = (k) => esc(c[k] ?? '');
   return `<form class="co stack" id="cf" style="gap:10px" novalidate><b>${c.id ? '업체 고치기' : '새 업체'}</b>
     <label class="lbl">업체명<input name="name" value="${v('name')}"></label>
-    <label class="lbl">지역 (목록 탭 이름)<input name="region" value="${v('region')}" placeholder="예) 서울 서부"></label>
+    <label class="lbl">지역 (목록 탭 이름)<input name="region" value="${v('region')}" placeholder="시도 이름으로 시작 · 예) 서울 서부, 경기 부천시"></label>
     <label class="lbl">출동 지역 설명<input name="area_desc" value="${v('area_desc')}"></label>
     <label class="lbl">업체 연락처 (선택된 고객에게만 보임)<input name="phone" value="${v('phone')}"></label>
     <label class="lbl">표시 (쉼표로 구분)<input name="tags" value="${esc((c.tags || []).join(', '))}" placeholder="후불, 분할, 유품 매입"></label>
@@ -96,6 +102,10 @@ function bind() {
   app.querySelectorAll('[data-dec]').forEach(b => b.onclick = () => {
     const box = b.closest('[data-rep]');
     busy(b, () => rpc('admin_decide_report', { p_key: key, p_report: box.dataset.rep, p_status: b.dataset.dec, p_note: box.querySelector('textarea').value })).then(load);
+  });
+  app.querySelectorAll('[data-assign]').forEach(b => b.onclick = () => {
+    const box = b.closest('[data-req]');
+    busy(b, () => rpc('admin_assign', { p_key: key, p_request: box.dataset.req, p_company: box.querySelector('select').value })).then(() => { toast('연결했습니다. 업체에 요청이 보입니다'); load(); });
   });
   app.querySelectorAll('[data-vis]').forEach(b => b.onclick = () => busy(b, () => rpc('admin_review_visible', { p_key: key, p_review: b.closest('[data-rv]').dataset.rv, p_visible: b.dataset.vis === '1' })).then(load));
   const add = app.querySelector('#add'); if (add) add.onclick = () => { edit = { tags: [], docs: [] }; render(); };

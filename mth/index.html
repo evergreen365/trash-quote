@@ -14,6 +14,7 @@
 <body>
 <div class="app" id="app"></div>
 <script src="common.js"></script>
+<script src="korea_map.js"></script>
 <script>
 const { rpc, upload, photoUrl, won, man, esc, dt, toast, busy, store } = MTH;
 const app = document.getElementById('app');
@@ -89,27 +90,84 @@ const CALC = {
 };
 let calc = { size: 1, load: 1, floor: 0 };
 
+// ── 지도 ──
+const SIDO = KOREA_MAP.p.map(p => p.n);
+const sidoOf = (region) => SIDO.find(s => String(region || '').startsWith(s)) || '기타';
+const LABEL_FIX = { '경기': [386, 312], '인천': [312, 246], '전남': [372, 760], '세종': [402, 395], '충남': [330, 420] };
+const JEJU_SHIFT = [70, -95];
+const CALLOUT = { '서울': [10, -120], '인천': [-120, 55], '세종': [-150, -55], '대전': [-130, 60], '광주': [-150, 10], '대구': [-10, 95], '울산': [120, -40], '부산': [110, 70] };
+const SMALL = Object.keys(CALLOUT);
+function mapPath(p) {
+  const [dx, dy] = p.n === '제주' ? JEJU_SHIFT : [0, 0];
+  return p.r.map(r => 'M' + r.map(([x, y]) => `${x + dx},${y + dy}`).join('L') + 'Z').join('');
+}
+function inRing(x, y, r) {
+  let ins = false;
+  for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+    const [xi, yi] = r[i], [xj, yj] = r[j];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) ins = !ins;
+  }
+  return ins;
+}
+function sidoAt(lat, lon) {
+  const M = KOREA_MAP, x = (lon - M.lon0) * M.k * M.sc, y = (M.lat1 - lat) * M.sc;
+  const hit = M.p.find(p => p.r.some(r => inRing(x, y, r)));
+  if (hit) return hit.n;
+  let best = null, bd = 1e12;   // 바다 위·경계 밖이면 가장 가까운 시도
+  M.p.forEach(p => { const d = (p.l[0] - x) ** 2 + (p.l[1] - y) ** 2; if (d < bd) { bd = d; best = p.n; } });
+  return best;
+}
+function koreaMap(counts, sel) {
+  const M = KOREA_MAP;
+  const shapes = M.p.map(p => {
+    const n = counts[p.n] || 0, on = p.n === sel;
+    const fill = n ? (on ? 'var(--accent-d)' : 'var(--accent)') : (on ? '#B9C4CC' : '#E3E8EC');
+    return `<path d="${mapPath(p)}" fill="${fill}" stroke="#fff" stroke-width="${on ? 5 : 2.5}" data-sido="${p.n}" style="cursor:pointer"></path>`;
+  }).join('');
+  const labels = M.p.map(p => {
+    const n = counts[p.n] || 0, co = CALLOUT[p.n];
+    if (co && !n && p.n !== state.sido) return '';   // 업체 없는 작은 광역시는 이름 생략 (아래 버튼으로 선택)
+    let [x, y] = LABEL_FIX[p.n] || p.l;
+    if (p.n === '제주') { x += JEJU_SHIFT[0]; y += JEJU_SHIFT[1]; }
+    let lead = '', col = n ? '#fff' : '#6B7480';
+    if (co) {   // 작은 광역시는 바깥에 이름표를 달아 겹치지 않게
+      const [cx, cy] = p.l; x = cx + co[0]; y = cy + co[1];
+      lead = `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y - 10}" stroke="${n ? 'var(--accent-d)' : '#AEB7C0'}" stroke-width="2.5"></line><circle cx="${cx}" cy="${cy}" r="6" fill="${n ? 'var(--accent-d)' : '#AEB7C0'}"></circle>`;
+      col = n ? 'var(--accent-d)' : '#6B7480';
+    }
+    return `<g style="pointer-events:none">${lead}<text x="${x}" y="${y}" text-anchor="middle" font-size="34" font-weight="800" fill="${col}" ${co ? 'stroke="#fff" stroke-width="8" paint-order="stroke"' : ''}>${p.n}</text>` +
+      (n ? `<rect x="${x - 36}" y="${y + 8}" width="72" height="36" rx="18" fill="${co ? 'var(--accent-d)' : '#fff'}"></rect><text x="${x}" y="${y + 35}" text-anchor="middle" font-size="25" font-weight="900" fill="${co ? '#fff' : 'var(--accent-d)'}">${n}곳</text>` : '') + '</g>';
+  }).join('');
+  return `<svg viewBox="0 0 ${M.w} ${M.h - 95}" style="width:100%;height:auto;display:block" aria-hidden="true">${shapes}${labels}</svg>`;
+}
+
 async function home() {
-  if (!state.companies.length) app.innerHTML = header() + '<main><div class="empty">불러오는 중…</div></main>';
-  try {
-    if (!state.regions.length) state.regions = await rpc('list_regions');
-    if (!state.region || !state.regions.includes(state.region)) state.region = state.regions[0] || null;
-    state.companies = state.region ? await rpc('list_companies', { p_region: state.region }) : [];
-  } catch (e) { toast(e.message); }
+  if (!state.all) app.innerHTML = header() + '<main><div class="empty">불러오는 중…</div></main>';
+  try { if (!state.all) state.all = await rpc('list_companies', { p_region: null }); } catch (e) { toast(e.message); state.all = []; }
+  const counts = {};
+  state.all.forEach(c => { const s = sidoOf(c.region); counts[s] = (counts[s] || 0) + 1; });
+  if (!state.sido) state.sido = store.get('mth_sido', null) || (state.all[0] && sidoOf(state.all[0].region)) || '서울';
+  const inSido = state.all.filter(c => sidoOf(c.region) === state.sido);
+  const regs = [...new Set(inSido.map(c => c.region))];
+  if (!regs.includes(state.region)) state.region = regs[0] || null;
+  state.companies = inSido.filter(c => c.region === state.region);
+  state.regions = regs;
   const r5 = v => Math.round(v / 5) * 5;
   const s = CALC.size[calc.size], l = CALC.load[calc.load], f = CALC.floor[calc.floor];
   const lo = r5(s[2] * l[2] * f[2]), hi = r5(s[3] * l[2] * f[2]);
   const opt = (k) => CALC[k].map((o, i) => `<button type="button" class="opt" aria-pressed="${calc[k] === i}" data-calc="${k}:${i}"><b>${o[0]}</b><span>${o[1]}</span></button>`).join('');
   app.innerHTML = header() + `<main>
-  <section class="sec soft" style="display:flex;flex-direction:column;gap:14px">
-    <span class="pill" style="align-self:flex-start">우리 지역 유품정리 업체 비교</span>
-    <h1><span class="hero-t1">추가금 0원</span><span class="hero-t2">약속한 업체만 모았습니다</span></h1>
-    <p style="margin:0;font-size:16px;color:#3A4048">후기와 견적을 비교하고 고르세요.<br>약속을 어기면 돌려받게 해 드립니다.</p>
-    <div class="card stack">
-      <label class="lbl">어느 지역인가요?
-        <select id="region">${state.regions.map(r => `<option ${r === state.region ? 'selected' : ''}>${esc(r)}</option>`).join('') || '<option>준비 중</option>'}</select></label>
-      <a class="btn" href="#list">업체 보기</a>
+  <section class="sec soft" style="display:flex;flex-direction:column;gap:12px;padding-top:20px">
+    <span class="pill" style="align-self:flex-start">우리 집 가까운 유품정리 업체</span>
+    <h1><span class="hero-t1" style="font-size:46px">추가금 0원</span><span class="hero-t2" style="font-size:23px">약속한 업체, 지도에서 고르세요</span></h1>
+    <div class="card" style="padding:10px 10px 12px">
+      <div id="kmap">${koreaMap(counts, state.sido)}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 4px 0">
+        <span class="note" style="display:flex;gap:10px;align-items:center"><span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--accent);margin-right:4px"></i>업체 있음</span><span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#E3E8EC;margin-right:4px"></i>모집 중</span></span>
+        <button type="button" class="btn sm line" id="geo">📍 내 위치로 찾기</button>
+      </div>
     </div>
+    <div class="chips" aria-label="시도 선택">${SIDO.filter(s => counts[s]).concat(SIDO.filter(s => !counts[s])).map(s => `<button type="button" class="chip" aria-pressed="${s === state.sido}" data-sido="${s}">${s}${counts[s] ? ' ' + counts[s] : ''}</button>`).join('')}</div>
   </section>
 
   <section class="sec" style="padding-bottom:8px">
@@ -122,11 +180,16 @@ async function home() {
   </section>
 
   <section class="sec" id="list">
-    <h2 class="h2">${esc(state.region || '')} 업체</h2>
-    <p class="desc" style="margin-bottom:12px">후기 순 · 최대 3곳을 담아 견적을 비교하세요</p>
-    <div class="chips" role="tablist" aria-label="지역" style="margin-bottom:14px">${state.regions.map(r => `<button type="button" class="chip" role="tab" aria-selected="${r === state.region}" data-region="${esc(r)}">${esc(r)}</button>`).join('')}</div>
-    <div class="stack">${state.companies.map((c, i) => coCard(c, i)).join('') || '<div class="empty">이 지역은 업체를 모으는 중입니다.</div>'}</div>
-    <p class="note" style="margin-top:10px">광고비로 순위를 살 수 없습니다. 후기 5건이 쌓이기 전에는 운영자가 확인한 순서로 보여 드립니다.</p>
+    <h2 class="h2">${esc(state.sido)} 유품정리 업체 <span style="color:var(--accent)">${inSido.length}곳</span></h2>
+    ${inSido.length ? `<p class="desc" style="margin-bottom:12px">후기 순 · 최대 3곳을 담아 견적을 비교하세요</p>
+    ${regs.length > 1 ? `<div class="chips" role="tablist" aria-label="권역" style="margin-bottom:14px">${regs.map(r => `<button type="button" class="chip" role="tab" aria-selected="${r === state.region}" data-region="${esc(r)}">${esc(r)}</button>`).join('')}</div>` : ''}
+    <div class="stack">${state.companies.map((c, i) => coCard(c, i)).join('')}</div>
+    <p class="note" style="margin-top:10px">광고비로 순위를 살 수 없습니다. 후기 5건이 쌓이기 전에는 운영자가 확인한 순서로 보여 드립니다.</p>`
+    : `<div class="box stack" style="margin-top:12px;gap:8px">
+        <b style="font-size:16px">${esc(state.sido)}은(는) 확인된 업체를 모으는 중입니다</b>
+        <p style="margin:0;font-size:14px;color:#3A4048">요청을 남겨 주시면 운영자가 서류와 작업 기록을 확인한 업체를 찾아 연결해 드립니다. 추가금 0원 약속은 똑같이 지킵니다.</p>
+        <button type="button" class="btn" id="concierge">이 지역 업체 연결 요청</button>
+      </div>`}
   </section>
 
   <section class="sec dark">
@@ -157,7 +220,7 @@ async function home() {
         <span style="font-size:13px;color:#C3C9D0">${s[0]} · 짐 ${['적음', '보통', '많음'][calc.load]} · 예상 범위</span>
         <span class="big">${lo}만 ~ ${hi}만 원</span>
         <div class="zbar"><span style="font-size:13px;font-weight:700">확정 견적 후 추가금</span><b>0원</b></div>
-        <a class="btn white" href="#list">업체 골라서 견적 받기</a>
+        <a class="btn white" href="#list">지도에서 업체 고르기</a>
         <span style="font-size:11px;color:#9EA6AF">[시안 단가] 실제 금액은 업체가 사진을 보고 확정합니다.</span>
       </div>
     </div>
@@ -178,8 +241,23 @@ async function home() {
     <p style="margin:0">무브투헤븐®은 등록상표입니다. 무브투헤븐은 중개 서비스이며, 작업은 고객이 고른 업체가 합니다.</p>
   </footer>` + stickyBar();
 
-  app.querySelector('#region').onchange = e => { state.region = e.target.value; store.set('mth_region', state.region); home(); };
-  app.querySelectorAll('[data-region]').forEach(b => b.onclick = () => { state.region = b.dataset.region; store.set('mth_region', state.region); home(); });
+  const pickSido = (s, scroll) => {
+    state.sido = s; state.region = null; store.set('mth_sido', s);
+    home().then(() => { if (scroll) document.getElementById('list').scrollIntoView({ behavior: 'smooth' }); });
+  };
+  app.querySelectorAll('[data-sido]').forEach(el => el.onclick = () => pickSido(el.dataset.sido, el.tagName !== 'BUTTON'));
+  app.querySelectorAll('[data-region]').forEach(b => b.onclick = () => { state.region = b.dataset.region; const y = window.scrollY; home().then(() => window.scrollTo(0, y)); });
+  const cg = app.querySelector('#concierge');
+  if (cg) cg.onclick = () => { state.concierge = state.sido; state.sel = []; saveSel(); location.hash = '#/request'; };
+  app.querySelector('#geo').onclick = (e) => {
+    const b = e.currentTarget;
+    if (!navigator.geolocation) return toast('이 휴대폰에서는 위치를 확인할 수 없어요. 지도에서 골라 주세요');
+    b.disabled = true; b.textContent = '위치 확인 중…';
+    navigator.geolocation.getCurrentPosition(
+      pos => { const s = sidoAt(pos.coords.latitude, pos.coords.longitude); toast(`${s} 업체를 보여 드릴게요`); pickSido(s, true); },
+      () => { b.disabled = false; b.textContent = '📍 내 위치로 찾기'; toast('위치를 확인하지 못했어요. 지도에서 골라 주세요'); },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 });
+  };
   app.querySelectorAll('[data-calc]').forEach(b => b.onclick = () => { const [k, i] = b.dataset.calc.split(':'); calc[k] = +i; const y = window.scrollY; home().then(() => window.scrollTo(0, y)); });
   bindSel(state.companies);
   app.querySelectorAll('a[href="#list"]').forEach(a => a.onclick = (e) => { e.preventDefault(); document.getElementById('list').scrollIntoView({ behavior: 'smooth' }); });
@@ -241,11 +319,14 @@ function request() {
   const ch = (k, arr) => arr.map(v => `<button type="button" class="opt" aria-pressed="${form[k] === v}" data-f="${k}" data-v="${esc(v)}"><b>${esc(v)}</b></button>`).join('');
   const KEEP = ['사진·앨범', '통장·도장·중요 서류', '현금·귀금속', '휴대폰·컴퓨터', '따로 없어요'];
   app.innerHTML = header({ back: '#/', title: '무료 견적 요청' }) + `<main><form id="rf" class="sec stack" style="gap:20px" novalidate>
-    <div class="box">
+    ${!sel.length && state.concierge ? `<div class="box">
+      <b style="font-size:14px">${esc(state.concierge)} · 운영자가 업체 연결</b>
+      <p style="margin:4px 0 0;font-size:14px">요청을 받으면 운영자가 확인된 업체를 찾아 연결합니다. 견적이 오면 「내 견적」에서 비교할 수 있습니다.</p>
+    </div>` : `<div class="box">
       <b style="font-size:14px">받는 업체 ${sel.length}곳</b>
       <p style="margin:4px 0 0;font-size:14px">${sel.length ? esc(sel.map(s => s.name).join(', ')) : '아직 고른 업체가 없습니다.'}</p>
       <a href="#/" style="font-size:13px;font-weight:700">${sel.length ? '업체 바꾸기' : '업체 고르러 가기'}</a>
-    </div>
+    </div>`}
     <fieldset style="border:0;margin:0;padding:0"><legend style="font-size:16px;font-weight:800;margin-bottom:8px">집 크기</legend><div class="grid2">${ch('size', ['원룸', '투룸', '3룸', '30평 이상'])}</div></fieldset>
     <fieldset style="border:0;margin:0;padding:0"><legend style="font-size:16px;font-weight:800;margin-bottom:8px">짐의 양</legend><div class="grid2">${ch('load', ['적어요', '보통이에요', '많아요'])}</div></fieldset>
     <fieldset style="border:0;margin:0;padding:0"><legend style="font-size:16px;font-weight:800;margin-bottom:8px">층수</legend><div class="grid2">${ch('floor', ['1층·엘리베이터', '2~3층 계단', '4층 이상 계단'])}</div></fieldset>
@@ -262,7 +343,7 @@ function request() {
     <label class="lbl">이름<input id="nm" autocomplete="name" value="${esc(form.nm || '')}"></label>
     <label class="lbl">휴대폰 번호<input id="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000" value="${esc(form.tel || '')}"></label>
     <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px"><input type="checkbox" id="agree"><span>요청 내용과 연락처를 고른 업체에 전달하는 데 동의합니다. 연락처는 내가 고른 업체에만 보입니다.</span></label>
-    <button type="submit" class="btn" id="go">업체 ${sel.length}곳에 견적 요청</button>
+    <button type="submit" class="btn" id="go">${!sel.length && state.concierge ? '업체 연결 요청 보내기' : `업체 ${sel.length}곳에 견적 요청`}</button>
     <p class="note" style="text-align:center;margin:0">추가금 0원 · 작업 후 결제·분할 납부 가능 업체 있음</p>
   </form></main>`;
   const keepForm = () => { const g = id => app.querySelector('#' + id); form.odor = g('odor').checked; form.dong = g('dong').value; form.note = g('note').value; form.wish = g('wish').value; form.nm = g('nm').value; form.tel = g('tel').value; };
@@ -277,16 +358,17 @@ function request() {
   };
   app.querySelector('#rf').onsubmit = (e) => {
     e.preventDefault(); keepForm();
-    if (!sel.length) return toast('먼저 업체를 1곳 이상 담아 주세요');
+    const concierge = !sel.length && state.concierge;
+    if (!sel.length && !concierge) return toast('먼저 업체를 1곳 이상 담아 주세요');
     if (!form.size || !form.load || !form.floor) return toast('집 크기, 짐의 양, 층수를 골라 주세요');
     if (!form.nm.trim() || form.tel.replace(/\D/g, '').length < 10) return toast('이름과 휴대폰 번호를 확인해 주세요');
     if (!app.querySelector('#agree').checked) return toast('전달 동의에 체크해 주세요');
     busy(app.querySelector('#go'), async () => {
-      const r = await rpc('create_request', { p: { region: sel[0].region, size: form.size, load: form.load, floor: form.floor, odor: form.odor,
+      const r = await rpc('create_request', { p: { region: concierge ? state.concierge : sel[0].region, size: form.size, load: form.load, floor: form.floor, odor: form.odor,
         address_dong: form.dong, keep_items: form.keep, keep_note: form.note, photo_paths: form.photos, contact_name: form.nm.trim(),
         phone: form.tel.trim(), wish_date: form.wish }, p_companies: sel.map(s => s.id) });
-      const my = store.get('mth_my', []); my.unshift({ id: r.id, key: r.key, at: new Date().toISOString(), names: sel.map(s => s.name) }); store.set('mth_my', my);
-      state.sel = []; saveSel(); form = { size: '', load: '', floor: '', odor: false, keep: ['사진·앨범', '통장·도장·중요 서류'], photos: [] };
+      const my = store.get('mth_my', []); my.unshift({ id: r.id, key: r.key, at: new Date().toISOString(), names: concierge ? [state.concierge + ' 업체 연결'] : sel.map(s => s.name) }); store.set('mth_my', my);
+      state.sel = []; saveSel(); state.concierge = null; form = { size: '', load: '', floor: '', odor: false, keep: ['사진·앨범', '통장·도장·중요 서류'], photos: [] };
       location.hash = `#/r/${r.id}/${r.key}?new=1`;
     });
   };
@@ -311,6 +393,7 @@ async function status(id, key, isNew) {
   if (!j) {
     const quoted = d.targets.filter(t => t.quote);
     body += `<section class="sec stack" style="padding-top:0"><h2 class="h2">견적 비교 <span style="font-size:15px;color:var(--sub)">${quoted.length}/${d.targets.length}곳 도착</span></h2>`;
+    if (!d.targets.length) body += `<div class="box"><b>운영자가 이 지역의 확인된 업체를 찾고 있습니다</b><p style="margin:4px 0 0;font-size:14px">업체가 연결되면 견적이 이 화면에 올라옵니다.</p></div>`;
     if (quoted.length) {
       body += `<div style="overflow-x:auto"><table class="qt"><thead><tr><th></th>${quoted.map(t => `<th>${esc(t.company.name.replace('예시업체 ', ''))}</th>`).join('')}</tr></thead><tbody>
         ${ITEMS.map(([k, l]) => `<tr><td>${l}</td>${quoted.map(t => `<td>${t.quote.items[k] ? (k === 'buyback' ? '−' : '') + man(t.quote.items[k]) : '-'}</td>`).join('')}</tr>`).join('')}
