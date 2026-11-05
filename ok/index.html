@@ -5,42 +5,49 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>추가작업 동의서</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@700&display=swap" rel="stylesheet">
 <style>
+@font-face{font-family:"Pretendard GOV";font-weight:400;font-display:swap;src:url(fonts/PretendardGOV-Regular.subset.woff2) format("woff2")}
+@font-face{font-family:"Pretendard GOV";font-weight:500;font-display:swap;src:url(fonts/PretendardGOV-Medium.subset.woff2) format("woff2")}
+@font-face{font-family:"Pretendard GOV";font-weight:700;font-display:swap;src:url(fonts/PretendardGOV-Bold.subset.woff2) format("woff2")}
+:root{--g90:#1e2124;--g70:#464c53;--g50:#6d7882;--g30:#b1b8be;--g20:#cdd1d5;--g10:#e6e8ea;--g5:#f4f5f6;--pri:#2b6b3e;--pri-d:#1f5130;--pri-bg:#eef6f0;--focus:#256ef4}
 *{box-sizing:border-box}
-html,body{margin:0;background:#eef0ec;color:#222;font-family:Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;-webkit-text-size-adjust:100%}
+html,body{margin:0;background:var(--g5);color:var(--g90);font-family:"Pretendard GOV",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;-webkit-text-size-adjust:100%}
 .paper{max-width:560px;margin:0 auto;background:#fff;min-height:100vh;padding:26px 18px 40px}
-@media(min-width:600px){.paper{margin:24px auto;min-height:auto;border:1px solid #d5d8d2;padding:36px 34px 44px}}
+@media(min-width:600px){.paper{margin:24px auto;min-height:auto;border:1px solid var(--g20);padding:36px 34px 44px}}
 h1{font-family:"Noto Serif KR",serif;font-size:26px;letter-spacing:6px;text-align:center;margin:4px 0 4px;padding-bottom:10px;border-bottom:3px double #333}
-.no{text-align:right;font-size:12px;color:#888;margin:6px 0 18px}
-.lead{font-size:16px;line-height:1.75;margin:0 0 16px}
+.no{text-align:right;font-size:12px;color:var(--g50);margin:6px 0 18px}
+.lead{font-size:17px;line-height:1.75;margin:0 0 16px}
 table{width:100%;border-collapse:collapse;font-size:15px;margin:0 0 14px}
-th,td{border:1px solid #9a9a9a;padding:9px 10px;vertical-align:middle;line-height:1.5}
-th{background:#f1f2ee;font-weight:600;white-space:nowrap;text-align:center;width:26%}
+th,td{border:1px solid var(--g30);padding:9px 10px;vertical-align:middle;line-height:1.5}
+th{background:var(--g5);font-weight:600;white-space:nowrap;text-align:center;width:26%}
 .list th{width:auto}
-.list td.n{text-align:center;width:42px;color:#555}
+.list td.n{text-align:center;width:42px;color:var(--g70)}
 .list td.a{text-align:right;white-space:nowrap;width:30%}
-.list tr.sum td{background:#f7f8f4;font-weight:700}
-.box{border:1px solid #c9ccc4;background:#fafbf8;padding:12px 14px;font-size:14.5px;line-height:1.7;margin:0 0 18px}
+.list tr.sum td{background:var(--g5);font-weight:700}
+.box{border:1px solid var(--g20);background:#fbfbfc;padding:12px 14px;font-size:14.5px;line-height:1.7;margin:0 0 18px}
 .box p{margin:0}
 .box p+p{margin-top:6px}
 .agree{border-top:1px solid #333;padding-top:18px;text-align:center}
 .agree .s{font-size:16px;margin:0 0 6px}
-.agree .d{font-size:15px;color:#444;margin:0 0 14px}
+.agree .d{font-size:15px;color:var(--g70);margin:0 0 14px}
 .name{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 0 16px;font-size:16px}
 .name input{width:150px;font:inherit;font-size:17px;padding:8px 10px;border:0;border-bottom:2px solid #333;text-align:center;outline:none;background:transparent}
-.btn{display:block;width:100%;border:0;border-radius:8px;background:#2b6b3e;color:#fff;font:inherit;font-size:18px;font-weight:700;padding:15px;cursor:pointer}
-.btn:disabled{background:#9db3a3}
-.sub{font-size:13px;color:#777;margin:10px 0 0;line-height:1.6}
+.btn{display:block;width:100%;border:0;border-radius:8px;background:var(--pri);color:#fff;font:inherit;font-size:18px;font-weight:700;padding:15px;cursor:pointer}
+.btn:disabled{background:var(--g20)}
+.sub{font-size:13px;color:var(--g50);margin:10px 0 0;line-height:1.6}
 .co{margin-top:26px;text-align:center;font-size:15px;line-height:1.7}
 .co b{font-size:17px}
-.co a{color:#222}
-.done{display:none;border:2px solid #2b6b3e;background:#f0f7f2;padding:16px;text-align:center;font-size:16px;line-height:1.7}
-.done b{color:#2b6b3e;font-size:19px}
+.co a{color:var(--g90)}
+.done{display:none;border:2px solid var(--pri);background:var(--pri-bg);padding:16px;text-align:center;font-size:16px;line-height:1.7}
+.done b{color:var(--pri);font-size:19px}
 .err{color:#b3261e;font-size:14px;min-height:20px;margin:8px 0 0}
 .bad{padding:60px 10px;text-align:center;font-size:16px;line-height:1.8}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--focus);outline-offset:1px;border-color:var(--focus)}
+.btn{min-height:56px;font-size:19px!important;letter-spacing:-.2px}
+.btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+body.rp{--pri:#1f3864;--pri-d:#162a4d;--pri-bg:#eef2f9}
 </style>
 </head>
 <body>
@@ -65,7 +72,7 @@ let D=null;
 try{D=JSON.parse(b64d(P||''))}catch(e){}
 if(!D||!S){app.innerHTML='<div class="bad">확인할 수 없는 링크입니다.<br>담당자에게 다시 받아 주세요.<br><br>문의 <a href="tel:16682412">1668-2412</a></div>'}
 else{
-  const B=BRAND[D.b]||BRAND.eg;
+  const B=BRAND[D.b]||BRAND.eg;if(D.b==='rp')document.body.classList.add('rp');
   const total=D.items.reduce((s,i)=>s+(Number(i.amt)||0),0);
   const rows=D.items.map((it,i)=>`<tr><td class="n">${i+1}</td><td>${esc(it.desc)}</td><td class="a">${won(it.amt)}</td></tr>`).join('');
   const doneKey='ok_'+D.id;

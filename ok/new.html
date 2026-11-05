@@ -5,34 +5,41 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>추가작업 동의 요청 만들기</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
+@font-face{font-family:"Pretendard GOV";font-weight:400;font-display:swap;src:url(fonts/PretendardGOV-Regular.subset.woff2) format("woff2")}
+@font-face{font-family:"Pretendard GOV";font-weight:500;font-display:swap;src:url(fonts/PretendardGOV-Medium.subset.woff2) format("woff2")}
+@font-face{font-family:"Pretendard GOV";font-weight:700;font-display:swap;src:url(fonts/PretendardGOV-Bold.subset.woff2) format("woff2")}
+:root{--g90:#1e2124;--g70:#464c53;--g50:#6d7882;--g30:#b1b8be;--g20:#cdd1d5;--g10:#e6e8ea;--g5:#f4f5f6;--pri:#2b6b3e;--pri-d:#1f5130;--pri-bg:#eef6f0;--focus:#256ef4}
 *{box-sizing:border-box}
-html,body{margin:0;background:#eef0ec;color:#222;font-family:Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;-webkit-text-size-adjust:100%}
+html,body{margin:0;background:var(--g5);color:var(--g90);font-family:"Pretendard GOV",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;-webkit-text-size-adjust:100%}
 .wrap{max-width:520px;margin:0 auto;background:#fff;min-height:100vh;padding:20px 16px 40px}
 h1{font-size:21px;margin:0 0 4px}
-.hint{font-size:13.5px;color:#666;margin:0 0 18px;line-height:1.6}
+.hint{font-size:13.5px;color:var(--g70);margin:0 0 18px;line-height:1.6}
 label.t{display:block;font-size:14px;font-weight:700;margin:16px 0 6px}
-input,select,textarea{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1px solid #c8cbc4;border-radius:6px;background:#fff}
+input,select,textarea{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1px solid var(--g30);border-radius:8px;background:#fff}
 textarea{min-height:70px;resize:vertical}
 .seg{display:flex;gap:6px}
-.seg label{flex:1;text-align:center;border:1px solid #c8cbc4;border-radius:6px;padding:11px 4px;font-size:14.5px;cursor:pointer;line-height:1.3}
+.seg label{flex:1;text-align:center;border:1px solid var(--g30);border-radius:8px;padding:11px 4px;font-size:14.5px;cursor:pointer;line-height:1.3}
 .seg input{display:none}
 .seg input:checked+span{font-weight:700}
-.seg label:has(input:checked){border-color:#2b6b3e;background:#eef6f0;color:#1f5130}
+.seg label:has(input:checked){border-color:var(--pri);background:var(--pri-bg);color:var(--pri-d)}
 .row{display:flex;gap:6px;margin-bottom:6px}
 .row .d{flex:1}
 .row .a{width:120px;text-align:right}
-.row button{width:40px;border:1px solid #c8cbc4;background:#fff;border-radius:6px;font-size:18px;color:#888}
-.add{border:1px dashed #9aa497;background:#fafbf8;border-radius:6px;padding:10px;width:100%;font:inherit;font-size:14.5px;color:#2b6b3e;cursor:pointer}
+.row button{width:40px;border:1px solid var(--g30);background:#fff;border-radius:8px;font-size:18px;color:var(--g50)}
+.add{border:1px dashed var(--g30);background:#fbfbfc;border-radius:8px;padding:10px;width:100%;font:inherit;font-size:14.5px;color:var(--pri);cursor:pointer}
 .total{text-align:right;font-weight:700;margin:8px 0 0;font-size:15px}
-.btn{display:block;width:100%;border:0;border-radius:8px;background:#2b6b3e;color:#fff;font:inherit;font-size:17px;font-weight:700;padding:15px;margin-top:22px;cursor:pointer}
-.btn.sec{background:#fff;color:#2b6b3e;border:1.5px solid #2b6b3e;margin-top:8px}
-.btn:disabled{background:#9db3a3}
+.btn{display:block;width:100%;border:0;border-radius:8px;background:var(--pri);color:#fff;font:inherit;font-size:17px;font-weight:700;padding:15px;margin-top:22px;cursor:pointer}
+.btn.sec{background:#fff;color:var(--pri);border:1.5px solid var(--pri);margin-top:8px}
+.btn:disabled{background:var(--g20)}
 .err{color:#b3261e;font-size:14px;margin:10px 0 0;min-height:18px}
 .out{display:none;margin-top:20px;border-top:1px solid #ddd;padding-top:16px}
-.out pre{white-space:pre-wrap;word-break:break-all;background:#f6f7f4;border:1px solid #ddd;border-radius:6px;padding:12px;font:inherit;font-size:14px;line-height:1.6;margin:0}
-.ok{font-size:14px;color:#2b6b3e;margin:8px 0 0;min-height:18px}
+.out pre{white-space:pre-wrap;word-break:break-all;background:var(--g5);border:1px solid #ddd;border-radius:8px;padding:12px;font:inherit;font-size:14px;line-height:1.6;margin:0}
+.ok{font-size:14px;color:var(--pri);margin:8px 0 0;min-height:18px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--focus);outline-offset:1px;border-color:var(--focus)}
+.btn{min-height:56px;font-size:19px!important;letter-spacing:-.2px}
+.btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+body.rp{--pri:#1f3864;--pri-d:#162a4d;--pri-bg:#eef2f9}
 </style>
 </head>
 <body>
@@ -59,7 +66,7 @@ textarea{min-height:70px;resize:vertical}
   <label class="t" for="cust">고객 성함</label>
   <input id="cust" placeholder="예: 홍길동">
 
-  <label class="t" for="phone">고객 휴대폰 <small style="font-weight:400;color:#888">(문자 보내기용, 기록에는 안 남음)</small></label>
+  <label class="t" for="phone">고객 휴대폰 <small style="font-weight:400;color:var(--g50)">(문자 보내기용, 기록에는 안 남음)</small></label>
   <input id="phone" type="tel" inputmode="numeric" placeholder="01012345678">
 
   <label class="t" for="site">현장</label>
@@ -70,7 +77,7 @@ textarea{min-height:70px;resize:vertical}
   <button type="button" class="add" id="addRow">+ 한 줄 더</button>
   <p class="total" id="total">합계 0원</p>
 
-  <label class="t" for="note">메모 <small style="font-weight:400;color:#888">(선택)</small></label>
+  <label class="t" for="note">메모 <small style="font-weight:400;color:var(--g50)">(선택)</small></label>
   <textarea id="note" placeholder="예: 베란다 창고 안쪽에서 짐이 추가로 나왔습니다."></textarea>
 
   <button class="btn" id="make">문자 만들기</button>
@@ -101,6 +108,7 @@ function addRow(d='',a=''){
 }
 function items(){return[...$('items').children].map(r=>({desc:r.querySelector('.d').value.trim(),amt:num(r.querySelector('.a').value)})).filter(i=>i.desc)}
 function sum(){$('total').textContent='합계 '+won(items().reduce((s,i)=>s+i.amt,0))}
+document.querySelectorAll('input[name=b]').forEach(r=>r.onchange=()=>document.body.classList.toggle('rp',r.value==='rp'&&r.checked));
 addRow();
 $('addRow').onclick=()=>addRow();
 let link='',text='';
