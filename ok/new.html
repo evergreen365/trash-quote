@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>추가작업 동의 요청 만들기</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;background:#eef0ec;color:#222;font-family:Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:520px;margin:0 auto;background:#fff;min-height:100vh;padding:20px 16px 40px}
+h1{font-size:21px;margin:0 0 4px}
+.hint{font-size:13.5px;color:#666;margin:0 0 18px;line-height:1.6}
+label.t{display:block;font-size:14px;font-weight:700;margin:16px 0 6px}
+input,select,textarea{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1px solid #c8cbc4;border-radius:6px;background:#fff}
+textarea{min-height:70px;resize:vertical}
+.seg{display:flex;gap:6px}
+.seg label{flex:1;text-align:center;border:1px solid #c8cbc4;border-radius:6px;padding:11px 4px;font-size:14.5px;cursor:pointer;line-height:1.3}
+.seg input{display:none}
+.seg input:checked+span{font-weight:700}
+.seg label:has(input:checked){border-color:#2b6b3e;background:#eef6f0;color:#1f5130}
+.row{display:flex;gap:6px;margin-bottom:6px}
+.row .d{flex:1}
+.row .a{width:120px;text-align:right}
+.row button{width:40px;border:1px solid #c8cbc4;background:#fff;border-radius:6px;font-size:18px;color:#888}
+.add{border:1px dashed #9aa497;background:#fafbf8;border-radius:6px;padding:10px;width:100%;font:inherit;font-size:14.5px;color:#2b6b3e;cursor:pointer}
+.total{text-align:right;font-weight:700;margin:8px 0 0;font-size:15px}
+.btn{display:block;width:100%;border:0;border-radius:8px;background:#2b6b3e;color:#fff;font:inherit;font-size:17px;font-weight:700;padding:15px;margin-top:22px;cursor:pointer}
+.btn.sec{background:#fff;color:#2b6b3e;border:1.5px solid #2b6b3e;margin-top:8px}
+.btn:disabled{background:#9db3a3}
+.err{color:#b3261e;font-size:14px;margin:10px 0 0;min-height:18px}
+.out{display:none;margin-top:20px;border-top:1px solid #ddd;padding-top:16px}
+.out pre{white-space:pre-wrap;word-break:break-all;background:#f6f7f4;border:1px solid #ddd;border-radius:6px;padding:12px;font:inherit;font-size:14px;line-height:1.6;margin:0}
+.ok{font-size:14px;color:#2b6b3e;margin:8px 0 0;min-height:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>추가작업 동의 요청 만들기</h1>
+  <p class="hint">내용을 적고 [문자 만들기]를 누르면 고객에게 보낼 문자가 만들어집니다. 고객이 링크를 열어 [동의합니다]를 누르면 대표님 텔레그램으로 기록이 갑니다.</p>
+
+  <label class="t">구분</label>
+  <div class="seg">
+    <label><input type="radio" name="t" value="add" checked><span>추가 요청</span></label>
+    <label><input type="radio" name="t" value="found"><span>새로 나온 부분</span></label>
+    <label><input type="radio" name="t" value="upgrade"><span>사양 변경</span></label>
+  </div>
+
+  <label class="t">업체</label>
+  <div class="seg">
+    <label><input type="radio" name="b" value="eg" checked><span>에버그린<br><small>쓰레기집·특수청소</small></span></label>
+    <label><input type="radio" name="b" value="rp"><span>리커버리프로<br><small>화재복구</small></span></label>
+  </div>
+
+  <label class="t" for="staff">담당자</label>
+  <select id="staff"><option>윤주영</option><option>정준영</option><option>윤성훈</option><option>김현섭</option></select>
+
+  <label class="t" for="cust">고객 성함</label>
+  <input id="cust" placeholder="예: 홍길동">
+
+  <label class="t" for="phone">고객 휴대폰 <small style="font-weight:400;color:#888">(문자 보내기용, 기록에는 안 남음)</small></label>
+  <input id="phone" type="tel" inputmode="numeric" placeholder="01012345678">
+
+  <label class="t" for="site">현장</label>
+  <input id="site" placeholder="예: OO아파트 101동 1203호">
+
+  <label class="t">내용과 금액</label>
+  <div id="items"></div>
+  <button type="button" class="add" id="addRow">+ 한 줄 더</button>
+  <p class="total" id="total">합계 0원</p>
+
+  <label class="t" for="note">메모 <small style="font-weight:400;color:#888">(선택)</small></label>
+  <textarea id="note" placeholder="예: 베란다 창고 안쪽에서 짐이 추가로 나왔습니다."></textarea>
+
+  <button class="btn" id="make">문자 만들기</button>
+  <p class="err" id="err"></p>
+
+  <div class="out" id="out">
+    <pre id="msg"></pre>
+    <button class="btn" id="sms">문자로 보내기</button>
+    <button class="btn sec" id="copy">문자 내용 복사 (카톡에 붙여넣기)</button>
+    <p class="ok" id="ok"></p>
+  </div>
+</div>
+<script>
+const API='https://evergreen-proxy-git-main-evergreen-s-projects1.vercel.app/api/consent';
+const BASE=location.origin+location.pathname.replace(/new\.html$/,'');
+const $=id=>document.getElementById(id);
+const won=n=>(Number(n)||0).toLocaleString('ko-KR')+'원';
+const num=s=>Number(String(s).replace(/[^0-9]/g,''))||0;
+try{const s=localStorage.getItem('ok_staff');if(s)$('staff').value=s}catch(e){}
+$('staff').onchange=()=>{try{localStorage.setItem('ok_staff',$('staff').value)}catch(e){}};
+function addRow(d='',a=''){
+  const r=document.createElement('div');r.className='row';
+  r.innerHTML='<input class="d" placeholder="예: 작은방 붙박이장 안쪽 짐 1톤"><input class="a" inputmode="numeric" placeholder="금액"><button type="button" aria-label="삭제">×</button>';
+  r.querySelector('.d').value=d;r.querySelector('.a').value=a;
+  r.querySelector('.a').oninput=e=>{const v=num(e.target.value);e.target.value=v?v.toLocaleString('ko-KR'):'';sum()};
+  r.querySelector('button').onclick=()=>{if($('items').children.length>1){r.remove();sum()}};
+  $('items').appendChild(r);
+}
+function items(){return[...$('items').children].map(r=>({desc:r.querySelector('.d').value.trim(),amt:num(r.querySelector('.a').value)})).filter(i=>i.desc)}
+function sum(){$('total').textContent='합계 '+won(items().reduce((s,i)=>s+i.amt,0))}
+addRow();
+$('addRow').onclick=()=>addRow();
+let link='',text='';
+$('make').onclick=async()=>{
+  $('err').textContent='';
+  const data={t:document.querySelector('input[name=t]:checked').value,b:document.querySelector('input[name=b]:checked').value,staff:$('staff').value,cust:$('cust').value.trim(),site:$('site').value.trim(),items:items(),note:$('note').value.trim()};
+  if(!data.cust){$('err').textContent='고객 성함을 적어 주세요.';return}
+  if(!data.items.length){$('err').textContent='내용을 한 줄 이상 적어 주세요.';return}
+  const btn=$('make');btn.disabled=true;btn.textContent='만드는 중…';
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'sign',data})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||!j.ok)throw new Error(j.error||'다시 눌러 주세요.');
+    link=BASE+'#p='+j.p+'&s='+j.s;
+    const brand=data.b==='rp'?'리커버리프로':'특수청소에버그린';
+    const kind={add:'요청하신 추가 작업',found:'작업 중 새로 확인된 부분',upgrade:'요청하신 사양 변경'}[data.t];
+    text=`[${brand}] ${data.cust} 고객님, ${kind} 내용과 금액을 정리했습니다. 아래 링크에서 확인하시고 [동의합니다]를 눌러 주세요.\n${link}\n담당 ${data.staff}`;
+    $('msg').textContent=text;$('out').style.display='block';$('out').scrollIntoView({behavior:'smooth'});
+  }catch(e){$('err').textContent=e.message}
+  btn.disabled=false;btn.textContent='문자 만들기';
+};
+$('sms').onclick=()=>{const p=$('phone').value.replace(/[^0-9]/g,'');location.href='sms:'+p+'?&body='+encodeURIComponent(text)};
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText(text);$('ok').textContent='복사했습니다. 카톡이나 문자에 붙여넣으세요.'}catch(e){$('ok').textContent='복사가 안 되면 위 내용을 길게 눌러 복사하세요.'}};
+</script>
+</body>
+</html>
