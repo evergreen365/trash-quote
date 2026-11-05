@@ -45,23 +45,10 @@ body.rp{--pri:#1f3864;--pri-d:#162a4d;--pri-bg:#eef2f9}
 <body>
 <div class="wrap">
   <h1>추가작업 동의 요청 만들기</h1>
-  <p class="hint">내용을 적고 [문자 만들기]를 누르면 고객에게 보낼 문자가 만들어집니다. 고객이 링크를 열어 [동의합니다]를 누르면 대표님 텔레그램으로 기록이 갑니다.</p>
+  <p class="hint">내용을 적고 [문자 만들기]를 누르면 고객에게 보낼 문자가 만들어집니다. 고객이 링크를 열어 [동의합니다]를 누르면 회사로 기록이 전달됩니다.</p>
 
-  <label class="t">구분</label>
-  <div class="seg">
-    <label><input type="radio" name="t" value="add" checked><span>추가 요청</span></label>
-    <label><input type="radio" name="t" value="found"><span>새로 나온 부분</span></label>
-    <label><input type="radio" name="t" value="upgrade"><span>사양 변경</span></label>
-  </div>
-
-  <label class="t">업체</label>
-  <div class="seg">
-    <label><input type="radio" name="b" value="eg" checked><span>에버그린<br><small>쓰레기집·특수청소</small></span></label>
-    <label><input type="radio" name="b" value="rp"><span>리커버리프로<br><small>화재복구</small></span></label>
-  </div>
-
-  <label class="t" for="staff">담당자</label>
-  <select id="staff"><option>윤주영</option><option>정준영</option><option>윤성훈</option><option>김현섭</option></select>
+  <label class="t" for="staff">담당자 이름</label>
+  <input id="staff" placeholder="본인 이름을 적어 주세요" autocomplete="name">
 
   <label class="t" for="cust">고객 성함</label>
   <input id="cust" placeholder="예: 홍길동">
@@ -96,8 +83,8 @@ const BASE=location.origin+location.pathname.replace(/new\.html$/,'');
 const $=id=>document.getElementById(id);
 const won=n=>(Number(n)||0).toLocaleString('ko-KR')+'원';
 const num=s=>Number(String(s).replace(/[^0-9]/g,''))||0;
-try{const s=localStorage.getItem('ok_staff');if(s)$('staff').value=s}catch(e){}
-$('staff').onchange=()=>{try{localStorage.setItem('ok_staff',$('staff').value)}catch(e){}};
+try{const s=localStorage.getItem('ok_staff_name');if(s)$('staff').value=s}catch(e){}
+$('staff').oninput=()=>{try{localStorage.setItem('ok_staff_name',$('staff').value.trim())}catch(e){}};
 function addRow(d='',a=''){
   const r=document.createElement('div');r.className='row';
   r.innerHTML='<input class="d" placeholder="예: 작은방 붙박이장 안쪽 짐 1톤"><input class="a" inputmode="numeric" placeholder="금액"><button type="button" aria-label="삭제">×</button>';
@@ -108,13 +95,13 @@ function addRow(d='',a=''){
 }
 function items(){return[...$('items').children].map(r=>({desc:r.querySelector('.d').value.trim(),amt:num(r.querySelector('.a').value)})).filter(i=>i.desc)}
 function sum(){$('total').textContent='합계 '+won(items().reduce((s,i)=>s+i.amt,0))}
-document.querySelectorAll('input[name=b]').forEach(r=>r.onchange=()=>document.body.classList.toggle('rp',r.value==='rp'&&r.checked));
 addRow();
 $('addRow').onclick=()=>addRow();
 let link='',text='';
 $('make').onclick=async()=>{
   $('err').textContent='';
-  const data={t:document.querySelector('input[name=t]:checked').value,b:document.querySelector('input[name=b]:checked').value,staff:$('staff').value,cust:$('cust').value.trim(),site:$('site').value.trim(),items:items(),note:$('note').value.trim()};
+  const data={t:'add',b:'eg',staff:$('staff').value.trim(),cust:$('cust').value.trim(),site:$('site').value.trim(),items:items(),note:$('note').value.trim()};
+  if(!data.staff){$('err').textContent='담당자 이름을 적어 주세요.';return}
   if(!data.cust){$('err').textContent='고객 성함을 적어 주세요.';return}
   if(!data.items.length){$('err').textContent='내용을 한 줄 이상 적어 주세요.';return}
   const btn=$('make');btn.disabled=true;btn.textContent='만드는 중…';
@@ -123,8 +110,8 @@ $('make').onclick=async()=>{
     const j=await r.json().catch(()=>({}));
     if(!r.ok||!j.ok)throw new Error(j.error||'다시 눌러 주세요.');
     link=BASE+'#p='+j.p+'&s='+j.s;
-    const brand=data.b==='rp'?'리커버리프로':'특수청소에버그린';
-    const kind={add:'요청하신 추가 작업',found:'작업 중 새로 확인된 부분',upgrade:'요청하신 사양 변경'}[data.t];
+    const brand='특수청소에버그린';
+    const kind='추가 작업';
     text=`[${brand}] ${data.cust} 고객님, ${kind} 내용과 금액을 정리했습니다. 아래 링크에서 확인하시고 [동의합니다]를 눌러 주세요.\n${link}\n담당 ${data.staff}`;
     $('msg').textContent=text;$('out').style.display='block';$('out').scrollIntoView({behavior:'smooth'});
   }catch(e){$('err').textContent=e.message}

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>리커버리프로 추가작업 동의 요청</title>
+<style>
+@font-face{font-family:"Pretendard GOV";font-weight:400;font-display:swap;src:url(../ok/fonts/PretendardGOV-Regular.subset.woff2) format("woff2")}
+@font-face{font-family:"Pretendard GOV";font-weight:500;font-display:swap;src:url(../ok/fonts/PretendardGOV-Medium.subset.woff2) format("woff2")}
+@font-face{font-family:"Pretendard GOV";font-weight:700;font-display:swap;src:url(../ok/fonts/PretendardGOV-Bold.subset.woff2) format("woff2")}
+:root{--g90:#1e2124;--g70:#464c53;--g50:#6d7882;--g30:#b1b8be;--g20:#cdd1d5;--g10:#e6e8ea;--g5:#f4f5f6;--pri:#2b6b3e;--pri-d:#1f5130;--pri-bg:#eef6f0;--focus:#256ef4}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--g5);color:var(--g90);font-family:"Pretendard GOV",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:520px;margin:0 auto;background:#fff;min-height:100vh;padding:20px 16px 40px}
+h1{font-size:21px;margin:0 0 4px}
+.hint{font-size:13.5px;color:var(--g70);margin:0 0 18px;line-height:1.6}
+label.t{display:block;font-size:14px;font-weight:700;margin:16px 0 6px}
+input,select,textarea{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1px solid var(--g30);border-radius:8px;background:#fff}
+textarea{min-height:70px;resize:vertical}
+.seg{display:flex;gap:6px}
+.seg label{flex:1;text-align:center;border:1px solid var(--g30);border-radius:8px;padding:11px 4px;font-size:14.5px;cursor:pointer;line-height:1.3}
+.seg input{display:none}
+.seg input:checked+span{font-weight:700}
+.seg label:has(input:checked){border-color:var(--pri);background:var(--pri-bg);color:var(--pri-d)}
+.row{display:flex;gap:6px;margin-bottom:6px}
+.row .d{flex:1}
+.row .a{width:120px;text-align:right}
+.row button{width:40px;border:1px solid var(--g30);background:#fff;border-radius:8px;font-size:18px;color:var(--g50)}
+.add{border:1px dashed var(--g30);background:#fbfbfc;border-radius:8px;padding:10px;width:100%;font:inherit;font-size:14.5px;color:var(--pri);cursor:pointer}
+.total{text-align:right;font-weight:700;margin:8px 0 0;font-size:15px}
+.btn{display:block;width:100%;border:0;border-radius:8px;background:var(--pri);color:#fff;font:inherit;font-size:17px;font-weight:700;padding:15px;margin-top:22px;cursor:pointer}
+.btn.sec{background:#fff;color:var(--pri);border:1.5px solid var(--pri);margin-top:8px}
+.btn:disabled{background:var(--g20)}
+.err{color:#b3261e;font-size:14px;margin:10px 0 0;min-height:18px}
+.out{display:none;margin-top:20px;border-top:1px solid #ddd;padding-top:16px}
+.out pre{white-space:pre-wrap;word-break:break-all;background:var(--g5);border:1px solid #ddd;border-radius:8px;padding:12px;font:inherit;font-size:14px;line-height:1.6;margin:0}
+.ok{font-size:14px;color:var(--pri);margin:8px 0 0;min-height:18px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--focus);outline-offset:1px;border-color:var(--focus)}
+.btn{min-height:56px;font-size:19px!important;letter-spacing:-.2px}
+.btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+body.rp{--pri:#1f3864;--pri-d:#162a4d;--pri-bg:#eef2f9}
+</style>
+</head>
+<body class="rp">
+<div class="wrap">
+  <h1>리커버리프로<br>추가작업·사양 업그레이드 동의 요청</h1>
+  <p class="hint">내용을 적고 [문자 만들기]를 누르면 고객에게 보낼 문자가 만들어집니다. 고객이 링크를 열어 [동의합니다]를 누르면 회사로 기록이 전달됩니다.</p>
+
+  <label class="t">구분</label>
+  <div class="seg">
+    <label><input type="radio" name="t" value="add" checked><span>추가 작업</span></label>
+    <label><input type="radio" name="t" value="upgrade"><span>사양 업그레이드</span></label>
+  </div>
+
+  <label class="t">담당자</label>
+  <input id="staff" value="황은규 소장" readonly style="background:var(--g5);color:var(--g70)">
+
+  <label class="t" for="cust">고객 성함</label>
+  <input id="cust" placeholder="예: 홍길동">
+
+  <label class="t" for="phone">고객 휴대폰 <small style="font-weight:400;color:var(--g50)">(문자 보내기용, 기록에는 안 남음)</small></label>
+  <input id="phone" type="tel" inputmode="numeric" placeholder="01012345678">
+
+  <label class="t" for="site">현장</label>
+  <input id="site" placeholder="예: OO아파트 101동 1203호">
+
+  <label class="t">내용과 금액</label>
+  <div id="items"></div>
+  <button type="button" class="add" id="addRow">+ 한 줄 더</button>
+  <p class="total" id="total">합계 0원</p>
+
+  <label class="t" for="note">메모 <small style="font-weight:400;color:var(--g50)">(선택)</small></label>
+  <textarea id="note" placeholder="예: 고객 요청으로 주방 상판을 인조대리석으로 바꿉니다."></textarea>
+
+  <button class="btn" id="make">문자 만들기</button>
+  <p class="err" id="err"></p>
+
+  <div class="out" id="out">
+    <pre id="msg"></pre>
+    <button class="btn" id="sms">문자로 보내기</button>
+    <button class="btn sec" id="copy">문자 내용 복사 (카톡에 붙여넣기)</button>
+    <p class="ok" id="ok"></p>
+  </div>
+</div>
+<script>
+const API='https://evergreen-proxy-git-main-evergreen-s-projects1.vercel.app/api/consent';
+const BASE=location.origin+location.pathname.replace(/new\.html$/,'');
+const $=id=>document.getElementById(id);
+const won=n=>(Number(n)||0).toLocaleString('ko-KR')+'원';
+const num=s=>Number(String(s).replace(/[^0-9]/g,''))||0;
+function addRow(d='',a=''){
+  const r=document.createElement('div');r.className='row';
+  r.innerHTML='<input class="d" placeholder="예: 거실 벽지 합지 → 실크"><input class="a" inputmode="numeric" placeholder="금액"><button type="button" aria-label="삭제">×</button>';
+  r.querySelector('.d').value=d;r.querySelector('.a').value=a;
+  r.querySelector('.a').oninput=e=>{const v=num(e.target.value);e.target.value=v?v.toLocaleString('ko-KR'):'';sum()};
+  r.querySelector('button').onclick=()=>{if($('items').children.length>1){r.remove();sum()}};
+  $('items').appendChild(r);
+}
+function items(){return[...$('items').children].map(r=>({desc:r.querySelector('.d').value.trim(),amt:num(r.querySelector('.a').value)})).filter(i=>i.desc)}
+function sum(){$('total').textContent='합계 '+won(items().reduce((s,i)=>s+i.amt,0))}
+addRow();
+$('addRow').onclick=()=>addRow();
+let link='',text='';
+$('make').onclick=async()=>{
+  $('err').textContent='';
+  const data={t:document.querySelector('input[name=t]:checked').value,b:'rp',staff:'황은규 소장',cust:$('cust').value.trim(),site:$('site').value.trim(),items:items(),note:$('note').value.trim()};
+  if(!data.cust){$('err').textContent='고객 성함을 적어 주세요.';return}
+  if(!data.items.length){$('err').textContent='내용을 한 줄 이상 적어 주세요.';return}
+  const btn=$('make');btn.disabled=true;btn.textContent='만드는 중…';
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'sign',data})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||!j.ok)throw new Error(j.error||'다시 눌러 주세요.');
+    link=BASE+'#p='+j.p+'&s='+j.s;
+    const brand='리커버리프로';
+    const kind={add:'추가 작업',upgrade:'사양 업그레이드'}[data.t];
+    text=`[${brand}] ${data.cust} 고객님, ${kind} 내용과 금액을 정리했습니다. 아래 링크에서 확인하시고 [동의합니다]를 눌러 주세요.\n${link}\n담당 ${data.staff}`;
+    $('msg').textContent=text;$('out').style.display='block';$('out').scrollIntoView({behavior:'smooth'});
+  }catch(e){$('err').textContent=e.message}
+  btn.disabled=false;btn.textContent='문자 만들기';
+};
+$('sms').onclick=()=>{const p=$('phone').value.replace(/[^0-9]/g,'');location.href='sms:'+p+'?&body='+encodeURIComponent(text)};
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText(text);$('ok').textContent='복사했습니다. 카톡이나 문자에 붙여넣으세요.'}catch(e){$('ok').textContent='복사가 안 되면 위 내용을 길게 눌러 복사하세요.'}};
+</script>
+</body>
+</html>
