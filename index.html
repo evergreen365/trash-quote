@@ -32,7 +32,6 @@
 <meta name="kakao:image" content="https://evergreen365.github.io/trash-quote/og-image.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -357,6 +356,112 @@ footer a{color:var(--g3);text-decoration:none}
   .tn{font-size:16px}
   .before-after-wrap{grid-template-columns:1fr}
 }
+/* ===== 2026-11 리디자인: Pretendard GOV + KRDS(정부 디자인시스템) 색·간격 기준 ===== */
+@font-face{font-family:"Pretendard GOV";font-weight:400;font-display:swap;src:url(ok/fonts/PretendardGOV-Regular.subset.woff2) format("woff2")}
+@font-face{font-family:"Pretendard GOV";font-weight:500 600;font-display:swap;src:url(ok/fonts/PretendardGOV-Medium.subset.woff2) format("woff2")}
+@font-face{font-family:"Pretendard GOV";font-weight:700 900;font-display:swap;src:url(ok/fonts/PretendardGOV-Bold.subset.woff2) format("woff2")}
+:root{--g1:#173d2b;--g2:#1f6b45;--g3:#2a8456;--g4:#7fbf9b;--gp:#edf5f0;--gold:#1f6b45;--gol:#ffffff;--cr:#f4f5f6;--ch:#1e2124;--gm:#6d7882;--gl:#f4f5f6;--line:#e6e8ea;--line2:#cdd1d5;--sh:0 1px 2px rgba(30,33,36,.06);--shl:0 1px 3px rgba(30,33,36,.08)}
+body,.inp,.btn,button,input,select,textarea{font-family:"Pretendard GOV",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif!important;letter-spacing:-.01em}
+.hero h1,.tn,.ch h2,.py-inp,.rtitle,.ab-price,.ts-n{font-family:inherit!important}
+body{background:var(--cr);color:var(--ch);-webkit-font-smoothing:antialiased}
+/* 히어로: 그라데이션·장식 원 제거, 단색 */
+.hero{background:#173d2b}
+.hero::before,.hero::after,.anchor-box::before{display:none}
+.hero-in{padding:34px 20px 28px}
+.badge{background:transparent;border:1px solid rgba(255,255,255,.28);border-radius:6px;backdrop-filter:none;padding:4px 10px}
+.badge span{color:#d7e9de;font-size:12px;letter-spacing:0}
+.dot{animation:none;background:#7fbf9b}
+.hero h1{font-size:clamp(26px,6.4vw,36px);font-weight:800;letter-spacing:-.03em;line-height:1.3}
+.hero h1 em{color:#bfe3cc}
+.hero p{font-size:15px;color:rgba(255,255,255,.82)}
+.anchor-badge{background:#fff;box-shadow:none;border-radius:6px;padding:6px 14px}
+.anchor-badge span{color:#173d2b;font-size:14px;letter-spacing:0}
+.trust-bar{gap:0;margin-top:6px;border-top:1px solid rgba(255,255,255,.16);padding-top:16px}
+.ti{flex:1;min-width:70px}
+.tn{font-size:20px;font-weight:800;color:#fff}
+.tl{font-size:12px;color:rgba(255,255,255,.7)}
+.td{background:rgba(255,255,255,.16)}
+/* 진행 단계 */
+.prog-wrap{box-shadow:none;border-bottom:1px solid var(--line)}
+.sl{font-size:12px}
+.ptrack{height:3px;background:var(--line)}
+.pfill{background:var(--g2)}
+/* 카드 */
+.main{padding:20px 16px 80px}
+.card{border-radius:14px;box-shadow:var(--shl);border:1px solid var(--line)}
+.ch{background:#fff;align-items:flex-start;text-align:left;padding:22px 22px 14px;border-bottom:1px solid var(--line)}
+.ch .ci,.ci{display:none}
+.ch h2{color:var(--ch);font-size:21px;font-weight:800;letter-spacing:-.02em}
+.ch p{color:var(--gm);font-size:14px;margin-top:2px}
+.cb{padding:22px}
+.lbl{color:var(--ch);font-size:15px;font-weight:700;letter-spacing:-.01em}
+.lbl .hint{font-size:12px}
+.inp{border:1px solid var(--line2);border-radius:8px;font-size:16px;padding:12px 14px}
+.inp:focus{border-color:var(--g2);box-shadow:0 0 0 3px rgba(31,107,69,.14)}
+.py-btn{border:1px solid var(--line2);border-radius:8px}
+.py-inp{border:1px solid var(--line2);border-radius:8px;font-weight:800;color:var(--ch)}
+/* 선택 카드: 이모지 숨김, 테두리 1px, 선택 시 초록 */
+.rb .em,.upload-icon,.fb-icon,.ib-icon,.ai-promo-icon,.kg-lock,.rstamp{display:none!important}
+.rb{border:1px solid var(--line2);border-radius:10px;min-height:68px;padding:12px 8px;gap:2px}
+.rc input:checked+.rb{border:2px solid var(--g2);background:var(--gp);box-shadow:none;transform:none;padding:11px 7px}
+.rb .nm{font-size:14px}
+.rb .sm{font-size:12px}
+.lvbadge{width:18px;height:18px;font-size:10px;border-radius:4px}
+.lv1{background:#5a9a72}.lv2{background:#c98a2b}.lv3{background:#c2453b}.lv4{background:#33393f}
+.ci-item{border:1px solid var(--line2);border-radius:8px}
+.ci-item span{font-size:14px}
+.ton-wrap{background:#fff;border:1px solid var(--line);border-radius:10px}
+.ton-btn{border:1px solid var(--line2);border-radius:8px;font-size:13px}
+.ton-btn.active{border:2px solid var(--g2)}
+.photo-upload-area{border:1px dashed var(--line2);border-radius:10px;background:#fbfbfc}
+.beta-badge,.ai-sim-beta{background:#33393f}
+.ai-promo,.ai-sim-section{background:#1e2124}
+.ai-sim-title,.ai-promo-t,.aa-val{color:#fff}
+.aa-title{color:#bfe3cc}
+.adjust-banner{background:var(--gp);border:1px solid #cfe5d7}
+.adj-t{color:var(--g1)}.adj-s{color:var(--g2)}
+/* 버튼: 그라데이션·그림자·튀는 효과 제거 */
+.btn{border-radius:10px;font-size:16px;padding:15px 16px;box-shadow:none!important}
+.btn:hover,.btn-kakao:hover,.btn-naver:hover,.btn-tel:hover,.btn-pdf:hover,.btn-p:hover,.kakao-btn:hover{transform:none!important}
+.btn-p{background:var(--g2)}
+.btn-p:hover{background:var(--g1)}
+.btn-s{background:#fff;color:var(--ch);border:1px solid var(--line2)}
+.btn-tel{background:#1e2124}
+.btn-pdf{background:#fff;color:var(--ch);border:1px solid var(--line2)}
+/* 로딩 */
+.loading{background:rgba(23,61,43,.96);backdrop-filter:none}
+.spin{border-top-color:#fff}
+/* 결과 */
+.rtitle{font-weight:800;color:var(--ch);font-size:22px}
+.anchor-box{background:#173d2b;border-radius:12px}
+.ab-price{font-weight:800;color:#fff;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.free-banner{background:var(--gp);border:1px solid #cfe5d7}
+.fb-txt .fbt{color:var(--g1)}.fb-txt .fbs{color:var(--g2)}
+.install-banner{background:#173d2b;border:0}
+.ib-t{color:#fff}.ib-s{color:rgba(255,255,255,.82)}
+.anchor-badge span{font-size:13px}
+@media(max-width:480px){.rg.c3{grid-template-columns:1fr 1fr 1fr}.rb .nm{font-size:13px}.rb .sm{font-size:11px}}
+.breakdown{background:#fff;border:1px solid var(--line)}
+.bk-row{font-size:14px;border-bottom-color:var(--line)}
+.bk-val{font-variant-numeric:tabular-nums}
+.site-visit{background:#fff;border:1px solid var(--line)}
+.sv-t{color:var(--ch)}.sv-s{color:var(--gm)}
+.sv-btn{background:var(--g2);color:#fff}
+.nplace-save{background:#fff;border:1px solid var(--line)}
+.nplace-icon{background:#03c75a;color:#fff}
+.nplace-t{color:var(--ch)}.nplace-s{color:var(--gm)}
+.nplace-btn{background:#03c75a;color:#fff}
+.trust-sec{border-color:var(--line);background:#fff}
+.ts-stat{background:var(--gl)}
+.ts-n{font-weight:800;color:var(--ch)}
+.ts-l{color:var(--gm)}
+.rev{background:#fff;border:1px solid var(--line)}
+.rev-txt{font-size:13px;color:#464c53}
+.kakao-gate{background:#1e2124}
+.kakao-gate .kg-title{color:#fff}
+.kg-code-btn{background:#fff;color:#1e2124}
+.notice{background:#fbfbfc;border:1px solid var(--line);color:var(--gm)}
+footer strong{color:var(--ch)}
 </style>
 </head>
 <body>
@@ -847,15 +952,15 @@ footer a{color:var(--g3);text-decoration:none}
       </div>
       <div class="rev-grid">
         <div class="rev">
-          <div class="rev-top"><div><div class="rev-nm">인천 미추홀구 김○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2026.05.11</div></div>
+          <div class="rev-top"><div><div class="rev-nm">수도권 김○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2026.05.11</div></div>
           <div class="rev-txt">분할납부 된다고 해서 연락했는데 진짜로 나눠서 낼 수 있었어요. 목돈 없어서 망설였는데 작업 먼저 해주시고 부담 없이 해결했습니다. 강력 추천합니다.</div>
         </div>
         <div class="rev">
-          <div class="rev-top"><div><div class="rev-nm">서울 강서구 박○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2026.04.27</div></div>
+          <div class="rev-top"><div><div class="rev-nm">수도권 박○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2026.04.27</div></div>
           <div class="rev-txt">KBS에서 봤던 업체인데 직접 써보니 방송보다 더 전문적이었어요. 4단계 수준인데 하루 만에 다 해결해 주셨고 냄새도 완전히 잡혔습니다.</div>
         </div>
         <div class="rev">
-          <div class="rev-top"><div><div class="rev-nm">경기 수원시 최○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2026.05.19</div></div>
+          <div class="rev-top"><div><div class="rev-nm">수도권 최○○ 님</div><div class="rev-stars">★★★★★</div></div><div class="rev-dt">2026.05.19</div></div>
           <div class="rev-txt">SBS 방송 보고 믿고 맡겼어요. 10년 넘게 쌓인 현장인데 정말 깔끔하게 처리해 주셨고 행정사 자격으로 서류까지 도와주셔서 감사했습니다.</div>
         </div>
       </div>
@@ -884,7 +989,7 @@ footer a{color:var(--g3);text-decoration:none}
   대표: 김현섭 | 행정사 면허 보유 | <strong style="color:var(--g3)">365일 24시간 연중무휴</strong><br>
   <a href="https://www.evergreen24.co.kr/" target="_blank">www.evergreen24.co.kr</a> |
   <a href="tel:010-8499-0024">010-8499-0024</a><br>
-  © 2026 주식회사 리커버리프로. All rights reserved.
+  © 2026 특수청소에버그린. All rights reserved.
 </footer>
 
 <script>
@@ -1599,6 +1704,11 @@ window.addEventListener('DOMContentLoaded',()=>{
   const np=document.getElementById('nplaceBtn');
   if(np) np.href=CFG.naver_place_url;
 });
+</script>
+<script>
+(function(){var re=/[\u{1F000}-\u{1FAFF}\u{2300}-\u{23FF}\u{2600}-\u{2604}\u{2606}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]\s?/gu;
+function clean(n){if(n.nodeType===3){var t=n.nodeValue;if(t&&t.search(re)>-1){n.nodeValue=t.replace(re,'')}return}if(n.nodeType===1&&!/^(SCRIPT|STYLE|TEXTAREA|INPUT)$/.test(n.tagName)){for(var c=n.firstChild;c;c=c.nextSibling)clean(c)}}
+clean(document.body);new MutationObserver(function(ms){ms.forEach(function(m){if(m.type==='characterData')clean(m.target);else m.addedNodes.forEach(clean)})}).observe(document.body,{childList:true,subtree:true,characterData:true});})();
 </script>
 </body>
 </html>
