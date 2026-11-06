@@ -833,9 +833,9 @@ footer strong{color:var(--ch)}
 
     <!-- 앵커가 -->
     <div class="anchor-box">
-      <div class="ab-label">기본 청소 시작 금액 (VAT 별도)</div>
+      <div class="ab-label">예상 견적 합계 (VAT 별도)</div>
       <div class="ab-price" id="anchorPrice">—</div>
-      <div class="ab-sub">※ 기본 작업 기준 최저가 · 현장 확인 후 최종 확정</div>
+      <div class="ab-sub" id="anchorSub">※ 선택하신 항목 기준 · 현장 확인 후 최종 확정</div>
       <div class="ab-note" id="workDays"></div>
     </div>
 
@@ -1588,7 +1588,8 @@ function showResult(r){
     document.getElementById('adjustDesc').textContent='AI 사진 분석 결과 '+lines.join(', ')+'으로 조정하여 견적을 재계산했습니다.';
   } else { banner.style.display='none'; }
 
-  document.getElementById('anchorPrice').textContent=fmt(r.adjMin)+'~';
+  document.getElementById('anchorPrice').textContent=fmt(r.subtotal)+'~';
+  document.getElementById('anchorSub').textContent=r.wasteSite?'※ 폐기물(5톤 이상)은 현장 확인 후 별도 · 현장 확인 후 최종 확정':'※ 선택하신 항목 기준 · 현장 확인 후 최종 확정';
   document.getElementById('workDays').textContent=`예상 작업일수: ${r.workDays}일 · 현장 방문 후 최종 금액 확정`;
 
   const rows=[];
@@ -1615,7 +1616,7 @@ async function sendNotify(r){
   const svcLabel={pest:'해충제거',odor:'악취탈취',wash:'세탁서비스',clean:'입주청소',ladder:'사다리차',night:'심야비밀작업'};
   const aiLine=r.aiResult?`\n🤖 AI분석: 오염${r.aiResult.contamination_level}단계·쓰레기${trashAmtNm[r.aiResult.trash_amount]||'-'}·신뢰도${r.aiResult.confidence||'-'}${r.aiResult.special_notes&&r.aiResult.special_notes!=='없음'?`\n⚠ 특이: ${r.aiResult.special_notes}`:''}`:'';
   const photoLine=uploadedPhotoDataURL?'\n📷 사진 첨부됨':'';
-  const msg=`🔔 [에버그린 새 견적 접수]\n━━━━━━━━━━━━━━\n📅 ${new Date(r.ts).toLocaleString('ko-KR')}\n📞 ${r.phone}\n📍 ${r.addr}\n📐 ${r.py}평 | 오염 ${contNm[r.adjustedCont]}\n🗑️ 쓰레기양: ${trashLabel[String(r.adjustedTrash)]||r.adjustedTrash}\n📦 폐기물: ${r.tonVal>=5?'5톤+ 현장확인':r.tonVal===0?'없음':r.tonVal+'톤'}\n➕ 추가: ${r.svcs.length?r.svcs.map(s=>svcLabel[s]||s).join(', '):'없음'}\n📝 메모: ${r.memo||'없음'}\n💰 표시견적: ${fmt(r.adjMin)}~${aiLine}${photoLine}\n🗓️ 희망일: ${r.wdate||'미정'}\n━━━━━━━━━━━━━━`;
+  const msg=`🔔 [에버그린 새 견적 접수]\n━━━━━━━━━━━━━━\n📅 ${new Date(r.ts).toLocaleString('ko-KR')}\n📞 ${r.phone}\n📍 ${r.addr}\n📐 ${r.py}평 | 오염 ${contNm[r.adjustedCont]}\n🗑️ 쓰레기양: ${({0.8:'적음',1:'보통',1.35:'심함'})[Number(r.adjustedTrash)]||r.adjustedTrash}\n📦 폐기물: ${r.tonVal>=5?'5톤+ 현장확인':r.tonVal===0?'없음':r.tonVal+'톤'}\n➕ 추가: ${r.svcs.length?r.svcs.map(s=>svcLabel[s]||s).join(', '):'없음'}\n📝 메모: ${r.memo||'없음'}\n💰 표시견적: ${fmt(r.subtotal)}~ (VAT 별도${r.wasteSite?', 폐기물 현장확인 별도':''})\n   └ 기본청소 ${fmt(r.adjMin)} + 폐기물 ${fmt(r.wasteAmt)} + 추가 ${fmt(r.svcTotal)} / VAT 포함 약 ${fmt(r.vatTotal)}${aiLine}${photoLine}\n🗓️ 희망일: ${r.wdate||'미정'}\n━━━━━━━━━━━━━━`;
   await sendTelegram(msg);
 }
 
