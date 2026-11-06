@@ -462,6 +462,43 @@ body{background:var(--cr);color:var(--ch);-webkit-font-smoothing:antialiased}
 .kg-code-btn{background:#fff;color:#1e2124}
 .notice{background:#fbfbfc;border:1px solid var(--line);color:var(--gm)}
 footer strong{color:var(--ch)}
+
+/* AI 청소 후 모습 섹션 (2026-11) */
+.aisim{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
+.aisim-h{margin-bottom:12px}
+.aisim-t{font-size:17px;font-weight:800;color:var(--ch);letter-spacing:-.02em}
+.aisim-s{font-size:13.5px;color:var(--gm);margin-top:3px;line-height:1.55}
+.aisim .kakao-gate{background:#f4f5f6;border:1px solid var(--line);padding:16px}
+.aisim .kakao-gate .kg-title{color:var(--ch)}
+.aisim .kakao-gate .kg-sub{color:var(--gm)}
+.aisim .kakao-gate [style*="color:rgba(255,255,255"]{color:var(--gm)!important}
+.aisim .kg-code-btn{background:var(--g2);color:#fff}
+.aisim .photo-upload-area{padding:22px 16px}
+.aisim .upload-text{font-size:16px;color:var(--g2)}
+.aiprog-photo{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:4/3;background:#e6e8ea}
+.aiprog-photo img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.75) brightness(.92)}
+.aiprog-scan{position:absolute;left:0;right:0;top:0;height:38%;background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.38) 88%,rgba(191,227,204,.9));border-bottom:2px solid #bfe3cc;animation:aiscan 2.4s ease-in-out infinite}
+@keyframes aiscan{0%{transform:translateY(-100%)}100%{transform:translateY(270%)}}
+.aiprog-row{display:flex;justify-content:space-between;align-items:baseline;margin:14px 0 8px}
+.aiprog-label{font-size:15px;font-weight:700;color:var(--ch)}
+.aiprog-pct{font-size:14px;font-weight:700;color:var(--g2);font-variant-numeric:tabular-nums}
+.aiprog-track{height:8px;border-radius:99px;background:#e6e8ea;overflow:hidden}
+.aiprog-fill{height:100%;width:0;border-radius:99px;background:var(--g2);transition:width .35s ease}
+.aiprog-steps{display:flex;gap:6px;list-style:none;margin:12px 0 0;padding:0}
+.aiprog-steps li{flex:1;text-align:center;font-size:12.5px;color:#9aa3ab;padding:7px 0;border-radius:6px;background:#f4f5f6}
+.aiprog-steps li.on{color:var(--g1);background:var(--gp);font-weight:700}
+.aiprog-steps li.done{color:var(--g2)}
+.aiprog-steps li.done::before{content:"✓ "}
+.aiprog-note{font-size:12.5px;color:var(--gm);margin-top:10px;text-align:center}
+#aiDone .before-after-wrap{grid-template-columns:1fr 1fr;gap:8px}
+#aiDone .ba-img{aspect-ratio:3/4}
+#aiDone .ai-note{color:var(--gm);font-size:12px}
+.aisim-cta{margin-top:14px;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:8px}
+.aisim-cta-t{font-size:17px;font-weight:800;color:var(--ch)}
+.aisim-cta-s{font-size:13.5px;color:var(--gm);line-height:1.55;margin-bottom:4px}
+.aisim-retry{display:block;margin:12px auto 0;background:none;border:0;color:var(--gm);font-size:13px;text-decoration:underline;cursor:pointer}
+.aisim-fail{font-size:14px;color:var(--ch);background:#f4f5f6;border-radius:10px;padding:14px;line-height:1.6;text-align:center}
+@media(max-width:380px){#aiDone .before-after-wrap{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -722,57 +759,6 @@ footer strong{color:var(--ch)}
       <textarea class="inp" id="memo" rows="3" placeholder="예) 반려동물 키움, 10년 이상 방치, 화장실 막힘, 보관 필요 물품 있음 등"></textarea>
     </div>
 
-    <!-- ══ 사진 업로드 (NEW) ══ -->
-    <div class="divider"><span>AI 현장 분석 (선택)</span></div>
-    <div class="fg">
-      <label class="lbl">
-        현장 사진 업로드
-        <span class="beta-badge">BETA</span>
-        <span class="hint">AI가 오염도 분석 + 청소 후 모습을 생성합니다</span>
-      </label>
-
-      <!-- 잠금 UI: 카카오 채널 추가 후 해제 -->
-      <div id="photoLock" class="kakao-gate" style="margin-bottom:8px">
-        <div class="kg-lock">🔒</div>
-        <div class="kg-title">AI 청소 시뮬레이션 무료 체험</div>
-        <div class="kg-sub">카카오 채널을 추가하면<br>AI 청소 후 이미지 생성이 활성화됩니다</div>
-        <button type="button" class="kakao-btn" onclick="openKakaoChannel()">
-          💬 카카오 채널 추가하고 시작하기
-        </button>
-
-        <!-- 채널 추가 후 인증코드 입력 (백엔드 연동 시) -->
-        <div class="kg-step2" id="kgStep2">
-          <div style="color:rgba(255,255,255,.85);font-size:12px;margin-bottom:8px">채널에서 받은 <strong style="color:#f0d080">인증코드</strong>를 입력하세요</div>
-          <div class="kg-code-row">
-            <input type="tel" class="kg-code-inp" id="kakaoCode" placeholder="인증코드" maxlength="6" inputmode="numeric">
-            <button type="button" class="kg-code-btn" onclick="verifyKakao()">확인</button>
-          </div>
-          <div class="kg-msg" id="kakaoMsg"></div>
-        </div>
-
-        <div style="color:rgba(255,255,255,.4);font-size:10px;margin-top:10px">채널 친구에게는 분할납부·이벤트 소식을 보내드립니다</div>
-      </div>
-
-      <!-- 실제 업로드 영역 (잠금 해제 후) -->
-      <div id="photoUnlocked" style="display:none">
-        <div class="photo-upload-area" id="uploadArea" onclick="document.getElementById('photoInput').click()">
-          <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhoto(event)">
-          <div class="upload-icon">📷</div>
-          <div class="upload-text" id="uploadText">사진을 탭해서 업로드</div>
-          <div class="upload-sub">JPG · PNG · HEIC 지원 · 최대 1장</div>
-        </div>
-        <div class="photo-previews" id="photoPreviews"></div>
-      </div>
-
-      <div class="ai-promo" id="aiPromo">
-        <div class="ai-promo-icon">🤖</div>
-        <div>
-          <div class="ai-promo-t">AI가 사진을 분석합니다</div>
-          <div class="ai-promo-s">오염 단계 자동 감지 · 청소 후 예상 이미지 생성<br>입력값과 비교해 견적을 더 정확하게 조정합니다</div>
-        </div>
-      </div>
-    </div>
-
     <div class="br">
       <button class="btn btn-s" onclick="go(1)">← 이전</button>
       <button class="btn btn-p" onclick="go(3)">다음 단계 →</button>
@@ -839,34 +825,6 @@ footer strong{color:var(--ch)}
       <div class="rsub" id="rdate"></div>
     </div>
 
-    <!-- AI 시뮬레이션 (사진 있을 때만 표시) -->
-    <div class="ai-sim-section" id="aiSimSection" style="display:none">
-      <div class="ai-sim-header">
-        <span style="font-size:18px">🤖</span>
-        <span class="ai-sim-title">AI 청소 시뮬레이션</span>
-        <span class="ai-sim-beta">BETA</span>
-      </div>
-      <div class="before-after-wrap">
-        <div class="ba-item">
-          <span class="ba-label">BEFORE</span>
-          <img class="ba-img" id="beforeImg" src="" alt="청소 전">
-        </div>
-        <div class="ba-item">
-          <span class="ba-label">AFTER (AI 예상)</span>
-          <div class="ba-placeholder" id="afterPlaceholder">
-            <div class="spin-sm"></div>
-            <span>이미지 생성 중...</span>
-          </div>
-          <img class="ba-img" id="afterImg" src="" alt="청소 후 AI 예상" style="display:none">
-        </div>
-      </div>
-      <div class="ai-analysis-box" id="aiAnalysisBox" style="display:none">
-        <div class="aa-title">🔍 AI 현장 분석 결과</div>
-        <div id="aiAnalysisRows"></div>
-      </div>
-      <div class="ai-note">⚠️ AI 생성 이미지입니다. 실제 청소 결과는 현장에 따라 다를 수 있습니다.</div>
-    </div>
-
     <!-- 견적 보정 배너 (사진 분석으로 보정됐을 때) -->
     <div class="adjust-banner" id="adjustBanner" style="display:none">
       <div class="adj-t">🔄 AI 사진 분석으로 견적 보정됨</div>
@@ -908,6 +866,63 @@ footer strong{color:var(--ch)}
         <div class="sv-s">위 금액은 기본 시작가이며 실제 현장 상태에 따라 달라집니다.<br>전문가가 직접 방문하여 <strong style="color:#f0d080">정확한 견적을 무료</strong>로 산출해드립니다.</div>
       </div>
       <a href="tel:010-8499-0024" class="sv-btn">📞 바로 연결</a>
+    </div>
+
+    <!-- AI 청소 후 모습 (견적 확인 뒤) -->
+    <div class="aisim" id="aiSim">
+      <div class="aisim-h">
+        <div class="aisim-t">우리 집 사진으로 청소 후 모습 보기</div>
+        <div class="aisim-s">사진 한 장이면 AI가 청소를 마친 모습을 그려 드립니다. 무료입니다.</div>
+      </div>
+      <div id="photoLock" class="kakao-gate" style="margin-bottom:8px">
+        <div class="kg-lock">🔒</div>
+        <div class="kg-title">카카오 채널 추가하고 무료로 보기</div>
+        <div class="kg-sub">채널을 추가하면 바로 사진을 올릴 수 있습니다</div>
+        <button type="button" class="kakao-btn" onclick="openKakaoChannel()">
+          💬 카카오 채널 추가하고 시작하기
+        </button>
+
+        <!-- 채널 추가 후 인증코드 입력 (백엔드 연동 시) -->
+        <div class="kg-step2" id="kgStep2">
+          <div style="color:rgba(255,255,255,.85);font-size:12px;margin-bottom:8px">채널에서 받은 <strong style="color:#f0d080">인증코드</strong>를 입력하세요</div>
+          <div class="kg-code-row">
+            <input type="tel" class="kg-code-inp" id="kakaoCode" placeholder="인증코드" maxlength="6" inputmode="numeric">
+            <button type="button" class="kg-code-btn" onclick="verifyKakao()">확인</button>
+          </div>
+          <div class="kg-msg" id="kakaoMsg"></div>
+        </div>
+
+        <div style="color:rgba(255,255,255,.4);font-size:10px;margin-top:10px">채널 친구에게는 분할납부·이벤트 소식을 보내드립니다</div>
+      </div>
+      <div id="photoUnlocked" style="display:none">
+        <div class="photo-upload-area" id="uploadArea" onclick="document.getElementById('photoInput').click()">
+          <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhoto(event)">
+          <div class="upload-text" id="uploadText">사진 올리기</div>
+          <div class="upload-sub">방 전체가 보이게 찍은 사진 1장 · JPG·PNG·HEIC</div>
+        </div>
+      </div>
+      <div class="aiprog" id="aiProg" hidden>
+        <div class="aiprog-photo"><img id="aiProgImg" alt="올린 사진"><div class="aiprog-scan"></div></div>
+        <div class="aiprog-row"><span class="aiprog-label" id="aiProgLabel">사진을 확인하고 있어요</span><span class="aiprog-pct" id="aiProgPct">0%</span></div>
+        <div class="aiprog-track"><div class="aiprog-fill" id="aiProgFill"></div></div>
+        <ol class="aiprog-steps" id="aiProgSteps"><li class="on">사진 확인</li><li>쓰레기 지우기</li><li>마무리 보정</li></ol>
+        <div class="aiprog-note">보통 30초~1분 걸립니다. 기다리는 동안 아래 내용을 보셔도 됩니다.</div>
+      </div>
+      <div id="aiDone" hidden>
+        <div class="before-after-wrap">
+          <div class="ba-item"><span class="ba-label">지금</span><img class="ba-img" id="beforeImg" src="" alt="청소 전"></div>
+          <div class="ba-item"><span class="ba-label">청소 후 (AI 예상)</span><img class="ba-img" id="afterImg" src="" alt="청소 후 AI 예상"></div>
+        </div>
+        <div class="ai-note">AI가 만든 예상 이미지입니다. 실제 결과는 현장에 따라 다를 수 있습니다.</div>
+        <div class="aisim-cta">
+          <div class="aisim-cta-t">이 모습 그대로 만들어 드립니다</div>
+          <div class="aisim-cta-s">사진을 보내 주시면 확정 견적을 바로 알려 드립니다. 작업 후 결제, 분할납부 가능합니다.</div>
+          <a href="https://pf.kakao.com/_xiYxcxfxj/chat" target="_blank" rel="noopener" class="btn btn-kakao" onclick="track('sim_cta_kakao',{})">카카오톡으로 확정 견적 받기</a>
+          <a href="tel:010-8499-0024" class="btn btn-tel" onclick="track('sim_cta_tel',{})">010-8499-0024 바로 전화</a>
+        </div>
+        <button type="button" class="aisim-retry" onclick="retryPhoto()">다른 사진으로 다시 해보기</button>
+      </div>
+      <div id="aiFail" class="aisim-fail" hidden>이미지를 만들지 못했습니다. 잠시 후 다시 시도하시거나, 사진을 카카오톡으로 보내 주시면 직접 확인해 드립니다.<br><button type="button" class="aisim-retry" onclick="retryPhoto()">다시 시도</button></div>
     </div>
 
     <!-- 네이버 플레이스 저장 유도 (소프트) -->
@@ -1413,26 +1428,55 @@ function handlePhoto(event){
   reader.onload=async function(e){
     const compressed=await compressImage(e.target.result);
     uploadedPhotoDataURL=compressed;
-    const parts=compressed.split(',');
-    uploadedPhotoBase64=parts[1]; uploadedPhotoMime='image/jpeg';
-    const area=document.getElementById('uploadArea');
-    area.classList.add('has-photo');
-    document.getElementById('uploadText').textContent='사진 등록됨 ✓';
-    const previews=document.getElementById('photoPreviews');
-    previews.innerHTML=`<div class="photo-thumb"><img src="${compressed}" alt="업로드된 사진"><button class="del-btn" onclick="removePhoto(event)">✕</button></div>`;
-    document.getElementById('aiPromo').style.background='linear-gradient(135deg,#065f46,#064e3b)';
+    uploadedPhotoBase64=compressed.split(',')[1]; uploadedPhotoMime='image/jpeg';
+    runSimulation();
   };
   reader.readAsDataURL(file);
 }
 
-function removePhoto(e){
-  e.stopPropagation();
-  uploadedPhotoBase64=null; uploadedPhotoMime=null; uploadedPhotoDataURL=null;
-  document.getElementById('photoPreviews').innerHTML='';
-  document.getElementById('uploadText').textContent='사진을 탭해서 업로드';
-  document.getElementById('uploadArea').classList.remove('has-photo');
+let simTimer=null;
+function simProgress(start){
+  const fill=document.getElementById('aiProgFill'),pct=document.getElementById('aiProgPct'),lbl=document.getElementById('aiProgLabel'),steps=document.querySelectorAll('#aiProgSteps li');
+  const labels=['사진을 확인하고 있어요','쓰레기를 지우고 있어요','마무리 보정 중이에요'];
+  clearInterval(simTimer);
+  simTimer=setInterval(()=>{
+    const t=(Date.now()-start)/1000;
+    const v=Math.min(94,Math.round(100*(1-Math.exp(-t/22))));
+    fill.style.width=v+'%'; pct.textContent=v+'%';
+    const st=v<18?0:v<75?1:2;
+    lbl.textContent=labels[st];
+    steps.forEach((li,i)=>{li.className=i<st?'done':(i===st?'on':'')});
+  },300);
+}
+async function runSimulation(){
+  const prog=document.getElementById('aiProg');
+  document.getElementById('photoUnlocked').style.display='none';
+  document.getElementById('aiDone').hidden=true;
+  document.getElementById('aiFail').hidden=true;
+  document.getElementById('aiProgImg').src=uploadedPhotoDataURL;
+  document.getElementById('aiProgFill').style.width='0%';
+  prog.hidden=false;
+  track('sim_start',{});
+  simProgress(Date.now());
+  let after=null;
+  try{ after=await generateAfterImage(uploadedPhotoBase64, uploadedPhotoMime); }catch(e){}
+  clearInterval(simTimer);
+  if(!after){ prog.hidden=true; document.getElementById('aiFail').hidden=false; track('sim_fail',{}); return; }
+  document.getElementById('aiProgFill').style.width='100%'; document.getElementById('aiProgPct').textContent='100%';
+  addWatermark(after,function(url){
+    document.getElementById('beforeImg').src=uploadedPhotoDataURL;
+    document.getElementById('afterImg').src=url;
+    if(quoteData) quoteData.afterImageDataURL=url;
+    setTimeout(()=>{ prog.hidden=true; const d=document.getElementById('aiDone'); d.hidden=false; d.scrollIntoView({behavior:'smooth',block:'start'}); },350);
+    track('sim_done',{});
+    try{ sendTelegram(`🖼 [AI 청소 후 이미지 생성]\n📞 ${quoteData&&quoteData.phone||'-'}  📍 ${quoteData&&quoteData.addr||'-'}\n📅 ${new Date().toLocaleString('ko-KR')}`); }catch(e){}
+  });
+}
+function retryPhoto(){
+  document.getElementById('aiDone').hidden=true; document.getElementById('aiFail').hidden=true;
   document.getElementById('photoInput').value='';
-  document.getElementById('aiPromo').style.background='';
+  document.getElementById('photoUnlocked').style.display='block';
+  document.getElementById('photoInput').click();
 }
 
 async function analyzePhoto(base64, mime){
@@ -1501,21 +1545,7 @@ async function calcQuote(){
   const cname=document.getElementById('cname').value.trim();
   const memo=document.getElementById('memo').value.trim();
 
-  document.getElementById('loading').classList.add('on');
   let aiResult=null, afterImageDataURL=null, adjustedCont=cont, adjustedTrash=trash;
-
-  if(uploadedPhotoBase64){
-    setLoadingStep(1);
-    try{ aiResult=await analyzePhoto(uploadedPhotoBase64, uploadedPhotoMime);
-      if(aiResult){
-        if(aiResult.contamination_level && aiResult.contamination_level!==cont) adjustedCont=Math.min(4,Math.max(1,aiResult.contamination_level));
-        if(aiResult.trash_amount){ const tMap={low:0.8,medium:1.0,high:1.35}; adjustedTrash=tMap[aiResult.trash_amount]||trash; }
-      }
-    }catch(err){}
-    setLoadingStep(2); await new Promise(r=>setTimeout(r,400));
-    setLoadingStep(3);
-    try{ afterImageDataURL=await generateAfterImage(uploadedPhotoBase64, uploadedPhotoMime); }catch(err){}
-  } else { setLoadingStep(0); await new Promise(r=>setTimeout(r,600)); }
 
   const key=`${pyKey(py)}_${adjustedCont}`;
   const row=PRICE_TABLE[key]||[300000,500000,250000,''];
@@ -1534,8 +1564,6 @@ async function calcQuote(){
   const workDays=py<=15?1:py<=30?'1~2':py<=50?'2':py<=70?'2~3':'별도확인';
 
   quoteData={py,cont,adjustedCont,trash,adjustedTrash,elev,svcs,tonVal,baseMin,baseMax,adjMin,adjMax,factor,nightFactor,wasteAmt,wasteSite,svcTotal,svcRows,subtotal,vatTotal,workDays,phone,addr,wdate,cname,memo,aiResult,afterImageDataURL,ts:new Date().toISOString()};
-  document.getElementById('loading').classList.remove('on');
-  stopAdRotation(); const adEl2=document.getElementById('loadingAd'); if(adEl2) adEl2.style.display='none';
   showResult(quoteData); track('quote_complete',{py:py,level:adjustedCont}); sendNotify(quoteData).catch(()=>{});
 }
 
@@ -1550,34 +1578,6 @@ function showResult(r){
   curStep=4; updateUI(4);
   const now=new Date();
   document.getElementById('rdate').textContent=`${now.toLocaleDateString('ko-KR')} ${now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})} 기준 산출`;
-
-  const simSec=document.getElementById('aiSimSection');
-  if(r.uploadedPhotoDataURL||uploadedPhotoDataURL){
-    simSec.style.display='block';
-    document.getElementById('beforeImg').src=uploadedPhotoDataURL||r.uploadedPhotoDataURL;
-    if(r.afterImageDataURL){
-      document.getElementById('afterPlaceholder').style.display='none';
-      addWatermark(r.afterImageDataURL, function(watermarkedURL){ const afterImg=document.getElementById('afterImg'); afterImg.src=watermarkedURL; afterImg.style.display='block'; });
-    } else {
-      document.getElementById('afterPlaceholder').innerHTML='<span style="color:rgba(199,210,254,.5);font-size:11px;text-align:center;padding:10px">이미지 생성에 실패했습니다.<br>현장 방문 후 Before/After를<br>직접 확인해드립니다.</span>';
-    }
-    if(r.aiResult){
-      const box=document.getElementById('aiAnalysisBox'); box.style.display='block';
-      const aiCont=parseInt(r.aiResult.contamination_level)||null;
-      const aiTrash=r.aiResult.trash_amount||null;
-      const contMatch=aiCont===r.cont;
-      const trashValMap={'low':'적음','medium':'보통','high':'심함'};
-      const inputTrashVal={'0.8':'적음','1.0':'보통','1.35':'심함'}[String(r.trash)];
-      const trashMatch=trashValMap[aiTrash]===inputTrashVal;
-      const contDisplay=aiCont?contLvNm[aiCont]:'분석불가';
-      const trashDisplay=aiTrash?trashValMap[aiTrash]:'분석불가';
-      document.getElementById('aiAnalysisRows').innerHTML=`
-        <div class="aa-row"><span class="aa-lbl">AI 감지 오염 단계</span><span class="aa-val ${aiCont?(contMatch?'match':'warn'):''}">${contDisplay} ${aiCont?(contMatch?'✓ 일치':'⚠ 조정됨'):''}</span></div>
-        <div class="aa-row"><span class="aa-lbl">AI 감지 쓰레기 양</span><span class="aa-val ${aiTrash?(trashMatch?'match':'warn'):''}">${trashDisplay} ${aiTrash?(trashMatch?'✓ 일치':'⚠ 조정됨'):''}</span></div>
-        ${r.aiResult.special_notes&&r.aiResult.special_notes!=='없음'?`<div class="aa-row"><span class="aa-lbl">특이사항 감지</span><span class="aa-val warn">⚠ ${r.aiResult.special_notes}</span></div>`:''}
-        <div class="aa-row"><span class="aa-lbl">분석 신뢰도</span><span class="aa-val">${confidenceNm[r.aiResult.confidence]||'보통'}</span></div>`;
-    }
-  } else { simSec.style.display='none'; }
 
   const banner=document.getElementById('adjustBanner');
   if(r.aiResult&&(r.adjustedCont!==r.cont||r.adjustedTrash!==r.trash)){
@@ -1686,7 +1686,10 @@ function reset(){
   const btns=document.querySelectorAll('.ton-btn');
   btns.forEach(b=>b.classList.remove('active')); btns[0].classList.add('active');
   tonVal=0; document.getElementById('tonResult').textContent='포함 안 함';
-  quoteData=null; removePhoto({stopPropagation:()=>{}});
+  quoteData=null; uploadedPhotoBase64=null; uploadedPhotoMime=null; uploadedPhotoDataURL=null; clearInterval(simTimer);
+  ['aiProg','aiDone','aiFail'].forEach(id=>{const el=document.getElementById(id); if(el) el.hidden=true;});
+  const pi=document.getElementById('photoInput'); if(pi) pi.value='';
+  if(photoUnlockedFlag){ document.getElementById('photoUnlocked').style.display='block'; }
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
