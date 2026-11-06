@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /ok/
+Disallow: /rp/
+Sitemap: https://quote.evergreen24.co.kr/sitemap.xml
