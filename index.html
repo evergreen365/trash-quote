@@ -545,6 +545,15 @@ body{word-break:keep-all;overflow-wrap:break-word;line-break:strict}
 :is(.rev-txt,.aisim-fail){text-wrap:pretty}
 .sv-s strong,.seo-more a{white-space:nowrap}
 .ton-btn span,.nowrap{white-space:nowrap}
+.ton-result{gap:12px}
+.ton-result .trl{white-space:nowrap;flex-shrink:0}
+.ton-result .trv{text-align:right;min-width:0}
+.trv-amt{display:block;white-space:nowrap;font-size:16px}
+.trv-calc{display:block;white-space:nowrap;font-size:12px;font-weight:600;color:var(--gm);margin-top:2px}
+.bk-row{gap:12px}
+.bk-lbl{display:block;min-width:0}
+.bk-lbl small{display:block;margin-top:2px;line-height:1.4}
+.bk-val{white-space:nowrap;flex-shrink:0;text-align:right}
 </style>
 </head>
 <body>
@@ -1293,8 +1302,8 @@ function setTon(btn,val){
   tonVal=val;
   const el=document.getElementById('tonResult');
   if(val===0) el.textContent='포함 안 함';
-  else if(val>=5) el.innerHTML='<span style="color:var(--rd);font-weight:700">📞 현장 방문 후 별도 확인</span>';
-  else el.textContent=`${Math.round(val*400000).toLocaleString('ko-KR')}원 (${val}톤 × 40만원)`;
+  else if(val>=5) el.innerHTML='<span class="trv-amt" style="color:var(--rd)">현장 방문 후</span><span class="trv-calc">별도 확인</span>';
+  else el.innerHTML=`<span class="trv-amt">${Math.round(val*400000).toLocaleString('ko-KR')}원</span><span class="trv-calc">${val}톤 × 40만원</span>`;
 }
 
 document.getElementById('phone').addEventListener('input',function(){
